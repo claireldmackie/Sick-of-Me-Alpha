@@ -1,0 +1,167 @@
+========================================
+AI PROMPTING LOG - Session 001
+Date: February 28, 2026
+Tool: Cursor AI (Claude)
+========================================
+
+--- Entry 1 ---
+Time: ~12:00 PM
+User Prompt: Asked AI to help plan and build a point-and-click narrative-driven video game similar to Night in the Woods, starting with the first 3 scenes. Requested an "AI log" folder to track all AI interactions for school project documentation. Mentioned existing Interaction Flow folder with scene flowcharts, and existing art assets. Asked not to create any UI assets.
+
+AI Actions:
+- Explored the full workspace directory structure
+- Read all 3 interaction flow diagrams (PNG flowcharts for Scenes 1-3)
+- Viewed all existing art assets: backgrounds (bg-1, bg-2, bg-3), Main-Hero character, and all Scene 2 object sprites
+- Asked clarifying questions about technology choice, dialogue scripts, and interactive vs decorative objects
+
+Key Decisions Made:
+- Technology: Vanilla HTML5 Canvas + JavaScript (browser-based)
+- Resolution: 1920x1080 pixels
+- Scene data stored in JSON files for potential Unity migration later
+- Scene 2: Only lamp and parent are interactive; other objects are decorative
+- Coat interaction in Scene 2 was scrapped
+
+--- Entry 2 ---
+Time: ~12:30 PM
+User Prompt: Provided reference image showing Scene 2 layout with all objects placed around the armchair. Confirmed 1920x1080 resolution.
+
+AI Actions:
+- Viewed reference composition image for Scene 2
+- Noted object placement: hero near stairs, lamp on cabinet, clutter scattered around armchair on floor
+
+--- Entry 3 ---
+Time: ~12:45 PM
+User Prompt: Added Erma sketch to Scene 3 assets and Mom character to Scene 2 assets. Added Script folder with PDF scripts for all 3 scenes.
+
+AI Actions:
+- Found and viewed Erma.png (Scene 3 assets) - sketch of a neighbor character
+- Found and viewed Mom.png (Scene 2 assets) - parent slumped in sitting position
+- Read all 4 script PDFs:
+  * Scene 1 Script: Bedroom scene with Erma knocking, hero waking up
+  * Scene 2 Script: Dark living room, clicking parent, broken lamp, leaving house
+  * Scene 2 Close-up: Hero's reaction ("I didn't need to see that..")
+  * Scene 3 Script: Exterior, Erma dialogue about yard, mentions Veronica
+
+--- Entry 4 ---
+Time: ~12:55 PM
+User Prompt: Confirmed plan looks good. Go ahead with building.
+
+AI Actions:
+- Created full project directory structure (game/, with css/, js/, data/, assets/ subfolders)
+- Copied and renamed all assets into organized folders:
+  * backgrounds/: bg-1.png, bg-2.png, bg-3.png
+  * characters/: hero.png, mom.png, erma.png
+  * objects/: lamp.png, bottle-upright.png, bottle-sideways.png, pizza.png, takeout.png, drink-cup.png, book.png, socks.png, pillow.png, ashtray.png, burrito.png, dish.png, tray.png, cloud1.png, cloud2.png, makeup.png, parent-sleeping.png
+- Got image dimensions for all assets for positioning
+- Began writing game engine code (engine.js, input.js, dialogue.js, scene-manager.js, main.js)
+- Began writing scene data files (scene1.json, scene2.json, scene3.json)
+- Created index.html and style.css
+
+Files Created This Session:
+- AI log/log-001.txt (this file)
+- game/index.html
+- game/css/style.css
+- game/js/engine.js
+- game/js/input.js
+- game/js/dialogue.js
+- game/js/scene-manager.js
+- game/js/main.js
+- game/data/scene1.json
+- game/data/scene2.json
+- game/data/scene3.json
+- game/assets/ (all organized asset copies)
+
+--- Entry 5 ---
+Time: ~1:15 PM
+User Prompt: Tested the game and reported issues:
+1. Black gap on right side of Scene 1 background
+2. Window resizing squishes background horizontally
+3. Hero asset too small in Scene 1 -- wants it doubled
+4. Can't tell where to click to progress -- wants a visible arrow
+5. Arrow should only appear after curtain interaction
+6. Interactive items should glow on hover
+
+AI Actions:
+- Fixed background rendering (cover approach, then simplified to stretch-fill since aspect ratios nearly match)
+- Fixed CSS to use explicit pixel dimensions instead of percentages
+- Updated Scene 1 hero scale from 0.25 to 0.5
+- Added white arrow on right edge of Scene 1, hidden until after curtain interaction
+- Added hover glow system: faint white rounded-rect outline when hovering over the current interactive target
+- Added showObject/hideObject step types to the sequence system
+- Added onHoverChange callback to InputManager for real-time glow rendering
+
+--- Entry 6 ---
+Time: ~1:30 PM
+User Prompt: More visual fixes needed:
+1. Scene 2 hero should match Scene 1 size (was 0.25, should be 0.5)
+2. Scene 2 floor objects way too big (scale 2.0) -- make 3x smaller (0.67)
+3. Scene 2 mom should be twice as big (0.22 -> 0.44)
+
+AI Actions:
+- Updated scene2.json: hero scale 0.25 -> 0.5, y adjusted for ground level
+- Updated scene2.json: all floor object scales 2.0 -> 0.67
+- Updated scene2.json: mom scale 0.22 -> 0.44, adjusted hitbox
+
+Files Modified:
+- game/js/engine.js (background rendering, hover glow method)
+- game/js/input.js (hover change callback)
+- game/js/scene-manager.js (showObject/hideObject steps, hover glow rendering)
+- game/js/main.js (hover change wiring)
+- game/css/style.css (explicit canvas dimensions)
+- game/data/scene1.json (hero scale, arrow visibility, sequence update)
+- game/data/scene2.json (hero/mom/object scales)
+
+--- Entry 7 ---
+Time: ~2:00 PM
+User Prompt: Asked for a global config file so character sizes stay consistent across all scenes. Mom should stay one consistent size throughout (no size change on click). Hero should be the same size in every scene.
+
+AI Actions:
+- Created game/data/config.json defining global character properties:
+  * hero: scale 0.5, anchorX 0.1, anchorY 1.0
+  * parent (mom): scale 0.6, anchorX 0.5, anchorY 1.0
+  * erma: scale 0.35, anchorX 0.15, anchorY 1.0
+- Updated SceneManager with loadConfig() and applyCharacterDefaults() methods
+  * Config is loaded once at game start
+  * Scene files only specify position, visibility, interactivity, and hitbox
+  * Character image, scale, and anchor come from config automatically
+- Updated main.js to load config before first scene
+- Stripped hardcoded character styling from all 3 scene JSON files
+- Now changing a character's size in config.json changes it everywhere
+
+Files Created:
+- game/data/config.json
+
+Files Modified:
+- game/js/scene-manager.js (config loading + character defaults merging)
+- game/js/main.js (config load on start)
+- game/data/scene1.json (removed hardcoded character styling)
+- game/data/scene2.json (removed hardcoded character styling)
+- game/data/scene3.json (removed hardcoded character styling)
+
+========================================
+
+--- Entry 8 ---
+Date: 2026-02-28
+User Prompt: "Make the hero in scenes 1 and 2 bigger. In scene 3, she should be slightly smaller and further left, closer to Erma, feet on the ground. Skip button should auto-close dialogue. Skip button should only appear for 3+ line dialogue sequences. Also asked about sharing the project and cleaning context window."
+
+AI Actions:
+- Increased hero scale in config.json from 0.5 to 0.65 (affects scenes 1 and 2)
+- Scene 3 hero: added explicit scale override of 0.5, moved to x:800 y:1000 (was x:950 y:950) to be closer to Erma with feet on ground
+- Updated skip button behavior:
+  - Now immediately closes dialogue/closeup when clicked (resolves pending click promise)
+  - Only appears when there are 3+ consecutive dialogue steps remaining in the sequence
+  - Hidden by default via CSS (display: none)
+- Added countConsecutiveDialogueSteps() method to scene-manager.js to count remaining dialogue lines
+- Added showSkipButton() utility method to toggle visibility
+- Answered user question about sharing options (GitHub Pages, Netlify, zip file)
+- Discussed cleaning context window for continued development
+
+Files Modified:
+- game/data/config.json (hero scale 0.5 -> 0.65)
+- game/data/scene3.json (hero x:800, y:1000, scale:0.5)
+- game/js/scene-manager.js (skip button auto-close, conditional visibility, new helper methods)
+- game/css/style.css (skip button display:none by default)
+
+========================================
+END OF SESSION 001
+========================================

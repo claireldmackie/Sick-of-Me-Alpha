@@ -1,0 +1,42 @@
+{
+    "id": "scene3",
+    "background": "assets/backgrounds/bg-3.png",
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 800,
+            "y": 1000,
+            "scale": 0.5,
+            "flipX": true,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        },
+        {
+            "id": "erma",
+            "x": 700,
+            "y": 880,
+            "visible": true,
+            "interactive": true,
+            "zIndex": 2,
+            "hitbox": { "x": 600, "y": 540, "width": 240, "height": 360 }
+        }
+    ],
+    "objects": [],
+    "sequence": [
+        { "type": "waitForClick", "target": "erma" },
+        { "type": "dialogue", "speaker": "Erma", "text": "Well, look who finally decided to come outside." },
+        { "type": "dialogue", "speaker": "Erma", "text": "Well..? Aren't you gonna say anything?" },
+        { "type": "dialogue", "speaker": "Hero", "text": "You're not dinner..." },
+        { "type": "dialogue", "speaker": "Erma", "text": "???" },
+        { "type": "dialogue", "speaker": "Erma", "text": "You've really let this place go. You know, we all have responsibilities to uphold, even if we don't feel like it. Everyone in town is doing their best, you could put in more effort to help." },
+        { "type": "dialogue", "speaker": "Erma", "text": "Are you going to do anything about that mailbox of yours?" },
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Your yard's a bit of an eyesore." },
+        { "type": "dialogue", "speaker": "Erma", "text": "Veronica has been asking about you, maybe you should talk to her while you're up." },
+        { "type": "dialogue", "speaker": "Erma", "text": "Anyway, nice to see you up and about..." },
+        { "type": "pause", "duration": 1000 },
+        { "type": "transition" }
+    ]
+}

@@ -1,0 +1,198 @@
+{
+    "id": "scene2",
+    "background": "assets/backgrounds/bg-2.png",
+    "nextScene": "data/scene3.json",
+    "closeupImage": "assets/characters/mom.png",
+    "initialState": {
+        "dark": true,
+        "darkOpacity": 0.55,
+        "tvGlow": { "x": 300, "y": 600, "radius": 500 }
+    },
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 5
+        },
+        {
+            "id": "parent",
+            "x": 1100,
+            "y": 960,
+            "visible": true,
+            "interactive": true,
+            "zIndex": 3,
+            "hitbox": { "x": 1000, "y": 460, "width": 420, "height": 500 }
+        }
+    ],
+    "objects": [
+        {
+            "id": "lamp",
+            "image": "assets/objects/lamp.png",
+            "x": 740,
+            "y": 230,
+            "scale": 0.53,
+            "interactive": true,
+            "zIndex": 2
+        },
+        {
+            "id": "door",
+            "type": "hotspot",
+            "x": 880,
+            "y": 80,
+            "width": 200,
+            "height": 450,
+            "interactive": true
+        },
+        {
+            "id": "dish",
+            "image": "assets/objects/dish.png",
+            "x": 1100,
+            "y": 900,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "pizza",
+            "image": "assets/objects/pizza.png",
+            "x": 1160,
+            "y": 920,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "socks",
+            "image": "assets/objects/socks.png",
+            "x": 1240,
+            "y": 930,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "bottle-sideways",
+            "image": "assets/objects/bottle-sideways.png",
+            "x": 1340,
+            "y": 910,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "bottle-upright",
+            "image": "assets/objects/bottle-upright.png",
+            "x": 1500,
+            "y": 820,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "takeout",
+            "image": "assets/objects/takeout.png",
+            "x": 1560,
+            "y": 870,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "drink-cup",
+            "image": "assets/objects/drink-cup.png",
+            "x": 1620,
+            "y": 830,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "ashtray",
+            "image": "assets/objects/ashtray.png",
+            "x": 1440,
+            "y": 940,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "burrito",
+            "image": "assets/objects/burrito.png",
+            "x": 1380,
+            "y": 950,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "pillow",
+            "image": "assets/objects/pillow.png",
+            "x": 1280,
+            "y": 960,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "book",
+            "image": "assets/objects/book.png",
+            "x": 1180,
+            "y": 950,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "tray",
+            "image": "assets/objects/tray.png",
+            "x": 1120,
+            "y": 940,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "makeup",
+            "image": "assets/objects/makeup.png",
+            "x": 1480,
+            "y": 950,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 4
+        },
+        {
+            "id": "cloud1",
+            "image": "assets/objects/cloud1.png",
+            "x": 1150,
+            "y": 380,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 6
+        },
+        {
+            "id": "cloud2",
+            "image": "assets/objects/cloud2.png",
+            "x": 1220,
+            "y": 350,
+            "scale": 0.67,
+            "interactive": false,
+            "zIndex": 6
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "parent" },
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
+        { "type": "closeup", "image": "assets/characters/mom.png" },
+        { "type": "closeupDialogue", "speaker": "Parent", "text": "zzzssnorhhhhh" },
+        { "type": "closeupDialogue", "speaker": "Hero", "text": "I didn't need to see that.." },
+        { "type": "hideCloseup" },
+        { "type": "waitForClick", "target": "lamp" },
+        { "type": "dialogue", "speaker": "Hero", "text": "...hm.. it's broken" },
+        { "type": "waitForClick", "target": "door" },
+        { "type": "pause", "duration": 500 },
+        { "type": "transition" }
+    ]
+}

@@ -1,0 +1,29 @@
+{
+    "canvas": {
+        "width": 1920,
+        "height": 1080
+    },
+    "characters": {
+        "hero": {
+            "image": "assets/characters/hero.png",
+            "scale": 0.65,
+            "anchorX": 0.1,
+            "anchorY": 1.0
+        },
+        "parent": {
+            "image": "assets/characters/mom.png",
+            "scale": 0.6,
+            "anchorX": 0.5,
+            "anchorY": 1.0
+        },
+        "erma": {
+            "image": "assets/characters/erma.png",
+            "scale": 0.25,
+            "anchorX": 0.15,
+            "anchorY": 1.0
+        }
+    },
+    "transitions": {
+        "fadeDuration": 1000
+    }
+}

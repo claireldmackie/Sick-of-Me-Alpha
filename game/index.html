@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone Game</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas" width="1920" height="1080"></canvas>
+
+        <div id="dialogue-box" class="hidden">
+            <span id="dialogue-speaker"></span>
+            <p id="dialogue-text"></p>
+            <button id="skip-btn" title="Skip dialogue (dev only)">Skip &gt;&gt;</button>
+        </div>
+
+        <div id="narration-box" class="hidden">
+            <p id="narration-text"></p>
+        </div>
+
+        <div id="closeup-overlay" class="hidden">
+            <div id="closeup-content"></div>
+            <div id="closeup-dialogue-box" class="hidden">
+                <span id="closeup-speaker"></span>
+                <p id="closeup-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/engine.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/dialogue.js"></script>
+    <script src="js/scene-manager.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

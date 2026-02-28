@@ -1,0 +1,69 @@
+{
+    "id": "scene1",
+    "background": "assets/backgrounds/bg-1.png",
+    "nextScene": "data/scene2.json",
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "visible": false,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "curtain",
+            "type": "hotspot",
+            "x": 750,
+            "y": 80,
+            "width": 320,
+            "height": 450,
+            "interactive": true
+        },
+        {
+            "id": "door",
+            "type": "hotspot",
+            "x": 1680,
+            "y": 200,
+            "width": 240,
+            "height": 680,
+            "interactive": true
+        },
+        {
+            "id": "door-arrow",
+            "type": "arrow",
+            "x": 1860,
+            "y": 540,
+            "direction": "right",
+            "size": 35,
+            "color": "rgba(255, 255, 255, 0.7)",
+            "visible": false,
+            "zIndex": 10
+        }
+    ],
+    "sequence": [
+        { "type": "dialogue", "speaker": "Hero", "text": "hhmm..." },
+        { "type": "pause", "duration": 800 },
+        { "type": "dialogue", "speaker": "Unknown", "text": "*thump thump thump*" },
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
+        { "type": "dialogue", "speaker": "Unknown", "text": "HELLO?  *THUMP THUMP THUMP*" },
+        { "type": "dialogue", "speaker": "Unknown", "text": "I KNOW YOU'RE IN THERE..." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Five more minutes won't matter..." },
+        { "type": "dialogue", "speaker": "Unknown", "text": "..." },
+        { "type": "dialogue", "speaker": "Unknown", "text": "Are you ignoring me?" },
+        { "type": "dialogue", "speaker": "Unknown", "text": ".." },
+        { "type": "dialogue", "speaker": "Hero", "text": "They'll give up eventually." },
+        { "type": "dialogue", "speaker": "Unknown", "text": "COME OUT, I WANT TO TALK!  *THUMP THUMP THUMP*" },
+        { "type": "showCharacter", "target": "hero" },
+        { "type": "dialogue", "speaker": "Hero", "text": "Mom probably ordered dinner." },
+        { "type": "waitForClick", "target": "curtain" },
+        { "type": "dialogue", "speaker": "Hero", "text": "I should really clean those..." },
+        { "type": "showObject", "target": "door-arrow" },
+        { "type": "waitForClick", "target": "door" },
+        { "type": "pause", "duration": 500 },
+        { "type": "transition" }
+    ]
+}

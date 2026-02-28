@@ -1,0 +1,489 @@
+class SceneManager {
+    constructor(renderer, imageLoader, inputManager, dialogueManager) {
+        this.renderer = renderer;
+        this.imageLoader = imageLoader;
+        this.input = inputManager;
+        this.dialogue = dialogueManager;
+
+        this.currentScene = null;
+        this.sceneState = {};
+        this.sequenceIndex = 0;
+        this.waitingForTarget = null;
+        this.isProcessing = false;
+        this.onSceneEnd = null;
+        this.config = null;
+        this.skipRequested = false;
+        this._skipResolve = null;
+
+        const skipBtn = document.getElementById('skip-btn');
+        if (skipBtn) {
+            skipBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.skipRequested = true;
+                this.dialogue.hide();
+                this.dialogue.hideCloseup();
+                if (this._skipResolve) {
+                    const resolve = this._skipResolve;
+                    this._skipResolve = null;
+                    resolve();
+                }
+            });
+        }
+    }
+
+    async loadConfig(configFile) {
+        const response = await fetch(configFile);
+        this.config = await response.json();
+    }
+
+    applyCharacterDefaults(sceneData) {
+        if (!this.config || !this.config.characters || !sceneData.characters) return;
+
+        for (const char of sceneData.characters) {
+            const defaults = this.config.characters[char.id];
+            if (!defaults) continue;
+
+            if (char.image === undefined) char.image = defaults.image;
+            if (char.scale === undefined) char.scale = defaults.scale;
+            if (char.anchorX === undefined) char.anchorX = defaults.anchorX;
+            if (char.anchorY === undefined) char.anchorY = defaults.anchorY;
+        }
+    }
+
+    async loadScene(sceneFile) {
+        const response = await fetch(sceneFile);
+        const sceneData = await response.json();
+        this.applyCharacterDefaults(sceneData);
+        this.currentScene = sceneData;
+        this.sceneState = { ...(sceneData.initialState || {}) };
+        this.sequenceIndex = 0;
+        this.waitingForTarget = null;
+
+        const imageSources = [];
+        if (sceneData.background) imageSources.push(sceneData.background);
+        if (sceneData.characters) {
+            for (const char of sceneData.characters) {
+                if (char.image) imageSources.push(char.image);
+            }
+        }
+        if (sceneData.objects) {
+            for (const obj of sceneData.objects) {
+                if (obj.image) imageSources.push(obj.image);
+            }
+        }
+        if (sceneData.closeupImage) {
+            imageSources.push(sceneData.closeupImage);
+        }
+
+        await this.imageLoader.loadMultiple(imageSources);
+
+        this.updateHitTargets();
+        this.render();
+    }
+
+    async runSequence() {
+        const scene = this.currentScene;
+        if (!scene || !scene.sequence) return;
+
+        this.isProcessing = true;
+        this.skipRequested = false;
+
+        while (this.sequenceIndex < scene.sequence.length) {
+            const step = scene.sequence[this.sequenceIndex];
+
+            if (this.skipRequested) {
+                const skippable = ['dialogue', 'narration', 'pause', 'closeup', 'closeupDialogue', 'hideCloseup'];
+                if (skippable.includes(step.type)) {
+                    if (step.type === 'hideCloseup') this.dialogue.hideCloseup();
+                    this.sequenceIndex++;
+                    continue;
+                }
+                if (step.type === 'showCharacter') {
+                    this.setCharacterVisible(step.target, true);
+                    this.sequenceIndex++;
+                    continue;
+                }
+                if (step.type === 'showObject') {
+                    this.setObjectVisible(step.target, true);
+                    this.sequenceIndex++;
+                    continue;
+                }
+                if (step.type === 'setState') {
+                    Object.assign(this.sceneState, step.state);
+                    this.sequenceIndex++;
+                    continue;
+                }
+                this.skipRequested = false;
+                this.showSkipButton(false);
+                this.dialogue.hide();
+                this.dialogue.hideCloseup();
+                this.updateHitTargets();
+                this.render();
+            }
+
+            await this.executeStep(step);
+            this.sequenceIndex++;
+        }
+
+        this.isProcessing = false;
+
+        if (this.onSceneEnd) {
+            this.onSceneEnd(scene.nextScene);
+        }
+    }
+
+    updateHitTargets() {
+        if (!this.currentScene) return;
+
+        const targets = [];
+
+        if (this.currentScene.characters) {
+            for (const char of this.currentScene.characters) {
+                if (!char.interactive || char.visible === false) continue;
+                if (char.hitbox) {
+                    targets.push({ id: char.id, ...char.hitbox });
+                } else if (char.x !== undefined) {
+                    const img = this.imageLoader.get(char.image);
+                    const scale = char.scale || 1;
+                    const w = img ? img.naturalWidth * scale : 100;
+                    const h = img ? img.naturalHeight * scale : 100;
+                    const anchorX = char.anchorX ?? 0.5;
+                    const anchorY = char.anchorY ?? 1.0;
+                    targets.push({
+                        id: char.id,
+                        x: char.x - w * anchorX,
+                        y: char.y - h * anchorY,
+                        width: w,
+                        height: h
+                    });
+                }
+            }
+        }
+
+        if (this.currentScene.objects) {
+            for (const obj of this.currentScene.objects) {
+                if (!obj.interactive) continue;
+                if (obj.type === 'hotspot') {
+                    targets.push({
+                        id: obj.id,
+                        x: obj.x,
+                        y: obj.y,
+                        width: obj.width,
+                        height: obj.height
+                    });
+                } else if (obj.image) {
+                    const img = this.imageLoader.get(obj.image);
+                    const scale = obj.scale || 1;
+                    const w = img ? img.naturalWidth * scale : 50;
+                    const h = img ? img.naturalHeight * scale : 50;
+                    targets.push({
+                        id: obj.id,
+                        x: obj.x,
+                        y: obj.y,
+                        width: w,
+                        height: h
+                    });
+                }
+            }
+        }
+
+        this.input.setHitTargets(targets);
+    }
+
+    render() {
+        const scene = this.currentScene;
+        if (!scene) return;
+
+        this.renderer.clear();
+
+        const bgImg = this.imageLoader.get(scene.background);
+        if (bgImg) {
+            this.renderer.drawBackground(bgImg);
+        }
+
+        if (this.sceneState.dark) {
+            this.renderer.drawDarkOverlay(this.sceneState.darkOpacity || 0.6);
+            if (this.sceneState.tvGlow) {
+                this.renderer.drawTVGlow(
+                    this.sceneState.tvGlow.x,
+                    this.sceneState.tvGlow.y,
+                    this.sceneState.tvGlow.radius
+                );
+            }
+        }
+
+        const drawables = [];
+
+        if (scene.objects) {
+            for (const obj of scene.objects) {
+                if (obj.visible === false) continue;
+                if (obj.type === 'hotspot') continue;
+                if (obj.type === 'arrow') {
+                    drawables.push({
+                        type: 'arrow',
+                        data: obj,
+                        y: obj.y,
+                        zIndex: obj.zIndex || 10
+                    });
+                    continue;
+                }
+                drawables.push({
+                    type: 'object',
+                    data: obj,
+                    y: obj.y + (obj.height || 0),
+                    zIndex: obj.zIndex || 0
+                });
+            }
+        }
+
+        if (scene.characters) {
+            for (const char of scene.characters) {
+                if (char.visible === false) continue;
+                drawables.push({
+                    type: 'character',
+                    data: char,
+                    y: char.y,
+                    zIndex: char.zIndex || 1
+                });
+            }
+        }
+
+        drawables.sort((a, b) => a.zIndex - b.zIndex || a.y - b.y);
+
+        for (const d of drawables) {
+            const item = d.data;
+            if (d.type === 'arrow') {
+                this.renderer.drawArrow(
+                    item.x, item.y,
+                    item.direction || 'right',
+                    item.size || 30,
+                    item.color
+                );
+                continue;
+            }
+            const img = this.imageLoader.get(item.image);
+            if (!img) continue;
+            const scale = item.scale || 1;
+            const anchorX = item.anchorX ?? (d.type === 'character' ? 0.5 : 0);
+            const anchorY = item.anchorY ?? (d.type === 'character' ? 1.0 : 0);
+            const flipX = item.flipX || false;
+            this.renderer.drawSprite(img, item.x, item.y, scale, anchorX, anchorY, flipX);
+        }
+
+        this.drawHoverGlow();
+    }
+
+    drawHoverGlow() {
+        if (!this.waitingForTarget || !this.input.hoveredTarget) return;
+        if (this.input.hoveredTarget !== this.waitingForTarget) return;
+
+        const targets = this.input._hitTargets || [];
+        const target = targets.find(t => t.id === this.waitingForTarget);
+        if (!target) return;
+
+        this.renderer.drawHoverGlow(target.x, target.y, target.width, target.height);
+    }
+
+    async executeStep(step) {
+        switch (step.type) {
+            case 'dialogue': {
+                const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
+                this.showSkipButton(remaining >= 3);
+                this.dialogue.show(step.speaker, step.text);
+                await this.waitForAnyClick();
+                this.dialogue.hide();
+                this.showSkipButton(false);
+                break;
+            }
+
+            case 'narration': {
+                const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
+                this.showSkipButton(remaining >= 3);
+                this.dialogue.showNarrationText(step.text);
+                await this.waitForAnyClick();
+                this.dialogue.hide();
+                this.showSkipButton(false);
+                break;
+            }
+
+            case 'waitForClick':
+                this.waitingForTarget = step.target;
+                this.updateHitTargets();
+                this.render();
+                await this.waitForTargetClick(step.target);
+                this.waitingForTarget = null;
+                break;
+
+            case 'showCharacter':
+                this.setCharacterVisible(step.target, true);
+                this.updateHitTargets();
+                this.render();
+                break;
+
+            case 'hideCharacter':
+                this.setCharacterVisible(step.target, false);
+                this.updateHitTargets();
+                this.render();
+                break;
+
+            case 'showObject':
+                this.setObjectVisible(step.target, true);
+                this.render();
+                break;
+
+            case 'hideObject':
+                this.setObjectVisible(step.target, false);
+                this.render();
+                break;
+
+            case 'setState':
+                Object.assign(this.sceneState, step.state);
+                this.render();
+                break;
+
+            case 'closeup':
+                this.dialogue.showCloseup(step.image || null);
+                break;
+
+            case 'closeupDialogue': {
+                const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
+                this.showSkipButton(remaining >= 3);
+                this.dialogue.showCloseupText(step.speaker, step.text);
+                await this.waitForAnyClick();
+                this.dialogue.hide();
+                this.showSkipButton(false);
+                break;
+            }
+
+            case 'hideCloseup':
+                this.dialogue.hideCloseup();
+                break;
+
+            case 'pause':
+                await this.sleep(step.duration || 1000);
+                break;
+
+            case 'transition':
+                await this.fadeOut();
+                break;
+
+            default:
+                console.warn('Unknown step type:', step.type);
+        }
+    }
+
+    setCharacterVisible(id, visible) {
+        if (!this.currentScene || !this.currentScene.characters) return;
+        const char = this.currentScene.characters.find(c => c.id === id);
+        if (char) char.visible = visible;
+    }
+
+    setObjectVisible(id, visible) {
+        if (!this.currentScene || !this.currentScene.objects) return;
+        const obj = this.currentScene.objects.find(o => o.id === id);
+        if (obj) obj.visible = visible;
+    }
+
+    countConsecutiveDialogueSteps(fromIndex) {
+        const seq = this.currentScene.sequence;
+        let count = 0;
+        const dialogueTypes = ['dialogue', 'narration', 'closeupDialogue'];
+        for (let i = fromIndex; i < seq.length; i++) {
+            if (dialogueTypes.includes(seq[i].type)) {
+                count++;
+            } else if (seq[i].type === 'closeup' || seq[i].type === 'hideCloseup' || seq[i].type === 'showCharacter' || seq[i].type === 'showObject' || seq[i].type === 'pause') {
+                continue;
+            } else {
+                break;
+            }
+        }
+        return count;
+    }
+
+    showSkipButton(visible) {
+        const btn = document.getElementById('skip-btn');
+        if (btn) btn.style.display = visible ? 'block' : 'none';
+    }
+
+    waitForAnyClick() {
+        return new Promise((resolve) => {
+            this._skipResolve = resolve;
+            const handler = () => {
+                this._skipResolve = null;
+                this.input.removeClickCallback(handler);
+                resolve();
+            };
+            this.input.onClick(handler);
+        });
+    }
+
+    waitForTargetClick(targetId) {
+        return new Promise((resolve) => {
+            const handler = (coords) => {
+                const targets = (this.input._hitTargets || []).filter(t => t.id === targetId);
+                const hit = this.input.checkHit(coords, targets);
+                if (hit) {
+                    this.input.removeClickCallback(handler);
+                    resolve();
+                }
+            };
+            this.input.onClick(handler);
+        });
+    }
+
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async fadeOut() {
+        const ctx = this.renderer.ctx;
+        const w = this.renderer.width;
+        const h = this.renderer.height;
+        const duration = 1000;
+        const startTime = performance.now();
+
+        return new Promise((resolve) => {
+            const animate = (now) => {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                this.render();
+                ctx.fillStyle = `rgba(0, 0, 0, ${progress})`;
+                ctx.fillRect(0, 0, w, h);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    resolve();
+                }
+            };
+            requestAnimationFrame(animate);
+        });
+    }
+
+    async fadeIn() {
+        const ctx = this.renderer.ctx;
+        const w = this.renderer.width;
+        const h = this.renderer.height;
+        const duration = 1000;
+        const startTime = performance.now();
+
+        return new Promise((resolve) => {
+            const animate = (now) => {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                this.render();
+                ctx.fillStyle = `rgba(0, 0, 0, ${1 - progress})`;
+                ctx.fillRect(0, 0, w, h);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    resolve();
+                }
+            };
+            requestAnimationFrame(animate);
+        });
+    }
+}

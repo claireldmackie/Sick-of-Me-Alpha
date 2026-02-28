@@ -1,0 +1,10 @@
+.DS_Store
+.playwright-cli/
+*.png
+*.yaml
+!game/assets/**/*.png
+!Interaction flow/*.png
+!Reusable assets/*.png
+!Scene 1 assets/*.png
+!Scene 2 assets/*.png
+!Scene 3 assets/*.png
