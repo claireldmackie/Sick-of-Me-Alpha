@@ -23,7 +23,7 @@ class Game {
         ];
         this.sceneNames = [
             'Bedroom', 'Stairwell', 'Living Room', 'House Exterior',
-            'House Lane', "Neighbour's Lane", 'Dirt Path',
+            'House Lane', 'Dirt Path', "Neighbour's Lane",
             'Cows', 'Dirt Road 2', 'Bus Stop',
             'Town Entrance', 'Town'
         ];
@@ -130,7 +130,7 @@ class Game {
     }
 
     _startGameLoop() {
-        const speed = 18;
+        const speed = 14;
         const tick = () => {
             requestAnimationFrame(tick);
             if (!this.sceneManager.currentScene) return;

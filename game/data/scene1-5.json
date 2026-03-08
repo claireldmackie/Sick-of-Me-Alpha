@@ -4,32 +4,23 @@
     "nextScene": "data/scene2.json",
     "fadeDuration": 100,
     "initialState": {},
-    "characters": [
-        {
-            "id": "hero",
-            "x": 250,
-            "y": 960,
-            "visible": true,
-            "interactive": false,
-            "zIndex": 2
-        }
-    ],
+    "characters": [],
     "objects": [
         {
-            "id": "next-arrow",
+            "id": "stairs-arrow",
             "type": "arrow",
-            "x": 1905,
-            "y": 540,
-            "direction": "right",
-            "size": 15,
-            "color": "rgba(255, 255, 255, 0.4)",
+            "x": 960,
+            "y": 600,
+            "direction": "up",
+            "size": 35,
+            "color": "rgba(255, 255, 255, 0.7)",
             "visible": true,
-            "interactive": false,
+            "interactive": true,
             "zIndex": 10
         }
     ],
     "sequence": [
-        { "type": "waitForClick", "target": "next-arrow" },
+        { "type": "waitForClick", "target": "stairs-arrow" },
         { "type": "transition" }
     ]
 }

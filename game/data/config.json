@@ -6,8 +6,8 @@
     "characters": {
         "hero": {
             "image": "assets/characters/hero-v2.png",
-            "scale": 0.7,
-            "anchorX": 0.515,
+            "scale": 0.65,
+            "anchorX": 0.5,
             "anchorY": 1.0
         },
         "parent": {

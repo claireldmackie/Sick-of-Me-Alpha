@@ -162,7 +162,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(80, 95, 120, 0.85);
+    background: rgba(0, 0, 0, 0.95);
 }
 
 .modal-panel {

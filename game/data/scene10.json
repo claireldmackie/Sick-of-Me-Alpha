@@ -4,14 +4,23 @@
     "nextScene": "data/scene11.json",
     "fadeDuration": 100,
     "initialState": {},
-    "characters": [],
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 6
+        }
+    ],
     "objects": [
         {
             "id": "cat-sitting",
             "image": "assets/objects/cat-sitting.png",
             "x": 1020,
             "y": 450,
-            "scale": 1.0,
+            "scale": 0.7,
             "visible": true,
             "interactive": true,
             "zIndex": 5
@@ -19,9 +28,10 @@
         {
             "id": "cat-legup",
             "image": "assets/objects/cat-legup.png",
-            "x": 1020,
+            "x": 1280,
             "y": 450,
             "scale": 1.0,
+            "flipX": true,
             "visible": false,
             "interactive": false,
             "zIndex": 5
@@ -31,7 +41,7 @@
             "image": "assets/objects/cat-cleaning.png",
             "x": 1020,
             "y": 450,
-            "scale": 1.0,
+            "scale": 0.82,
             "visible": false,
             "interactive": false,
             "zIndex": 5

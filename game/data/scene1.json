@@ -8,7 +8,7 @@
         {
             "id": "hero",
             "x": 250,
-            "y": 960,
+            "y": 1020,
             "visible": false,
             "interactive": false,
             "zIndex": 2
@@ -36,13 +36,13 @@
         {
             "id": "door-arrow",
             "type": "arrow",
-            "x": 1860,
+            "x": 1790,
             "y": 540,
             "direction": "right",
-            "size": 35,
+            "size": 30,
             "color": "rgba(255, 255, 255, 0.7)",
             "visible": false,
-            "interactive": true,
+            "interactive": false,
             "zIndex": 10
         }
     ],
@@ -64,8 +64,7 @@
         { "type": "waitForClick", "target": "curtain" },
         { "type": "dialogue", "speaker": "Hero", "text": "I should really clean those..." },
         { "type": "showObject", "target": "door-arrow" },
-        { "type": "waitForClick", "target": "door" },
-        { "type": "pause", "duration": 500 },
+        { "type": "waitForClick", "target": "door-arrow" },
         { "type": "transition" }
     ]
 }

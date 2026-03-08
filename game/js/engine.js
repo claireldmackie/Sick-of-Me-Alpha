@@ -72,7 +72,6 @@ class Renderer {
         const drawX = x - w * anchorX | 0;
         const drawY = y - h * anchorY | 0;
 
-        this.ctx.imageSmoothingEnabled = false;
         if (flipX) {
             this.ctx.save();
             this.ctx.translate(x + w * anchorX | 0, drawY);
@@ -82,7 +81,6 @@ class Renderer {
         } else {
             this.ctx.drawImage(img, drawX, drawY, w, h);
         }
-        this.ctx.imageSmoothingEnabled = true;
     }
 
     drawDarkOverlay(opacity = 0.6) {
@@ -122,30 +120,47 @@ class Renderer {
         const ctx = this.ctx;
         ctx.save();
         ctx.translate(x, y);
-        ctx.fillStyle = color || 'rgba(255, 255, 255, 0.7)';
-        ctx.beginPath();
 
         const s = size || 30;
+        const r = s * 0.35;
+
+        ctx.beginPath();
         if (direction === 'right') {
-            ctx.moveTo(0, -s);
-            ctx.lineTo(s * 1.2, 0);
-            ctx.lineTo(0, s);
+            this._roundedArrowPath(ctx, [[0, -s], [s * 1.2, 0], [0, s]], r);
         } else if (direction === 'left') {
-            ctx.moveTo(0, -s);
-            ctx.lineTo(-s * 1.2, 0);
-            ctx.lineTo(0, s);
+            this._roundedArrowPath(ctx, [[0, -s], [-s * 1.2, 0], [0, s]], r);
         } else if (direction === 'down') {
-            ctx.moveTo(-s, 0);
-            ctx.lineTo(0, s * 1.2);
-            ctx.lineTo(s, 0);
+            this._roundedArrowPath(ctx, [[-s, 0], [0, s * 1.2], [s, 0]], r);
         } else if (direction === 'up') {
-            ctx.moveTo(-s, 0);
-            ctx.lineTo(0, -s * 1.2);
-            ctx.lineTo(s, 0);
+            this._roundedArrowPath(ctx, [[-s, 0], [0, -s * 1.2], [s, 0]], r);
         }
 
-        ctx.closePath();
-        ctx.fill();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+        ctx.strokeStyle = color || 'rgba(255, 255, 255, 0.7)';
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([6, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
         ctx.restore();
+    }
+
+    _roundedArrowPath(ctx, pts, r) {
+        const len = pts.length;
+        ctx.beginPath();
+        for (let i = 0; i < len; i++) {
+            const prev = pts[(i - 1 + len) % len];
+            const curr = pts[i];
+            const next = pts[(i + 1) % len];
+            const dx1 = curr[0] - prev[0], dy1 = curr[1] - prev[1];
+            const dx2 = next[0] - curr[0], dy2 = next[1] - curr[1];
+            const l1 = Math.hypot(dx1, dy1), l2 = Math.hypot(dx2, dy2);
+            const t = Math.min(r, l1 / 2, l2 / 2);
+            const x1 = curr[0] - (dx1 / l1) * t, y1 = curr[1] - (dy1 / l1) * t;
+            const x2 = curr[0] + (dx2 / l2) * t, y2 = curr[1] + (dy2 / l2) * t;
+            if (i === 0) ctx.moveTo(x1, y1);
+            else ctx.lineTo(x1, y1);
+            ctx.quadraticCurveTo(curr[0], curr[1], x2, y2);
+        }
+        ctx.closePath();
     }
 }

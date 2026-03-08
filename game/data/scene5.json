@@ -8,7 +8,7 @@
         {
             "id": "hero",
             "x": 250,
-            "y": 960,
+            "y": 1020,
             "visible": true,
             "interactive": false,
             "zIndex": 2
