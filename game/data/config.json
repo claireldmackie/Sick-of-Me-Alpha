@@ -5,9 +5,9 @@
     },
     "characters": {
         "hero": {
-            "image": "assets/characters/hero.png",
-            "scale": 0.65,
-            "anchorX": 0.1,
+            "image": "assets/characters/hero-v2.png",
+            "scale": 0.7,
+            "anchorX": 0.515,
             "anchorY": 1.0
         },
         "parent": {
@@ -20,6 +20,12 @@
             "image": "assets/characters/erma.png",
             "scale": 0.25,
             "anchorX": 0.15,
+            "anchorY": 1.0
+        },
+        "jeff": {
+            "image": "assets/characters/jeff.png",
+            "scale": 0.5,
+            "anchorX": 0.5,
             "anchorY": 1.0
         }
     },

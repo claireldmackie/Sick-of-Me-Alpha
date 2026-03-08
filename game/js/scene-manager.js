@@ -1,15 +1,18 @@
 class SceneManager {
-    constructor(renderer, imageLoader, inputManager, dialogueManager) {
+    constructor(renderer, imageLoader, inputManager, dialogueManager, letterManager) {
         this.renderer = renderer;
         this.imageLoader = imageLoader;
         this.input = inputManager;
         this.dialogue = dialogueManager;
+        this.letterManager = letterManager || null;
+        this.uiManager = null;
 
         this.currentScene = null;
         this.sceneState = {};
         this.sequenceIndex = 0;
         this.waitingForTarget = null;
         this.isProcessing = false;
+        this.stopped = false;
         this.onSceneEnd = null;
         this.config = null;
         this.skipRequested = false;
@@ -32,7 +35,7 @@ class SceneManager {
     }
 
     async loadConfig(configFile) {
-        const response = await fetch(configFile);
+        const response = await fetch(configFile + '?v=' + Date.now());
         this.config = await response.json();
     }
 
@@ -51,7 +54,7 @@ class SceneManager {
     }
 
     async loadScene(sceneFile) {
-        const response = await fetch(sceneFile);
+        const response = await fetch(sceneFile + '?v=' + Date.now());
         const sceneData = await response.json();
         this.applyCharacterDefaults(sceneData);
         this.currentScene = sceneData;
@@ -81,14 +84,55 @@ class SceneManager {
         this.render();
     }
 
+    getState() {
+        return {
+            sequenceIndex: this.sequenceIndex
+        };
+    }
+
+    fastForwardTo(targetIndex) {
+        if (!this.currentScene || !this.currentScene.sequence) return;
+
+        const seq = this.currentScene.sequence;
+        const stateTypes = ['showCharacter', 'hideCharacter', 'showObject', 'hideObject', 'setState', 'collectLetter'];
+
+        for (let i = 0; i < targetIndex && i < seq.length; i++) {
+            const step = seq[i];
+            if (!stateTypes.includes(step.type)) continue;
+
+            if (step.type === 'showCharacter') this.setCharacterVisible(step.target, true);
+            else if (step.type === 'hideCharacter') this.setCharacterVisible(step.target, false);
+            else if (step.type === 'showObject') this.setObjectVisible(step.target, true);
+            else if (step.type === 'hideObject') this.setObjectVisible(step.target, false);
+            else if (step.type === 'setState') Object.assign(this.sceneState, step.state);
+            else if (step.type === 'collectLetter' && this.letterManager) {
+                this.letterManager.collect(step.letterId);
+            }
+        }
+
+        this.sequenceIndex = targetIndex;
+        this.updateHitTargets();
+        this.render();
+    }
+
+    stop() {
+        this.stopped = true;
+        this.isProcessing = false;
+        this.input.clickCallbacks = [];
+        this.dialogue.hide();
+        this.dialogue.hideCloseup();
+    }
+
     async runSequence() {
         const scene = this.currentScene;
         if (!scene || !scene.sequence) return;
 
         this.isProcessing = true;
+        this.stopped = false;
         this.skipRequested = false;
 
         while (this.sequenceIndex < scene.sequence.length) {
+            if (this.stopped) return;
             const step = scene.sequence[this.sequenceIndex];
 
             if (this.skipRequested) {
@@ -110,6 +154,11 @@ class SceneManager {
                 }
                 if (step.type === 'setState') {
                     Object.assign(this.sceneState, step.state);
+                    this.sequenceIndex++;
+                    continue;
+                }
+                if (step.type === 'collectLetter') {
+                    if (this.letterManager) this.letterManager.collect(step.letterId);
                     this.sequenceIndex++;
                     continue;
                 }
@@ -162,7 +211,7 @@ class SceneManager {
 
         if (this.currentScene.objects) {
             for (const obj of this.currentScene.objects) {
-                if (!obj.interactive) continue;
+                if (!obj.interactive || obj.visible === false) continue;
                 if (obj.type === 'hotspot') {
                     targets.push({
                         id: obj.id,
@@ -171,18 +220,31 @@ class SceneManager {
                         width: obj.width,
                         height: obj.height
                     });
-                } else if (obj.image) {
-                    const img = this.imageLoader.get(obj.image);
-                    const scale = obj.scale || 1;
-                    const w = img ? img.naturalWidth * scale : 50;
-                    const h = img ? img.naturalHeight * scale : 50;
+                } else if (obj.type === 'arrow') {
+                    const s = obj.size || 30;
                     targets.push({
                         id: obj.id,
-                        x: obj.x,
-                        y: obj.y,
-                        width: w,
-                        height: h
+                        x: obj.x - s * 0.5,
+                        y: obj.y - s,
+                        width: s * 1.7,
+                        height: s * 2
                     });
+                } else if (obj.image) {
+                    if (obj.hitbox) {
+                        targets.push({ id: obj.id, ...obj.hitbox });
+                    } else {
+                        const img = this.imageLoader.get(obj.image);
+                        const scale = obj.scale || 1;
+                        const w = img ? img.naturalWidth * scale : 50;
+                        const h = img ? img.naturalHeight * scale : 50;
+                        targets.push({
+                            id: obj.id,
+                            x: obj.x,
+                            y: obj.y,
+                            width: w,
+                            height: h
+                        });
+                    }
                 }
             }
         }
@@ -275,10 +337,11 @@ class SceneManager {
 
     drawHoverGlow() {
         if (!this.waitingForTarget || !this.input.hoveredTarget) return;
-        if (this.input.hoveredTarget !== this.waitingForTarget) return;
+        const waiting = Array.isArray(this.waitingForTarget) ? this.waitingForTarget : [this.waitingForTarget];
+        if (!waiting.includes(this.input.hoveredTarget)) return;
 
         const targets = this.input._hitTargets || [];
-        const target = targets.find(t => t.id === this.waitingForTarget);
+        const target = targets.find(t => t.id === this.input.hoveredTarget);
         if (!target) return;
 
         this.renderer.drawHoverGlow(target.x, target.y, target.width, target.height);
@@ -328,11 +391,13 @@ class SceneManager {
 
             case 'showObject':
                 this.setObjectVisible(step.target, true);
+                this.updateHitTargets();
                 this.render();
                 break;
 
             case 'hideObject':
                 this.setObjectVisible(step.target, false);
+                this.updateHitTargets();
                 this.render();
                 break;
 
@@ -361,6 +426,15 @@ class SceneManager {
 
             case 'pause':
                 await this.sleep(step.duration || 1000);
+                break;
+
+            case 'collectLetter':
+                if (this.letterManager) {
+                    this.letterManager.collect(step.letterId);
+                    if (this.uiManager) {
+                        await this.uiManager.showSingleLetter(step.letterId);
+                    }
+                }
                 break;
 
             case 'transition':
@@ -418,17 +492,30 @@ class SceneManager {
     }
 
     waitForTargetClick(targetId) {
+        const ids = Array.isArray(targetId) ? targetId : [targetId];
         return new Promise((resolve) => {
+            this._resolveWait = () => {
+                this.input.removeClickCallback(handler);
+                resolve();
+            };
             const handler = (coords) => {
-                const targets = (this.input._hitTargets || []).filter(t => t.id === targetId);
+                const targets = (this.input._hitTargets || []).filter(t => ids.includes(t.id));
                 const hit = this.input.checkHit(coords, targets);
                 if (hit) {
+                    this._resolveWait = null;
                     this.input.removeClickCallback(handler);
-                    resolve();
+                    resolve(hit.id);
                 }
             };
             this.input.onClick(handler);
         });
+    }
+
+    forceResolveWait() {
+        if (this._resolveWait) {
+            this._resolveWait();
+            this._resolveWait = null;
+        }
     }
 
     sleep(ms) {
@@ -439,7 +526,7 @@ class SceneManager {
         const ctx = this.renderer.ctx;
         const w = this.renderer.width;
         const h = this.renderer.height;
-        const duration = 1000;
+        const duration = (this.currentScene && this.currentScene.fadeDuration) || 1000;
         const startTime = performance.now();
 
         return new Promise((resolve) => {
@@ -465,7 +552,7 @@ class SceneManager {
         const ctx = this.renderer.ctx;
         const w = this.renderer.width;
         const h = this.renderer.height;
-        const duration = 1000;
+        const duration = (this.currentScene && this.currentScene.fadeDuration) || 1000;
         const startTime = performance.now();
 
         return new Promise((resolve) => {

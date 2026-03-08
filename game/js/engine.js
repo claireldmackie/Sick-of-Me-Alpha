@@ -23,7 +23,7 @@ class ImageLoader {
                 this.loading.delete(src);
                 reject(new Error(`Failed to load image: ${src}`));
             };
-            img.src = src;
+            img.src = src + '?v=' + Date.now();
         });
 
         this.loading.set(src, promise);
@@ -69,18 +69,20 @@ class Renderer {
         if (!img) return;
         const w = img.naturalWidth * scale;
         const h = img.naturalHeight * scale;
-        const drawX = x - w * anchorX;
-        const drawY = y - h * anchorY;
+        const drawX = x - w * anchorX | 0;
+        const drawY = y - h * anchorY | 0;
 
+        this.ctx.imageSmoothingEnabled = false;
         if (flipX) {
             this.ctx.save();
-            this.ctx.translate(drawX + w, drawY);
+            this.ctx.translate(x + w * anchorX | 0, drawY);
             this.ctx.scale(-1, 1);
             this.ctx.drawImage(img, 0, 0, w, h);
             this.ctx.restore();
         } else {
             this.ctx.drawImage(img, drawX, drawY, w, h);
         }
+        this.ctx.imageSmoothingEnabled = true;
     }
 
     drawDarkOverlay(opacity = 0.6) {

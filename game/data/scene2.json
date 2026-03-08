@@ -12,7 +12,7 @@
         {
             "id": "hero",
             "x": 250,
-            "y": 1020,
+            "y": 740,
             "visible": true,
             "interactive": false,
             "zIndex": 5
@@ -40,7 +40,7 @@
         {
             "id": "door",
             "type": "hotspot",
-            "x": 880,
+            "x": 1100,
             "y": 80,
             "width": 200,
             "height": 450,

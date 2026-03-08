@@ -4,9 +4,12 @@
     box-sizing: border-box;
 }
 
-body {
+html, body {
     background: #000;
     overflow: hidden;
+    width: 100%;
+    height: 100%;
+    font-family: 'Reenie Beanie', cursive;
 }
 
 #game-container {
@@ -14,10 +17,6 @@ body {
     width: 1920px;
     height: 1080px;
     transform-origin: top left;
-}
-
-body {
-    overflow: hidden;
 }
 
 #game-canvas {
@@ -34,6 +33,405 @@ body {
 .hidden {
     display: none !important;
 }
+
+/* ── Screen Overlays ── */
+
+.screen-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    z-index: 50;
+}
+
+/* ── Homepage ── */
+
+#homepage-screen {
+    background: url('../assets/ui/homepage-bg.png') center/cover no-repeat;
+}
+
+.homepage-menu {
+    position: absolute;
+    left: 50%;
+    top: 620px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+#btn-continue.disabled,
+.ui-btn.disabled,
+.text-btn.disabled {
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+/* ── Buttons ── */
+
+.ui-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 425px;
+    height: 60px;
+    background: url('../assets/ui/button-normal.png') center/contain no-repeat;
+    border: none;
+    cursor: pointer;
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 36px;
+    color: #e0e0e0;
+    letter-spacing: 1px;
+    transition: transform 0.1s;
+}
+
+.ui-btn:hover {
+    background-image: url('../assets/ui/button-hover.png');
+    transform: scale(1.03);
+}
+
+.ui-btn span {
+    pointer-events: none;
+}
+
+.ui-btn .btn-text-img {
+    height: 36px;
+    pointer-events: none;
+}
+
+.ui-btn-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 425px;
+    height: 60px;
+    background: url('../assets/ui/button-normal.png') center/contain no-repeat;
+    border: none;
+    cursor: pointer;
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 36px;
+    color: #e0e0e0;
+    letter-spacing: 1px;
+    transition: transform 0.1s;
+}
+
+.ui-btn-text:hover {
+    background-image: url('../assets/ui/button-hover.png');
+    transform: scale(1.03);
+}
+
+/* ── HUD ── */
+
+#hud {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 40;
+}
+
+.hud-icon {
+    width: 48px;
+    height: 48px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(200, 200, 200, 0.5);
+    transition: color 0.2s;
+    padding: 4px;
+}
+
+.hud-icon:hover {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.hud-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* ── Modal Panels ── */
+
+#pause-overlay,
+#save-panel,
+#confirm-dialog {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(80, 95, 120, 0.85);
+}
+
+.modal-panel {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    background: url('../assets/ui/panel-bg.png') center/contain no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.panel-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 500px;
+}
+
+.close-btn {
+    position: absolute;
+    top: 195px;
+    right: 560px;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s, transform 0.15s;
+    z-index: 5;
+}
+
+.close-btn:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+.close-btn img {
+    width: 100%;
+    height: 100%;
+}
+
+.panel-title-img {
+    height: 50px;
+    margin-bottom: 8px;
+}
+
+.panel-title-text {
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 42px;
+    color: #d0d0d0;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+/* ── Volume Slider ── */
+
+.volume-row {
+    width: 100%;
+    padding: 0 20px;
+}
+
+#volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+
+#volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#volume-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+/* ── Save Slots ── */
+
+.save-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+.save-slot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 60px;
+    padding: 0 20px;
+    background: url('../assets/ui/save-slot-normal.png') center/100% 100% no-repeat;
+    border: none;
+    cursor: pointer;
+    font-family: 'Reenie Beanie', cursive;
+    transition: transform 0.1s;
+}
+
+.save-slot:hover {
+    background-image: url('../assets/ui/save-slot-hover.png');
+    transform: scale(1.02);
+}
+
+.save-slot.selected {
+    background-image: url('../assets/ui/save-slot-selected.png');
+}
+
+.slot-label {
+    font-size: 30px;
+    color: #fff;
+    pointer-events: none;
+}
+
+.slot-info {
+    font-size: 22px;
+    color: #888;
+    pointer-events: none;
+}
+
+.save-actions {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.text-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 30px;
+    color: #c0c0c0;
+    padding: 4px 12px;
+    transition: color 0.15s, transform 0.1s;
+}
+
+.text-btn:hover {
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.delete-img {
+    height: 32px;
+    vertical-align: middle;
+    transition: opacity 0.15s;
+}
+
+#btn-delete:hover .delete-img {
+    content: url('../assets/ui/delete-hover.png');
+}
+
+/* ── Confirm Dialog ── */
+
+.confirm-content {
+    text-align: center;
+}
+
+#confirm-message {
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 38px;
+    color: #e0e0e0;
+    line-height: 1.3;
+    margin-bottom: 16px;
+    white-space: pre-line;
+}
+
+/* ── Letter Viewer ── */
+
+#letter-viewer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(240, 238, 235, 0.95);
+}
+
+.letter-container {
+    position: relative;
+    width: 1200px;
+    height: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#letter-title {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 36px;
+    color: #999;
+}
+
+.letter-close {
+    position: absolute;
+    top: 30px;
+    right: 80px;
+}
+
+.letter-close img {
+    filter: brightness(0.5);
+}
+
+#letter-paper {
+    width: 550px;
+    height: 700px;
+    background: #f0eeeb;
+    box-shadow: 2px 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 60px 50px;
+    overflow-y: auto;
+}
+
+#letter-content {
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 24px;
+    color: #444;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.letter-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 48px;
+    color: #b8a0b8;
+    transition: color 0.2s, transform 0.15s;
+    padding: 10px;
+}
+
+.letter-arrow:hover {
+    color: #8a6a8a;
+    transform: translateY(-50%) scale(1.2);
+}
+
+.letter-arrow-left {
+    left: 80px;
+}
+
+.letter-arrow-right {
+    right: 80px;
+}
+
+/* ── Existing Dialogue / Narration / Closeup ── */
 
 #dialogue-box {
     position: absolute;
@@ -161,4 +559,86 @@ body {
 #closeup-text {
     font-size: 28px;
     line-height: 1.5;
+}
+
+/* ── Dev Tools ── */
+
+#dev-tools {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+#scene-selector {
+    position: relative;
+}
+
+#btn-select-scene {
+    background: rgba(40, 80, 160, 0.7);
+    border: 1px solid rgba(100, 150, 255, 0.5);
+    border-radius: 4px;
+    color: #fff;
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 22px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+#btn-select-scene:hover {
+    background: rgba(50, 100, 200, 0.9);
+}
+
+#scene-list {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 4px;
+    background: rgba(20, 30, 50, 0.95);
+    border: 1px solid rgba(100, 150, 255, 0.4);
+    border-radius: 6px;
+    padding: 6px 0;
+    min-width: 200px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+#scene-list button {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    color: #ccc;
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 24px;
+    padding: 6px 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+}
+
+#scene-list button:hover {
+    background: rgba(80, 120, 200, 0.4);
+    color: #fff;
+}
+
+#btn-reset-sim {
+    background: rgba(180, 40, 40, 0.7);
+    border: 1px solid rgba(255, 100, 100, 0.5);
+    border-radius: 4px;
+    color: #fff;
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 22px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+#btn-reset-sim:hover {
+    background: rgba(200, 50, 50, 0.9);
 }

@@ -1,0 +1,10 @@
+{
+    "id": "scene11",
+    "background": "assets/backgrounds/bg-11.png",
+    "nextScene": null,
+    "fadeDuration": 100,
+    "initialState": {},
+    "characters": [],
+    "objects": [],
+    "sequence": []
+}

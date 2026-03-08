@@ -1,13 +1,14 @@
 {
     "id": "scene3",
     "background": "assets/backgrounds/bg-3.png",
+    "fadeDuration": 100,
     "initialState": {},
     "characters": [
         {
             "id": "hero",
-            "x": 800,
-            "y": 1000,
-            "scale": 0.5,
+            "x": 1050,
+            "y": 940,
+            "scale": 0.54,
             "flipX": true,
             "visible": true,
             "interactive": false,
@@ -23,7 +24,20 @@
             "hitbox": { "x": 600, "y": 540, "width": 240, "height": 360 }
         }
     ],
-    "objects": [],
+    "objects": [
+        {
+            "id": "next-arrow",
+            "type": "arrow",
+            "x": 1905,
+            "y": 540,
+            "direction": "right",
+            "size": 15,
+            "color": "rgba(255, 255, 255, 0.4)",
+            "visible": false,
+            "interactive": false,
+            "zIndex": 10
+        }
+    ],
     "sequence": [
         { "type": "waitForClick", "target": "erma" },
         { "type": "dialogue", "speaker": "Erma", "text": "Well, look who finally decided to come outside." },
@@ -36,7 +50,8 @@
         { "type": "dialogue", "speaker": "Hero", "text": "Your yard's a bit of an eyesore." },
         { "type": "dialogue", "speaker": "Erma", "text": "Veronica has been asking about you, maybe you should talk to her while you're up." },
         { "type": "dialogue", "speaker": "Erma", "text": "Anyway, nice to see you up and about..." },
-        { "type": "pause", "duration": 1000 },
+        { "type": "showObject", "target": "next-arrow" },
+        { "type": "waitForClick", "target": "next-arrow" },
         { "type": "transition" }
     ]
 }

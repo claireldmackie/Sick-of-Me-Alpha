@@ -1,13 +1,14 @@
 {
     "id": "scene1",
     "background": "assets/backgrounds/bg-1.png",
-    "nextScene": "data/scene2.json",
+    "nextScene": "data/scene1-5.json",
+    "fadeDuration": 100,
     "initialState": {},
     "characters": [
         {
             "id": "hero",
             "x": 250,
-            "y": 1020,
+            "y": 960,
             "visible": false,
             "interactive": false,
             "zIndex": 2
@@ -17,8 +18,8 @@
         {
             "id": "curtain",
             "type": "hotspot",
-            "x": 750,
-            "y": 80,
+            "x": 850,
+            "y": 130,
             "width": 320,
             "height": 450,
             "interactive": true
@@ -41,6 +42,7 @@
             "size": 35,
             "color": "rgba(255, 255, 255, 0.7)",
             "visible": false,
+            "interactive": true,
             "zIndex": 10
         }
     ],

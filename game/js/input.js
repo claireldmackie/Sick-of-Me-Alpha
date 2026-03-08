@@ -5,9 +5,27 @@ class InputManager {
         this.clickCallbacks = [];
         this.hoveredTarget = null;
         this.onHoverChange = null;
+        this.blocked = false;
+        this.keysDown = new Set();
+        this.lastHorizontal = null;
 
         this.container.addEventListener('click', (e) => this.handleClick(e));
         this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            e.preventDefault();
+            this.keysDown.add(key);
+            if (key === 'a' || key === 'arrowleft') this.lastHorizontal = 'left';
+            else if (key === 'd' || key === 'arrowright') this.lastHorizontal = 'right';
+        });
+        document.addEventListener('keyup', (e) => {
+            e.preventDefault();
+            this.keysDown.delete(e.key.toLowerCase());
+        });
+    }
+
+    isKeyDown(key) {
+        return this.keysDown.has(key);
     }
 
     getCanvasCoords(e) {
@@ -21,6 +39,7 @@ class InputManager {
     }
 
     handleClick(e) {
+        if (this.blocked) return;
         const coords = this.getCanvasCoords(e);
         for (const cb of this.clickCallbacks) {
             cb(coords);
