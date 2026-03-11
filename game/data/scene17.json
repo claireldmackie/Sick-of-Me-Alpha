@@ -1,0 +1,62 @@
+{
+    "id": "scene17",
+    "background": "assets/backgrounds/bg-17.png",
+    "nextScene": "data/scene18.json",
+    "fadeDuration": 100,
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "drew",
+            "type": "hotspot",
+            "x": 900,
+            "y": 400,
+            "width": 250,
+            "height": 500,
+            "interactive": true
+        },
+        {
+            "id": "next-arrow",
+            "type": "arrow",
+            "x": 1905,
+            "y": 540,
+            "direction": "right",
+            "size": 15,
+            "color": "rgba(255, 255, 255, 0.4)",
+            "visible": false,
+            "interactive": false,
+            "zIndex": 10
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "drew" },
+        { "type": "dialogue", "speaker": "Hero", "text": "Why are you in the road?" },
+        { "type": "dialogue", "speaker": "Drew", "text": "..." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Hello?" },
+        { "type": "dialogue", "speaker": "Drew", "text": "..." },
+        { "type": "dialogue", "speaker": "Drew", "text": "This is so like you." },
+        { "type": "dialogue", "speaker": "Hero", "text": "???" },
+        { "type": "dialogue", "speaker": "Drew", "text": "Heh..." },
+        { "type": "dialogue", "speaker": "Drew", "text": "This is so you." },
+        { "type": "dialogue", "speaker": "Drew", "text": "..." },
+        { "type": "dialogue", "speaker": "Drew", "text": "You when you walked up to me." },
+        { "type": "dialogue", "speaker": "Drew", "text": "..." },
+        { "type": "dialogue", "speaker": "Drew", "text": "Me right now." },
+        { "type": "dialogue", "speaker": "Drew", "text": "..." },
+        { "type": "dialogue", "speaker": "Drew", "text": "Us thirty seconds ago." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Do you have anything else to say??" },
+        { "type": "dialogue", "speaker": "Drew", "text": "I can't afford groceries this month." },
+        { "type": "showObject", "target": "next-arrow" },
+        { "type": "waitForClick", "target": "next-arrow" },
+        { "type": "transition" }
+    ]
+}

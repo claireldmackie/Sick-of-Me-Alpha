@@ -3,5 +3,31 @@
         "id": "letter-1",
         "title": "Letter #1",
         "content": "Dear [Hero],\n\nWriting letters kinda makes me feel like I'm a sickly Victorian child communicating to my favourite pen pal across the sea. It's okay though, I kind of dig it.\n\nThe other day I ran into Veronica at the Bello-eleven. She complained at length about how she thinks the cat drives away customers. How could a cutie like that scare people?? I think she's the one that's driving away the customers, don't tell her I said that though.\n\nI hope I see you soon.\n\nLove,\n[Friend]"
+    },
+    {
+        "id": "letter-2",
+        "title": "",
+        "cssClass": "bill-note",
+        "content": "BILL OVERDUE"
+    },
+    {
+        "id": "letter-3",
+        "title": "Letter #3",
+        "content": "Dear [Hero],\n\nI had so much fun at the bridge, I wasn't expecting you to visit me. I don't feel very good today, but I'm probably just tired from being out for so long. It does suck that our secret spot has become so mainstream... Get it? Cause it's by a stream? Yup, you get it.\n\nIt's nice to have everyone else there, but sometimes, I miss when it was just us. They don't get my jokes like you do. I like Calvin though, he's a nice guy. He looks all grumpy but really, he's just old. If I were as old as him, I think I'd be pretty grumpy. I think he likes us though, probably cause we're the coolest people in this town.\n\nAlso, whenever you get a chance, you should write me a letter back. Give me something to look forward to.\n\nLove,\n[Friend]"
+    },
+    {
+        "id": "letter-4",
+        "title": "Letter #4",
+        "content": "Dear [Hero],\n\nI know recitals are boring, but I thought you were going to stop by.\n\nI'm not that good at piano, but one day I will be, and you will have missed my uprising. I might not even bring you on tour with me when I'm famous.\n\nIt's funny, we live down the street from each other, but I never see you anymore.\n\nYou do this a lot. You know you can talk to me, right? If somethings wrong... If nothing is wrong, then you are just being a dick.\n\nSometimes I can't understand you.\n\n[Friend]"
+    },
+    {
+        "id": "letter-5",
+        "title": "Letter #5",
+        "content": "You finally sent me a letter back. You didn't really answer anything I said, but at least I feel like less of a creepy stalker now, so thanks...\n\nSorry about my attitude in my last letter... if you even read it. I don't get why you don't come see me more.\n\nI know you don't like opening up, and I know your emo demeanour is appropriate given what you go through. Is that why I've been seeing less of you? or is it something else. I wish you'd just tell me.\n\nYou know, we would be unstoppable if there wasn't so much road between us. I'll get my bike fixed up eventually.\n\nLove,\n[Friend]\n\nP.S. Going to skip the clinic today, the new one is so far away, and what could he tell me that's new anyway."
+    },
+    {
+        "id": "letter-hero",
+        "title": "[Hero's] Letter",
+        "content": "Dear [Friend]\n\nI'm sorry I left you for so long. This place reminds me of how I used to be, I felt so trapped I didn't know what to do. I can't seem to move past anything that's happened.\n\nI wish you got to know me enough to be sick of me. Terribly and horribly sick of me. But I lost you, and now I seem to be losing myself. But you never asked me to be perfect. You just asked me to be there.\n\nSometimes I feel like I can hear you, telling me to get off my miserable ass and make some kind of change. If you were still here, you wouldn't be wasting away like I am. You'd call me dramatic. You'd remind me that I'm not the main character in everyone's story, not even yours.\n\nI miss you.\n\nLove,\n[Hero]"
     }
 ]

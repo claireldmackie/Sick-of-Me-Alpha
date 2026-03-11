@@ -1,0 +1,38 @@
+{
+    "id": "scene20",
+    "background": "assets/backgrounds/bg-20.png",
+    "nextScene": "data/scene21.json",
+    "fadeDuration": 100,
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "next-arrow",
+            "type": "arrow",
+            "x": 1905,
+            "y": 540,
+            "direction": "right",
+            "size": 15,
+            "color": "rgba(255, 255, 255, 0.4)",
+            "visible": false,
+            "interactive": false,
+            "zIndex": 10
+        }
+    ],
+    "sequence": [
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
+        { "type": "collectLetter", "letterId": "letter-4" },
+        { "type": "showObject", "target": "next-arrow" },
+        { "type": "waitForClick", "target": "next-arrow" },
+        { "type": "transition" }
+    ]
+}

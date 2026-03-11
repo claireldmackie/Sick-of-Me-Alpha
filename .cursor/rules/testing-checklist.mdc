@@ -1,0 +1,46 @@
+---
+description: Reminder to test critical game systems after making changes
+alwaysApply: true
+---
+
+# Testing Checklist
+
+After making changes to the game, remind the user to test the following. List only the items relevant to what was changed.
+
+## Scene Transitions
+- Scene loads without console errors
+- Fade-in/fade-out plays correctly
+- Clicking the navigation arrow (or walking to the edge) advances to the correct next scene
+- If a `nextScene` was changed, verify the full flow from the modified scene onward
+
+## Dialogue
+- All dialogue lines display with the correct speaker name
+- Clicking advances through each line in order
+- Skip button appears when 3+ consecutive dialogue lines remain
+- Close-up dialogue shows and hides properly
+
+## Interactions
+- All `waitForClick` targets are clickable (not hidden, not missing `interactive: true`)
+- Hover glow appears on the correct target
+- Objects show/hide at the right moments in the sequence
+
+## Letter Collection
+- Letters appear in the full-screen viewer when collected
+- Collected letters persist and are accessible via the envelope HUD icon
+- Letter navigation (prev/next arrows) works in the viewer
+
+## Save / Load
+- Saving captures the current scene and sequence step
+- Loading resumes at the correct scene and step (fast-forward restores object/character visibility)
+- All 3 save slots work independently
+
+## Music
+- Music fades in at the correct moment (after Erma dialogue in Scene 3)
+- Volume slider in pause menu adjusts playback volume in real time
+- Music loops continuously across scene transitions
+- Music stops on quit-to-menu and reset
+
+## Branching (Scene 22)
+- All 5 dialogue option prompts appear with 3 choices each
+- Follow-up dialogue displays after each choice
+- The correct ending scene loads based on majority category

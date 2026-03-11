@@ -1,0 +1,73 @@
+---
+description: Enforces the expected structure for scene JSON files so scenes don't accidentally break
+globs: game/data/scene*.json
+alwaysApply: false
+---
+
+# Scene JSON Data Format
+
+Every scene file MUST be valid JSON with these top-level fields:
+
+| Field | Required | Type | Notes |
+|-------|----------|------|-------|
+| `id` | YES | string | Unique scene identifier, e.g. `"scene3"` |
+| `background` | YES | string | Path to background image, e.g. `"assets/backgrounds/bg-3.png"` |
+| `nextScene` | no | string or null | Path to next scene file, e.g. `"data/scene4.json"`. Omit or set null if ending scene. |
+| `fadeDuration` | no | number | Fade transition duration in ms. Default `1000`. Use `100` for fast cuts. |
+| `initialState` | no | object | State flags like `{ "dark": true, "darkOpacity": 0.55, "tvGlow": {...} }` |
+| `characters` | YES | array | Character entries (can be empty `[]`) |
+| `objects` | YES | array | Object entries (can be empty `[]`) |
+| `sequence` | YES | array | Ordered sequence steps that drive the scene |
+
+## Character Entry Fields
+
+| Field | Required | Notes |
+|-------|----------|-------|
+| `id` | YES | Must match a key in `config.json` characters: `hero`, `parent`, `erma`, `jeff` |
+| `x`, `y` | YES | Position on the 1920x1080 canvas |
+| `visible` | YES | Boolean |
+| `interactive` | YES | Boolean -- can the player click this character? |
+| `zIndex` | no | Draw order (higher = on top) |
+| `scale` | no | Overrides the config default |
+| `flipX` | no | Mirror horizontally |
+| `hitbox` | no | Custom click area: `{ "x", "y", "width", "height" }` |
+
+## Object Entry Fields
+
+Objects come in three types: `hotspot`, `arrow`, or image objects (no `type` field, has `image`).
+
+**Hotspot:** `{ "id", "type": "hotspot", "x", "y", "width", "height", "interactive": true }`
+**Arrow:** `{ "id", "type": "arrow", "x", "y", "direction", "size", "color", "visible", "interactive", "zIndex" }`
+**Image:** `{ "id", "image": "assets/objects/foo.png", "x", "y", "scale", "visible", "interactive", "zIndex" }`
+
+## Valid Sequence Step Types
+
+| Step Type | Required Fields | Description |
+|-----------|----------------|-------------|
+| `dialogue` | `speaker`, `text` | Shows dialogue box. Player clicks to advance. |
+| `narration` | `text` | Centred narration text. Player clicks to advance. |
+| `pause` | `duration` | Wait in ms before continuing. |
+| `waitForClick` | `target` | Blocks until player clicks the named object/character. |
+| `showCharacter` | `target` | Makes a character visible. |
+| `hideCharacter` | `target` | Hides a character. |
+| `showObject` | `target` | Makes an object visible. |
+| `hideObject` | `target` | Hides an object. |
+| `setState` | `state` | Merges key/values into scene state. |
+| `closeup` | (optional `image`) | Shows dark overlay, optionally with an image. |
+| `closeupDialogue` | `speaker`, `text` | Dialogue shown over the closeup. Optional `html: true`. |
+| `hideCloseup` | — | Closes the closeup overlay. |
+| `collectLetter` | `letterId` | Collects a letter and shows it. Must match an id in `letters.json`. |
+| `tutorial` | — | Shows movement tutorial prompt. |
+| `dialogueOptions` | `speaker`, `prompt`, `options[]` | Branching choice. Each option: `{ "id", "label", "followUp", "category" }`. |
+| `determineEnding` | `endings` | Maps category to scene file: `{ "connect": "...", "leave": "...", "reflect": "..." }`. |
+| `showNote` | `text`, (optional `title`, `cssClass`) | Shows custom content in the letter viewer UI. Blocks until closed. |
+| `startMusic` | (optional `fadeDuration`) | Starts background music with fade-in. |
+| `showCredits` | — | Shows the credits overlay. |
+| `transition` | — | Fades out and proceeds to the next scene. Usually the last step. |
+
+## Common Mistakes to Avoid
+
+- Forgetting `"interactive": true` on objects/characters the player needs to click
+- Referencing a `target` in `waitForClick` that doesn't exist in `characters` or `objects`
+- Missing `transition` as the final step (scene will hang)
+- Setting `visible: false` on an object but forgetting to `showObject` before a `waitForClick` on it

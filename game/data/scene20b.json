@@ -1,0 +1,22 @@
+{
+    "id": "scene20b",
+    "background": "assets/backgrounds/bg-20b.png",
+    "nextScene": null,
+    "fadeDuration": 1000,
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 960,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [],
+    "sequence": [
+        { "type": "pause", "duration": 3000 },
+        { "type": "showCredits" }
+    ]
+}

@@ -1,0 +1,70 @@
+{
+    "id": "scene21",
+    "background": "assets/backgrounds/bg-21.png",
+    "nextScene": "data/scene22.json",
+    "fadeDuration": 100,
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "tree-creatures",
+            "type": "hotspot",
+            "x": 800,
+            "y": 200,
+            "width": 400,
+            "height": 300,
+            "interactive": true
+        },
+        {
+            "id": "bush",
+            "type": "hotspot",
+            "x": 1400,
+            "y": 700,
+            "width": 300,
+            "height": 300,
+            "interactive": true,
+            "visible": false
+        },
+        {
+            "id": "next-arrow",
+            "type": "arrow",
+            "x": 1905,
+            "y": 540,
+            "direction": "right",
+            "size": 15,
+            "color": "rgba(255, 255, 255, 0.4)",
+            "visible": false,
+            "interactive": false,
+            "zIndex": 10
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "tree-creatures" },
+        { "type": "dialogue", "speaker": "Tree People", "text": "Sup." },
+        { "type": "dialogue", "speaker": "Tree People", "text": "How's it hangin'?" },
+        { "type": "dialogue", "speaker": "Hero", "text": "I'm not the one in a tree..." },
+        { "type": "dialogue", "speaker": "Tree People", "text": "Heh, yeah." },
+        { "type": "dialogue", "speaker": "Tree People", "text": "Where are ya running off to at this hour?" },
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
+        { "type": "dialogue", "speaker": "Tree People", "text": "Ahhh the silent type... Well, we won't pry anymore." },
+        { "type": "dialogue", "speaker": "Tree People", "text": "Have a good night, don't stay out too long." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Thanks." },
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
+        { "type": "collectLetter", "letterId": "letter-5" },
+        { "type": "dialogue", "speaker": "Hero", "text": "No going back now..." },
+        { "type": "showObject", "target": "bush" },
+        { "type": "waitForClick", "target": "bush" },
+        { "type": "showObject", "target": "next-arrow" },
+        { "type": "waitForClick", "target": "next-arrow" },
+        { "type": "transition" }
+    ]
+}

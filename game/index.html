@@ -9,8 +9,8 @@
     <title>Sick of Me</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=3">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Reenie+Beanie&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body>
     <div id="game-container">
@@ -122,6 +122,26 @@
             </div>
         </div>
 
+        <!-- Tutorial Prompt -->
+        <div id="tutorial-prompt" class="hidden">
+            <p>Use A and D or Arrow Keys to move</p>
+        </div>
+
+        <!-- Dialogue Options (branching) -->
+        <div id="dialogue-options" class="hidden">
+            <p id="options-prompt"></p>
+            <div id="options-buttons"></div>
+        </div>
+
+        <!-- Credits Overlay -->
+        <div id="credits-overlay" class="screen-overlay hidden">
+            <div class="credits-content">
+                <h1>Sick of Me</h1>
+                <p>Thank you for playing.</p>
+                <button class="close-btn credits-close" data-close="credits"><img src="assets/ui/x-close.png" alt="Close"></button>
+            </div>
+        </div>
+
         <!-- Gameplay overlays (existing) -->
         <div id="dialogue-box" class="hidden">
             <span id="dialogue-speaker"></span>
@@ -150,13 +170,14 @@
         </div>
     </div>
 
+    <script src="js/audio-manager.js?v=2"></script>
     <script src="js/engine.js?v=4"></script>
     <script src="js/input.js?v=3"></script>
     <script src="js/dialogue.js?v=3"></script>
     <script src="js/save-manager.js?v=3"></script>
     <script src="js/letter-manager.js?v=3"></script>
-    <script src="js/scene-manager.js?v=3"></script>
-    <script src="js/ui-manager.js?v=3"></script>
-    <script src="js/main.js?v=4"></script>
+    <script src="js/scene-manager.js?v=7"></script>
+    <script src="js/ui-manager.js?v=5"></script>
+    <script src="js/main.js?v=10"></script>
 </body>
 </html>

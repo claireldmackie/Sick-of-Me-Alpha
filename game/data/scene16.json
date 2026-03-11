@@ -1,0 +1,56 @@
+{
+    "id": "scene16",
+    "background": "assets/backgrounds/bg-16.png",
+    "nextScene": "data/scene17.json",
+    "fadeDuration": 100,
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "clinic",
+            "type": "hotspot",
+            "x": 400,
+            "y": 300,
+            "width": 300,
+            "height": 400,
+            "interactive": true,
+            "visible": false
+        },
+        {
+            "id": "next-arrow",
+            "type": "arrow",
+            "x": 1905,
+            "y": 540,
+            "direction": "right",
+            "size": 15,
+            "color": "rgba(255, 255, 255, 0.4)",
+            "visible": false,
+            "interactive": false,
+            "zIndex": 10
+        }
+    ],
+    "sequence": [
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
+        { "type": "closeup" },
+        { "type": "closeupDialogue", "speaker": "", "text": "<div class='bill-note'>BILL, OVERDUE</div>", "html": true },
+        { "type": "hideCloseup" },
+        { "type": "dialogue", "speaker": "Hero", "text": "*sigh* I'm not going to read that one yet..." },
+        { "type": "collectLetter", "letterId": "letter-2" },
+        { "type": "dialogue", "speaker": "Hero", "text": "How many of these did I miss?" },
+        { "type": "showObject", "target": "clinic" },
+        { "type": "waitForClick", "target": "clinic" },
+        { "type": "dialogue", "speaker": "Hero", "text": "When did the clinic shut down?" },
+        { "type": "showObject", "target": "next-arrow" },
+        { "type": "waitForClick", "target": "next-arrow" },
+        { "type": "transition" }
+    ]
+}

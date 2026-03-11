@@ -1,0 +1,24 @@
+{
+    "id": "scene14",
+    "background": "assets/backgrounds/bg-14.png",
+    "nextScene": "data/scene15.json",
+    "fadeDuration": 100,
+    "initialState": {},
+    "characters": [],
+    "objects": [
+        {
+            "id": "counter",
+            "type": "hotspot",
+            "x": 400,
+            "y": 300,
+            "width": 600,
+            "height": 400,
+            "interactive": true
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "counter" },
+        { "type": "dialogue", "speaker": "Hero", "text": "I think that's all I need." },
+        { "type": "transition" }
+    ]
+}

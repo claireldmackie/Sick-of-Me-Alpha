@@ -1,8 +1,9 @@
 class UIManager {
-    constructor(saveManager, letterManager, inputManager) {
+    constructor(saveManager, letterManager, inputManager, audioManager) {
         this.saveManager = saveManager;
         this.letterManager = letterManager;
         this.inputManager = inputManager || null;
+        this.audioManager = audioManager || null;
 
         this.panelMode = null;       // 'save' | 'load' | 'copy-source' | 'copy-dest' | 'delete-select'
         this.selectedSlot = null;
@@ -104,6 +105,21 @@ class UIManager {
         this.letterViewer.querySelector('.close-btn').addEventListener('click', () => this.hideLetterViewer());
         this.btnLetterPrev.addEventListener('click', () => this.navigateLetter(-1));
         this.btnLetterNext.addEventListener('click', () => this.navigateLetter(1));
+
+        this.volumeSlider = document.getElementById('volume-slider');
+        if (this.volumeSlider) {
+            if (this.audioManager) {
+                this.volumeSlider.value = Math.round(this.audioManager.getVolume() * 100);
+            }
+            this._updateSliderFill();
+            this.volumeSlider.addEventListener('input', () => {
+                const val = Number(this.volumeSlider.value) / 100;
+                this._updateSliderFill();
+                if (this.audioManager) {
+                    this.audioManager.setVolume(val);
+                }
+            });
+        }
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') this._handleEscape();
@@ -411,7 +427,24 @@ class UIManager {
         if (!letter) return Promise.resolve();
 
         this.letterTitle.textContent = letter.title;
-        this.letterContent.textContent = letter.content;
+        this._applyLetterContent(letter);
+        this.btnLetterPrev.classList.add('hidden');
+        this.btnLetterNext.classList.add('hidden');
+        this.letterViewer.classList.remove('hidden');
+        this._syncInputBlock();
+
+        return new Promise((resolve) => {
+            this._letterCloseResolve = resolve;
+        });
+    }
+
+    showNote(title, content, cssClass) {
+        this.letterTitle.textContent = title || '';
+        if (cssClass) {
+            this.letterContent.innerHTML = `<span class="${cssClass}">${content}</span>`;
+        } else {
+            this.letterContent.textContent = content;
+        }
         this.btnLetterPrev.classList.add('hidden');
         this.btnLetterNext.classList.add('hidden');
         this.letterViewer.classList.remove('hidden');
@@ -444,12 +477,26 @@ class UIManager {
         if (!letter) return;
 
         this.letterTitle.textContent = letter.title;
-        this.letterContent.textContent = letter.content;
+        this._applyLetterContent(letter);
         this.btnLetterPrev.classList.toggle('hidden', this.currentLetterIndex <= 0);
         this.btnLetterNext.classList.toggle('hidden', this.currentLetterIndex >= collected.length - 1);
     }
 
+    _applyLetterContent(letter) {
+        if (letter.cssClass) {
+            this.letterContent.innerHTML = `<span class="${letter.cssClass}">${letter.content}</span>`;
+        } else {
+            this.letterContent.textContent = letter.content;
+        }
+    }
+
     /* ── Utilities ── */
+
+    _updateSliderFill() {
+        if (!this.volumeSlider) return;
+        const pct = this.volumeSlider.value;
+        this.volumeSlider.style.setProperty('--fill', pct + '%');
+    }
 
     _syncInputBlock() {
         if (this.inputManager) {

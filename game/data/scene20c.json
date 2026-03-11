@@ -1,0 +1,13 @@
+{
+    "id": "scene20c",
+    "background": "assets/backgrounds/bg-20c.png",
+    "nextScene": null,
+    "fadeDuration": 1000,
+    "initialState": {},
+    "characters": [],
+    "objects": [],
+    "sequence": [
+        { "type": "pause", "duration": 3000 },
+        { "type": "showCredits" }
+    ]
+}

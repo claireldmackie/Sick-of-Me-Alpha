@@ -27,12 +27,12 @@
     "objects": [
         {
             "id": "backpack",
-            "type": "hotspot",
-            "x": 1250,
-            "y": 400,
-            "width": 200,
-            "height": 200,
-            "interactive": true
+            "image": "assets/objects/backpack.png",
+            "x": 1280,
+            "y": 405,
+            "scale": 0.5,
+            "interactive": true,
+            "zIndex": 2
         },
         {
             "id": "next-arrow",
@@ -56,6 +56,7 @@
         { "type": "dialogue", "speaker": "Jeff", "text": "I'm supposed to meet my girlfriend for lunch." },
         { "type": "dialogue", "speaker": "Jeff", "text": "A bus drove past me a couple hours ago, do you think there will be another one?" },
         { "type": "dialogue", "speaker": "Hero", "text": "..." },
+        { "type": "dialogue", "speaker": "Jeff", "text": "*Sighs and hunches over in defeat*" },
         { "type": "dialogue", "speaker": "Jeff", "text": "You're right... wishful thinking." },
         { "type": "showObject", "target": "next-arrow" },
         { "type": "waitForClick", "target": "next-arrow" },

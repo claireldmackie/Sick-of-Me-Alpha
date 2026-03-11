@@ -1,0 +1,51 @@
+---
+description: Naming conventions for game asset files (backgrounds, characters, objects, UI, audio)
+globs: game/assets/**/*
+alwaysApply: false
+---
+
+# Asset Naming Conventions
+
+All assets live under `game/assets/` in subfolders by type.
+
+## Backgrounds -- `game/assets/backgrounds/`
+
+- Format: `bg-{number}.png`
+- Sequential numbering matching scene order: `bg-1.png`, `bg-2.png`, ... `bg-22.png`
+- Sub-scenes use a dash suffix: `bg-1-5.png` (stairwell between scene 1 and 2)
+- Ending variants use a letter suffix: `bg-20a.png`, `bg-20b.png`, `bg-20c.png`
+- Always `.png`
+
+## Characters -- `game/assets/characters/`
+
+- Format: `{name}.png` -- lowercase, hyphenated if multi-word
+- Current files: `hero-v2.png`, `mom.png`, `erma.png`, `jeff.png`
+- Use version suffixes (`-v2`, `-v3`) only when replacing an existing character sprite
+- Must match the `image` path in `config.json` character definitions
+
+## Objects -- `game/assets/objects/`
+
+- Format: `{descriptive-name}.png` -- lowercase, hyphenated
+- Use state suffixes for variants of the same object: `mailbox-closed.png`, `mailbox-open.png`
+- Use pose suffixes for character-like objects: `cat-sitting.png`, `cat-legup.png`, `cat-cleaning.png`
+- Always `.png`
+
+## UI -- `game/assets/ui/`
+
+- Format: `{element-name}.png` -- lowercase, hyphenated
+- State variants use suffixes: `button-normal.png`, `button-hover.png`
+- Always `.png`
+
+## Audio -- `game/assets/audio/`
+
+- Background music: `music.mp3`
+- If adding more tracks, use descriptive names: `music-town.mp3`, `music-ending.mp3`
+- `.mp3` format
+
+## General Rules
+
+- All filenames lowercase
+- Use hyphens (`-`) not underscores or spaces
+- Always use `.png` for images, `.mp3` for audio
+- When adding a new asset, place it in the correct subfolder
+- Reference paths in scene JSON files relative to the `game/` folder: `"assets/backgrounds/bg-3.png"`

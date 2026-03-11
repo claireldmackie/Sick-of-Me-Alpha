@@ -7,20 +7,17 @@
     "characters": [],
     "objects": [
         {
-            "id": "stairs-arrow",
-            "type": "arrow",
-            "x": 960,
-            "y": 600,
-            "direction": "up",
-            "size": 35,
-            "color": "rgba(255, 255, 255, 0.7)",
-            "visible": true,
-            "interactive": true,
-            "zIndex": 10
+            "id": "stairs",
+            "type": "hotspot",
+            "x": 500,
+            "y": 200,
+            "width": 920,
+            "height": 700,
+            "interactive": true
         }
     ],
     "sequence": [
-        { "type": "waitForClick", "target": "stairs-arrow" },
+        { "type": "waitForClick", "target": "stairs" },
         { "type": "transition" }
     ]
 }

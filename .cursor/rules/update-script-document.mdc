@@ -1,0 +1,28 @@
+---
+description: Reminder to update the prototype script document whenever game dialogue, scene flow, or interactions change
+globs: game/data/*.json, game/js/scene-manager.js, game/js/main.js
+alwaysApply: false
+---
+
+# Script Document Sync Rule
+
+Whenever you modify **dialogue, scene flow, interactions, branching logic, letter content, or scene ordering**, you MUST also update the script document at:
+
+**`Script/SickOfMe-Prototype-Script.md`**
+
+## What to update
+
+- **Dialogue changes:** Update the exact lines in the relevant scene section.
+- **New scenes:** Add a new scene section in the correct position in the document, update the SCENE FLOW diagram, and update scene numbering if needed.
+- **Removed scenes:** Remove the section and update the SCENE FLOW diagram.
+- **Interaction changes:** Update the sequence steps (click targets, object show/hide, arrows).
+- **Letter changes:** Update the COLLECTIBLE LETTERS section and note which scene collects it.
+- **Branching/ending changes:** Update the BRANCHING DIALOGUE and ENDINGS sections.
+- **Character additions:** Update the CHARACTERS list at the top.
+- **Scene name changes:** Update both the scene heading and the SCENE FLOW diagram.
+
+## How to update
+
+1. Read `Script/SickOfMe-Prototype-Script.md` before making changes so you know current state.
+2. After making code changes, update the corresponding section(s) in the script document.
+3. Update the "Last Updated" date at the top of the document.

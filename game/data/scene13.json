@@ -1,0 +1,54 @@
+{
+    "id": "scene13",
+    "background": "assets/backgrounds/bg-13.png",
+    "nextScene": "data/scene14.json",
+    "fadeDuration": 100,
+    "initialState": {},
+    "characters": [],
+    "objects": [
+        {
+            "id": "flower-in-bucket",
+            "image": "assets/objects/flower.png",
+            "x": 870,
+            "y": 680,
+            "scale": 0.4,
+            "interactive": false,
+            "zIndex": 2
+        },
+        {
+            "id": "flower-on-ground",
+            "image": "assets/objects/flower.png",
+            "x": 970,
+            "y": 830,
+            "scale": 0.35,
+            "interactive": false,
+            "zIndex": 2
+        },
+        {
+            "id": "flowers",
+            "type": "hotspot",
+            "x": 830,
+            "y": 680,
+            "width": 250,
+            "height": 220,
+            "interactive": true
+        },
+        {
+            "id": "snack",
+            "type": "hotspot",
+            "x": 50,
+            "y": 200,
+            "width": 1050,
+            "height": 450,
+            "interactive": true,
+            "visible": false
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "flowers" },
+        { "type": "dialogue", "speaker": "Hero", "text": "These will have to do... I should probably get a snack too." },
+        { "type": "showObject", "target": "snack" },
+        { "type": "waitForClick", "target": "snack" },
+        { "type": "transition" }
+    ]
+}

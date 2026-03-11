@@ -1,0 +1,70 @@
+{
+    "id": "scene18",
+    "background": "assets/backgrounds/bg-18.png",
+    "nextScene": "data/scene19.json",
+    "fadeDuration": 100,
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "lady",
+            "type": "hotspot",
+            "x": 900,
+            "y": 400,
+            "width": 250,
+            "height": 500,
+            "interactive": true
+        },
+        {
+            "id": "next-arrow",
+            "type": "arrow",
+            "x": 1905,
+            "y": 540,
+            "direction": "right",
+            "size": 15,
+            "color": "rgba(255, 255, 255, 0.4)",
+            "visible": false,
+            "interactive": false,
+            "zIndex": 10
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "lady" },
+        { "type": "dialogue", "speaker": "Hero", "text": "Isn't that bad for you?" },
+        { "type": "dialogue", "speaker": "Lady", "text": "Yeah, but hell, what are you gonna do." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Could I have some?" },
+        { "type": "dialogue", "speaker": "Lady", "text": "No sweetie, you don't want to end up like me, all washed up and nowhere to go. I used to be quite a looker, still am, but I draw a different crowd now." },
+        { "type": "dialogue", "speaker": "Lady", "text": "I'll tell you, I've been smoking a lot more lately. It feels like there's nothing to do this town, it's lost a lot of its spirit. Talking to all these lame-o's is such a drag, it's draining my life force... You know what I mean?" },
+        { "type": "dialogue", "speaker": "Hero", "text": "Yeah, I do." },
+        { "type": "dialogue", "speaker": "Lady", "text": "You look so sad all on your own, it's a whole without a half, isn't it?" },
+        { "type": "dialogue", "speaker": "Hero", "text": "I guess." },
+        { "type": "dialogue", "speaker": "Lady", "text": "I went to the party by the bridge... won't be doing that again." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Veronica said it was \"all out of whack\"." },
+        { "type": "dialogue", "speaker": "Lady", "text": "That's one way of putting it." },
+        { "type": "dialogue", "speaker": "Lady", "text": "I think people are having a harder time coping these days. Everybody has some kind of distraction, something to obsess over. No one's really helping since you left." },
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
+        { "type": "dialogue", "speaker": "Lady", "text": "It's not very fair, is it..?" },
+        { "type": "dialogue", "speaker": "Hero", "text": "I'm sorry." },
+        { "type": "dialogue", "speaker": "Lady", "text": "It's not your fault. Too many people stop trying to do anything about the situation they're in because they feel like nothing they do matters." },
+        { "type": "dialogue", "speaker": "Lady", "text": "Can one person really make a difference?" },
+        { "type": "dialogue", "speaker": "Hero", "text": "You've made a difference to me." },
+        { "type": "dialogue", "speaker": "Lady", "text": "Then you already know the answer, don't you? We can't save everyone. But we can show up." },
+        { "type": "dialogue", "speaker": "Lady", "text": "I rely on you a lot, as well. Whether I like it or not. I do, really..." },
+        { "type": "dialogue", "speaker": "Hero", "text": "I know." },
+        { "type": "dialogue", "speaker": "Lady", "text": "Thank you..." },
+        { "type": "dialogue", "speaker": "Hero", "text": "For what?" },
+        { "type": "dialogue", "speaker": "Lady", "text": "Listening to me." },
+        { "type": "showObject", "target": "next-arrow" },
+        { "type": "waitForClick", "target": "next-arrow" },
+        { "type": "transition" }
+    ]
+}

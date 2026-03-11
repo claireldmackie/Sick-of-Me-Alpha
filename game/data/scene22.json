@@ -1,0 +1,128 @@
+{
+    "id": "scene22",
+    "background": "assets/backgrounds/bg-22.png",
+    "fadeDuration": 1000,
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 600,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "grave",
+            "type": "hotspot",
+            "x": 800,
+            "y": 400,
+            "width": 300,
+            "height": 400,
+            "interactive": true
+        },
+        {
+            "id": "basket",
+            "type": "hotspot",
+            "x": 1150,
+            "y": 500,
+            "width": 200,
+            "height": 200,
+            "interactive": true,
+            "visible": false
+        },
+        {
+            "id": "grave-letter",
+            "type": "hotspot",
+            "x": 700,
+            "y": 700,
+            "width": 200,
+            "height": 150,
+            "interactive": true,
+            "visible": false
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "grave" },
+        { "type": "dialogue", "speaker": "Hero", "text": "These are for you... It's your favourite flavour." },
+        { "type": "showObject", "target": "basket" },
+        { "type": "waitForClick", "target": "basket" },
+        { "type": "dialogue", "speaker": "Hero", "text": "Everyone in town left stuff here for me while I was gone..." },
+        { "type": "showObject", "target": "grave-letter" },
+        { "type": "waitForClick", "target": "grave-letter" },
+        { "type": "dialogue", "speaker": "Hero", "text": "I wrote a letter for you..." },
+        { "type": "collectLetter", "letterId": "letter-hero" },
+        { "type": "dialogue", "speaker": "Hero", "text": "I wrote you a letter explaining how I feel, but now it all feels wrong." },
+        { "type": "dialogue", "speaker": "Hero", "text": "It's different when I'm sitting here, I have to face the fact that you're really gone." },
+
+        {
+            "type": "dialogueOptions",
+            "speaker": "Hero",
+            "prompt": "I haven't visited you in a month. I think I felt...",
+            "options": [
+                { "id": "guilty", "label": "Guilty...", "followUp": "Sitting by your grave now that you're gone. I should have been there for you more while you were here.", "category": "connect" },
+                { "id": "helpless", "label": "Helpless...", "followUp": "You're gone and there is nothing I can do to change that. Everything feels so out of my control.", "category": "leave" },
+                { "id": "angry", "label": "Angry...", "followUp": "You knew you were sick and you acted like everything was fine. I wish you took it more seriously.", "category": "reflect" }
+            ]
+        },
+
+        {
+            "type": "dialogueOptions",
+            "speaker": "Hero",
+            "prompt": "When you were still here, I wish I had...",
+            "options": [
+                { "id": "told-you", "label": "Told you how I was feeling...", "followUp": "I always felt like I should deal with my problems on my own, you had more to deal with.", "category": "reflect" },
+                { "id": "spent-time", "label": "Spent more time with you...", "followUp": "I wasted the time I had left not knowing it would be gone.", "category": "connect" },
+                { "id": "read-letters", "label": "Read the letters you sent...", "followUp": "I could've done something or at least given you what you asked for.", "category": "leave" }
+            ]
+        },
+
+        {
+            "type": "dialogueOptions",
+            "speaker": "Hero",
+            "prompt": "It took a long time for me to get the courage to go back to the town again. I was worried that they...",
+            "options": [
+                { "id": "blame-me", "label": "Would blame me...", "followUp": "I left for so long. I wasn't there to help you and I wasn't there to help them move on.", "category": "leave" },
+                { "id": "pity-me", "label": "Would pity me...", "followUp": "I don't need that. I don't want people to look at me differently.", "category": "reflect" },
+                { "id": "move-on", "label": "Would move on...", "followUp": "I felt so stuck. I couldn't face the change. It hurt to see the town without you.", "category": "connect" }
+            ]
+        },
+
+        {
+            "type": "dialogueOptions",
+            "speaker": "Hero",
+            "prompt": "When I finally went outside, the town...",
+            "options": [
+                { "id": "not-supportive", "label": "Wasn't very supportive...", "followUp": "It felt like they blamed me for everything falling apart. What was I supposed to do anyway?", "category": "leave" },
+                { "id": "tried-support", "label": "Tried to support me...", "followUp": "They pushed me to keep going, I don't think I would have gotten the courage to visit without them.", "category": "connect" },
+                { "id": "supported-where", "label": "Supported me where they could...", "followUp": "They talked to me like everything was normal, they even left me some stuff by your grave.", "category": "reflect" }
+            ]
+        },
+
+        {
+            "type": "dialogueOptions",
+            "speaker": "Hero",
+            "prompt": "I need to figure out how to live without you. I think the only way I can do that is by...",
+            "options": [
+                { "id": "connect-community", "label": "Connecting more with the community...", "followUp": "I'm going to try and move on in your absence. I've learned that life keeps moving even when I can't, and I want to be there for people.", "category": "connect" },
+                { "id": "move-away", "label": "Moving somewhere and keep living...", "followUp": "I need to get out of here. I don't think I can move past anything, living in that house and living without you feels so lonely.", "category": "leave" },
+                { "id": "take-time", "label": "Taking more time to reflect...", "followUp": "Everything feels like too much, I just want to sleep. I feel like everyone's relying on me and I don't know what to do.", "category": "reflect" }
+            ]
+        },
+
+        { "type": "dialogue", "speaker": "Hero", "text": "I'm going to miss you." },
+
+        {
+            "type": "determineEnding",
+            "endings": {
+                "connect": "data/scene20a.json",
+                "leave": "data/scene20b.json",
+                "reflect": "data/scene20c.json"
+            }
+        },
+
+        { "type": "transition" }
+    ]
+}

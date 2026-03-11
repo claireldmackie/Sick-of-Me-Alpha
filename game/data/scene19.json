@@ -1,0 +1,67 @@
+{
+    "id": "scene19",
+    "background": "assets/backgrounds/bg-19.png",
+    "nextScene": "data/scene20.json",
+    "fadeDuration": 1000,
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "calvin",
+            "type": "hotspot",
+            "x": 800,
+            "y": 400,
+            "width": 300,
+            "height": 400,
+            "interactive": true
+        },
+        {
+            "id": "next-arrow",
+            "type": "arrow",
+            "x": 1905,
+            "y": 540,
+            "direction": "right",
+            "size": 15,
+            "color": "rgba(255, 255, 255, 0.4)",
+            "visible": false,
+            "interactive": false,
+            "zIndex": 10
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "calvin" },
+        { "type": "dialogue", "speaker": "Calvin", "text": "...Heyy *burp*" },
+        { "type": "dialogue", "speaker": "Hero", "text": "Hey Calvin." },
+        { "type": "dialogue", "speaker": "Calvin", "text": "Here's your bag. I've had it for... a while now. Sorry, it's a bit soggy." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Thank you." },
+        { "type": "dialogue", "speaker": "Calvin", "text": "Found suh-some old photos *urppp* in my house..." },
+        { "type": "dialogue", "speaker": "Calvin", "text": "Take a look." },
+        { "type": "closeup" },
+        { "type": "closeupDialogue", "speaker": "", "text": "Faded photos of two young men laughing." },
+        { "type": "hideCloseup" },
+        { "type": "dialogue", "speaker": "Calvin", "text": "It's me and an old friend of m-mine..." },
+        { "type": "dialogue", "speaker": "Calvin", "text": "That's what I looked like back in the day" },
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
+        { "type": "dialogue", "speaker": "Calvin", "text": "I don't feel like I fit in this town very much sometimes... *urrp*" },
+        { "type": "dialogue", "speaker": "Calvin", "text": "Sometimes.... you get it" },
+        { "type": "dialogue", "speaker": "Hero", "text": "I think you fit in just right." },
+        { "type": "dialogue", "speaker": "Calvin", "text": "Now I do, now I do..." },
+        { "type": "dialogue", "speaker": "Calvin", "text": "Wasn't always like that." },
+        { "type": "dialogue", "speaker": "Hero", "text": "You think I could get past you?" },
+        { "type": "dialogue", "speaker": "Calvin", "text": "Oh yeah, yeah... Sorry." },
+        { "type": "dialogue", "speaker": "Calvin", "text": "Come by again sometime." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Maybe, Calvin." },
+        { "type": "showObject", "target": "next-arrow" },
+        { "type": "waitForClick", "target": "next-arrow" },
+        { "type": "transition" }
+    ]
+}

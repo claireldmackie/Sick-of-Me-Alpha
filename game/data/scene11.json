@@ -1,10 +1,32 @@
 {
     "id": "scene11",
     "background": "assets/backgrounds/bg-11.png",
-    "nextScene": null,
+    "nextScene": "data/scene12.json",
     "fadeDuration": 100,
     "initialState": {},
-    "characters": [],
-    "objects": [],
-    "sequence": []
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "store",
+            "type": "hotspot",
+            "x": 1200,
+            "y": 200,
+            "width": 400,
+            "height": 500,
+            "interactive": true
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "store" },
+        { "type": "transition" }
+    ]
 }

@@ -39,9 +39,13 @@ class DialogueManager {
         this.isCloseup = true;
     }
 
-    showCloseupText(speaker, text) {
+    showCloseupText(speaker, text, useHtml) {
         this.closeupSpeaker.textContent = speaker || '';
-        this.closeupText.textContent = text;
+        if (useHtml) {
+            this.closeupText.innerHTML = text;
+        } else {
+            this.closeupText.textContent = text;
+        }
         this.closeupDialogueBox.classList.remove('hidden');
         this.isShowing = true;
     }

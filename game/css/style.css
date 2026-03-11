@@ -228,33 +228,50 @@ html, body {
 }
 
 #volume-slider {
+    --fill: 75%;
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 2px;
+    height: 6px;
+    background: linear-gradient(to right, #d4829c 0%, #d4829c var(--fill), rgba(255, 255, 255, 0.2) var(--fill), rgba(255, 255, 255, 0.2) 100%);
+    border-radius: 3px;
     outline: none;
     cursor: pointer;
+    margin: 8px 0;
 }
 
 #volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     background: #fff;
     border-radius: 50%;
     cursor: pointer;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
 }
 
 #volume-slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     background: #fff;
     border-radius: 50%;
     border: none;
     cursor: pointer;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+#volume-slider::-moz-range-track {
+    background: rgba(255, 255, 255, 0.2);
+    height: 6px;
+    border-radius: 3px;
+    border: none;
+}
+
+#volume-slider::-moz-range-progress {
+    background: #d4829c;
+    height: 6px;
+    border-radius: 3px;
 }
 
 /* ── Save Slots ── */
@@ -403,6 +420,7 @@ html, body {
     color: #444;
     line-height: 1.6;
     white-space: pre-line;
+    height: 100%;
 }
 
 .letter-arrow {
@@ -561,6 +579,121 @@ html, body {
     line-height: 1.5;
 }
 
+/* ── Tutorial Prompt ── */
+
+#tutorial-prompt {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    padding: 24px 48px;
+    z-index: 12;
+    opacity: 0;
+    transition: opacity 0.8s ease-in;
+}
+
+#tutorial-prompt.visible {
+    opacity: 1;
+}
+
+#tutorial-prompt.fading-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
+
+#tutorial-prompt p {
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 40px;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: center;
+}
+
+/* ── Dialogue Options ── */
+
+#dialogue-options {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 1400px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 30px 40px;
+    color: #fff;
+    z-index: 15;
+}
+
+#options-prompt {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 26px;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    color: #ddd;
+}
+
+#options-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#options-buttons button {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 6px;
+    color: #ccc;
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 30px;
+    padding: 12px 24px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+#options-buttons button:hover {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── Credits Overlay ── */
+
+#credits-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.95);
+}
+
+.credits-content {
+    text-align: center;
+    color: #d0d0d0;
+    position: relative;
+}
+
+.credits-content h1 {
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 72px;
+    color: #e0e0e0;
+    margin-bottom: 20px;
+}
+
+.credits-content p {
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 36px;
+    color: #999;
+}
+
+.credits-close {
+    position: absolute;
+    top: -40px;
+    right: -60px;
+}
+
 /* ── Dev Tools ── */
 
 #dev-tools {
@@ -641,4 +774,21 @@ html, body {
 
 #btn-reset-sim:hover {
     background: rgba(200, 50, 50, 0.9);
+}
+
+.bill-note {
+    color: #cc0000;
+    font-size: 140px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    line-height: 1.1;
+    border: 4px solid #cc0000;
+    padding: 20px 40px;
 }

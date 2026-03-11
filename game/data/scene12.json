@@ -1,0 +1,51 @@
+{
+    "id": "scene12",
+    "background": "assets/backgrounds/bg-12.png",
+    "nextScene": "data/scene13.json",
+    "fadeDuration": 1000,
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "scale": 0.8,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "girl",
+            "type": "hotspot",
+            "x": 800,
+            "y": 700,
+            "width": 300,
+            "height": 200,
+            "interactive": true
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "girl" },
+        { "type": "dialogue", "speaker": "Hero", "text": "Is she okay?" },
+        { "type": "pause", "duration": 800 },
+        { "type": "dialogue", "speaker": "Veronica", "text": "Oh, hey [Hero]! Didn't see you there!" },
+        { "type": "dialogue", "speaker": "Veronica", "text": "It's been a while... I guess we've never really talked one on one, have we?" },
+        { "type": "dialogue", "speaker": "Hero", "text": "I-" },
+        { "type": "dialogue", "speaker": "Veronica", "text": "How have you been? Personally, I love my life. Some would say I'm thriving." },
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
+        { "type": "dialogue", "speaker": "Veronica", "text": "But it has been feeling pretty desolate around here lately. I think everyone is going crazy or something." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Mhm." },
+        { "type": "dialogue", "speaker": "Veronica", "text": "You know how it is in this town, when part of our routine is changed everyone gets unsettled. It's easy for things to feel like their falling apart when no one's around to pick up the pieces. Maybe if you hadn't up and disappeared like you did..." },
+        { "type": "pause", "duration": 1000 },
+        { "type": "dialogue", "speaker": "Veronica", "text": "I forgive you though, I have a generous spirit." },
+        { "type": "dialogue", "speaker": "Veronica", "text": "...or so people say!" },
+        { "type": "dialogue", "speaker": "Hero", "text": "It's pretty dirty in here." },
+        { "type": "dialogue", "speaker": "Veronica", "text": "Oh? Yeah, I guess it is... I hadn't noticed." },
+        { "type": "dialogue", "speaker": "Veronica", "text": "Anyway, what can I get for you?" },
+        { "type": "dialogue", "speaker": "Hero", "text": "I'd like some flowers." },
+        { "type": "dialogue", "speaker": "Veronica", "text": "Sure, have a look around." },
+        { "type": "transition" }
+    ]
+}

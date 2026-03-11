@@ -1,0 +1,59 @@
+{
+    "id": "scene15",
+    "background": "assets/backgrounds/bg-12.png",
+    "nextScene": "data/scene16.json",
+    "fadeDuration": 100,
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "scale": 0.8,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "girl",
+            "type": "hotspot",
+            "x": 800,
+            "y": 700,
+            "width": 300,
+            "height": 200,
+            "interactive": true
+        },
+        {
+            "id": "doors",
+            "type": "hotspot",
+            "x": 750,
+            "y": 50,
+            "width": 450,
+            "height": 550,
+            "interactive": true,
+            "visible": false
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "girl" },
+        { "type": "dialogue", "speaker": "Veronica", "text": "Hey [Hero]" },
+        { "type": "dialogue", "speaker": "Hero", "text": "Hm?" },
+        { "type": "dialogue", "speaker": "Veronica", "text": "We had a party out by the bridge like we usually do, but with the routine all out of whack it was a mess! Calvin was there and he was droning on and on, worse than usual. And there was nobody to send out invitations, so everyone showed up at different times." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Sounds hectic." },
+        { "type": "dialogue", "speaker": "Veronica", "text": "Very. It's easy for the equilibrium around here to get thrown off, you know that right? I know you know that, but I guess it didn't stop you from going off on your own." },
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
+        { "type": "dialogue", "speaker": "Veronica", "text": "Anyway, it's fine. Even if the party sucked don't worry about it, really." },
+        { "type": "dialogue", "speaker": "Veronica", "text": "..." },
+        { "type": "dialogue", "speaker": "Veronica", "text": "Speaking of Calvin, he still has your bag and everything you left by the bridge. You were in such a hurry to leave, can't blame you though. Are you going to pick it up?" },
+        { "type": "dialogue", "speaker": "Hero", "text": "Yeah, I will. I forgot about that." },
+        { "type": "dialogue", "speaker": "Veronica", "text": "..." },
+        { "type": "dialogue", "speaker": "Veronica", "text": "Well, it was nice talking to you." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Are you going to get up?" },
+        { "type": "dialogue", "speaker": "Veronica", "text": "I could, if I wanted to... but I don't want to. I'm not stuck just comfy, y'know?" },
+        { "type": "showObject", "target": "doors" },
+        { "type": "waitForClick", "target": "doors" },
+        { "type": "transition" }
+    ]
+}

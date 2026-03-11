@@ -14,9 +14,12 @@ class SceneManager {
         this.isProcessing = false;
         this.stopped = false;
         this.onSceneEnd = null;
+        this.onStepAdvance = null;
         this.config = null;
         this.skipRequested = false;
         this._skipResolve = null;
+        this.audioManager = null;
+        this.playerChoices = [];
 
         const skipBtn = document.getElementById('skip-btn');
         if (skipBtn) {
@@ -121,6 +124,15 @@ class SceneManager {
         this.input.clickCallbacks = [];
         this.dialogue.hide();
         this.dialogue.hideCloseup();
+        if (this._resolveWait) {
+            this._resolveWait();
+            this._resolveWait = null;
+        }
+        if (this._skipResolve) {
+            const resolve = this._skipResolve;
+            this._skipResolve = null;
+            resolve();
+        }
     }
 
     async runSequence() {
@@ -172,6 +184,7 @@ class SceneManager {
 
             await this.executeStep(step);
             this.sequenceIndex++;
+            if (this.onStepAdvance) this.onStepAdvance(this.sequenceIndex);
         }
 
         this.isProcessing = false;
@@ -329,7 +342,14 @@ class SceneManager {
             const anchorX = item.anchorX ?? (d.type === 'character' ? 0.5 : 0);
             const anchorY = item.anchorY ?? (d.type === 'character' ? 1.0 : 0);
             const flipX = item.flipX || false;
+            const opacity = item.opacity ?? 1.0;
+            const brightness = item.brightness ?? null;
+            const ctx = this.renderer.ctx;
+            if (opacity < 1.0) ctx.globalAlpha = opacity;
+            if (brightness !== null) ctx.filter = `brightness(${brightness})`;
             this.renderer.drawSprite(img, item.x, item.y, scale, anchorX, anchorY, flipX);
+            if (brightness !== null) ctx.filter = 'none';
+            if (opacity < 1.0) ctx.globalAlpha = 1.0;
         }
 
         this.drawHoverGlow();
@@ -413,7 +433,7 @@ class SceneManager {
             case 'closeupDialogue': {
                 const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
                 this.showSkipButton(remaining >= 3);
-                this.dialogue.showCloseupText(step.speaker, step.text);
+                this.dialogue.showCloseupText(step.speaker, step.text, step.html);
                 await this.waitForAnyClick();
                 this.dialogue.hide();
                 this.showSkipButton(false);
@@ -436,6 +456,51 @@ class SceneManager {
                     }
                 }
                 break;
+
+            case 'tutorial': {
+                await this.showTutorial(step.text);
+                break;
+            }
+
+            case 'dialogueOptions': {
+                const chosen = await this.showDialogueOptions(step.speaker, step.prompt, step.options);
+                this.playerChoices.push(chosen.category);
+                if (chosen.followUp) {
+                    this.dialogue.show(step.speaker, chosen.followUp);
+                    await this.waitForAnyClick();
+                    this.dialogue.hide();
+                }
+                break;
+            }
+
+            case 'determineEnding': {
+                const ending = this.determineEnding();
+                const endingMap = step.endings || {};
+                const nextScene = endingMap[ending];
+                if (nextScene) {
+                    this.currentScene.nextScene = nextScene;
+                }
+                break;
+            }
+
+            case 'showNote': {
+                if (this.uiManager) {
+                    await this.uiManager.showNote(step.title || '', step.text || '', step.cssClass || '');
+                }
+                break;
+            }
+
+            case 'startMusic': {
+                if (this.audioManager) {
+                    this.audioManager.fadeIn(step.fadeDuration || 3000);
+                }
+                break;
+            }
+
+            case 'showCredits': {
+                await this.showCreditsOverlay();
+                break;
+            }
 
             case 'transition':
                 await this.fadeOut();
@@ -516,6 +581,88 @@ class SceneManager {
             this._resolveWait();
             this._resolveWait = null;
         }
+    }
+
+    showDialogueOptions(speaker, prompt, options) {
+        return new Promise((resolve) => {
+            const container = document.getElementById('dialogue-options');
+            const promptEl = document.getElementById('options-prompt');
+            const buttonsEl = document.getElementById('options-buttons');
+
+            promptEl.textContent = (speaker ? speaker + ': ' : '') + prompt;
+            buttonsEl.innerHTML = '';
+
+            for (const opt of options) {
+                const btn = document.createElement('button');
+                btn.textContent = opt.label;
+                btn.addEventListener('click', () => {
+                    container.classList.add('hidden');
+                    resolve(opt);
+                });
+                buttonsEl.appendChild(btn);
+            }
+
+            container.classList.remove('hidden');
+        });
+    }
+
+    showTutorial() {
+        return new Promise((resolve) => {
+            const el = document.getElementById('tutorial-prompt');
+            if (!el) { resolve(); return; }
+
+            el.classList.remove('hidden', 'fading-out', 'visible');
+            el.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                el.classList.add('visible');
+            });
+
+            const keys = ['a', 'd', 'arrowleft', 'arrowright'];
+            const handler = (e) => {
+                if (keys.includes(e.key.toLowerCase())) {
+                    document.removeEventListener('keydown', handler);
+                    el.classList.remove('visible');
+                    el.classList.add('fading-out');
+                    setTimeout(() => {
+                        el.classList.add('hidden');
+                        el.classList.remove('fading-out');
+                        resolve();
+                    }, 500);
+                }
+            };
+            document.addEventListener('keydown', handler);
+        });
+    }
+
+    showCreditsOverlay() {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('credits-overlay');
+            if (!overlay) { resolve(); return; }
+            overlay.classList.remove('hidden');
+            const closeBtn = overlay.querySelector('.credits-close');
+            const handler = () => {
+                closeBtn.removeEventListener('click', handler);
+                overlay.classList.add('hidden');
+                resolve();
+            };
+            if (closeBtn) closeBtn.addEventListener('click', handler);
+        });
+    }
+
+    determineEnding() {
+        const counts = {};
+        for (const cat of this.playerChoices) {
+            counts[cat] = (counts[cat] || 0) + 1;
+        }
+        let best = 'connect';
+        let bestCount = 0;
+        for (const [cat, count] of Object.entries(counts)) {
+            if (count > bestCount) {
+                bestCount = count;
+                best = cat;
+            }
+        }
+        return best;
     }
 
     sleep(ms) {
