@@ -60,9 +60,10 @@
         { "type": "dialogue", "speaker": "Unknown", "text": "COME OUTSIDE, I WANT TO TALK! *Thump thump thump*" },
         { "type": "showCharacter", "target": "hero" },
         { "type": "dialogue", "speaker": "Hero", "text": "Mom probably ordered dinner." },
+        { "type": "showTutorial" },
         { "type": "waitForClick", "target": "curtain" },
+        { "type": "hideTutorial" },
         { "type": "dialogue", "speaker": "Hero", "text": "I should really clean those..." },
-        { "type": "tutorial" },
         { "type": "showObject", "target": "door-arrow" },
         { "type": "waitForClick", "target": "door-arrow" },
         { "type": "transition" }

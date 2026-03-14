@@ -9,29 +9,22 @@
         {
             "id": "flower-in-bucket",
             "image": "assets/objects/flower.png",
-            "x": 870,
-            "y": 680,
-            "scale": 0.4,
+            "x": 820,
+            "y": 595,
+            "scale": 0.14,
+            "filter": "brightness(1.15) sepia(0.08) hue-rotate(70deg) saturate(0.8)",
             "interactive": false,
             "zIndex": 2
         },
         {
-            "id": "flower-on-ground",
+            "id": "flower-in-bucket-2",
             "image": "assets/objects/flower.png",
-            "x": 970,
-            "y": 830,
-            "scale": 0.35,
+            "x": 870,
+            "y": 630,
+            "scale": 0.11,
+            "filter": "brightness(1.15) sepia(0.08) hue-rotate(70deg) saturate(0.8)",
             "interactive": false,
             "zIndex": 2
-        },
-        {
-            "id": "flowers",
-            "type": "hotspot",
-            "x": 830,
-            "y": 680,
-            "width": 250,
-            "height": 220,
-            "interactive": true
         },
         {
             "id": "snack",
@@ -40,14 +33,10 @@
             "y": 200,
             "width": 1050,
             "height": 450,
-            "interactive": true,
-            "visible": false
+            "interactive": true
         }
     ],
     "sequence": [
-        { "type": "waitForClick", "target": "flowers" },
-        { "type": "dialogue", "speaker": "Hero", "text": "These will have to do... I should probably get a snack too." },
-        { "type": "showObject", "target": "snack" },
         { "type": "waitForClick", "target": "snack" },
         { "type": "transition" }
     ]

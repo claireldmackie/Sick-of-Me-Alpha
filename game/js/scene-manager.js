@@ -20,6 +20,7 @@ class SceneManager {
         this._skipResolve = null;
         this.audioManager = null;
         this.playerChoices = [];
+        this.fading = false;
 
         const skipBtn = document.getElementById('skip-btn');
         if (skipBtn) {
@@ -85,6 +86,9 @@ class SceneManager {
 
         this.updateHitTargets();
         this.render();
+        const ctx = this.renderer.ctx;
+        ctx.fillStyle = 'rgb(0, 0, 0)';
+        ctx.fillRect(0, 0, this.renderer.width, this.renderer.height);
     }
 
     getState() {
@@ -344,11 +348,13 @@ class SceneManager {
             const flipX = item.flipX || false;
             const opacity = item.opacity ?? 1.0;
             const brightness = item.brightness ?? null;
+            const customFilter = item.filter || null;
             const ctx = this.renderer.ctx;
             if (opacity < 1.0) ctx.globalAlpha = opacity;
-            if (brightness !== null) ctx.filter = `brightness(${brightness})`;
+            if (customFilter) ctx.filter = customFilter;
+            else if (brightness !== null) ctx.filter = `brightness(${brightness})`;
             this.renderer.drawSprite(img, item.x, item.y, scale, anchorX, anchorY, flipX);
-            if (brightness !== null) ctx.filter = 'none';
+            if (customFilter || brightness !== null) ctx.filter = 'none';
             if (opacity < 1.0) ctx.globalAlpha = 1.0;
         }
 
@@ -452,6 +458,7 @@ class SceneManager {
                 if (this.letterManager) {
                     this.letterManager.collect(step.letterId);
                     if (this.uiManager) {
+                        this.uiManager.addUnreadLetter();
                         await this.uiManager.showSingleLetter(step.letterId);
                     }
                 }
@@ -459,6 +466,31 @@ class SceneManager {
 
             case 'tutorial': {
                 await this.showTutorial(step.text);
+                break;
+            }
+
+            case 'showTutorial': {
+                const el = document.getElementById('tutorial-prompt');
+                if (el) {
+                    el.classList.remove('hidden', 'fading-out', 'visible');
+                    el.offsetHeight;
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => el.classList.add('visible'));
+                    });
+                }
+                break;
+            }
+
+            case 'hideTutorial': {
+                const el = document.getElementById('tutorial-prompt');
+                if (el) {
+                    el.classList.remove('visible');
+                    el.classList.add('fading-out');
+                    setTimeout(() => {
+                        el.classList.add('hidden');
+                        el.classList.remove('fading-out');
+                    }, 500);
+                }
                 break;
             }
 
@@ -701,6 +733,7 @@ class SceneManager {
         const h = this.renderer.height;
         const duration = (this.currentScene && this.currentScene.fadeDuration) || 1000;
         const startTime = performance.now();
+        this.fading = true;
 
         return new Promise((resolve) => {
             const animate = (now) => {
@@ -714,6 +747,7 @@ class SceneManager {
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
+                    this.fading = false;
                     resolve();
                 }
             };

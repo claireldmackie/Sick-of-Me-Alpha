@@ -9,6 +9,7 @@ class UIManager {
         this.selectedSlot = null;
         this.copySourceSlot = null;
         this.currentLetterIndex = 0;
+        this.unreadLetters = 0;
 
         this.onNewGame = null;
         this.onLoadSave = null;
@@ -58,6 +59,7 @@ class UIManager {
 
         this.hudHamburger = document.getElementById('hud-hamburger');
         this.hudEnvelope = document.getElementById('hud-envelope');
+        this.letterBadge = document.getElementById('letter-badge');
     }
 
     _bindEvents() {
@@ -125,9 +127,10 @@ class UIManager {
             if (e.key === 'Escape') this._handleEscape();
         });
 
-        const overlays = [this.homepage, this.pauseOverlay, this.savePanel, this.confirmDialog, this.letterViewer];
+        const dialogueOptions = document.getElementById('dialogue-options');
+        const overlays = [this.homepage, this.pauseOverlay, this.savePanel, this.confirmDialog, this.letterViewer, dialogueOptions];
         for (const el of overlays) {
-            el.addEventListener('click', (e) => e.stopPropagation());
+            if (el) el.addEventListener('click', (e) => e.stopPropagation());
         }
     }
 
@@ -406,7 +409,24 @@ class UIManager {
 
     /* ── Letter Viewer ── */
 
+    addUnreadLetter() {
+        this.unreadLetters++;
+        this._updateBadge();
+    }
+
+    _updateBadge() {
+        if (!this.letterBadge) return;
+        if (this.unreadLetters > 0) {
+            this.letterBadge.textContent = this.unreadLetters;
+            this.letterBadge.classList.remove('hidden');
+        } else {
+            this.letterBadge.classList.add('hidden');
+        }
+    }
+
     showLetterViewer() {
+        this.unreadLetters = 0;
+        this._updateBadge();
         const collected = this.letterManager.getCollected();
         if (collected.length === 0) {
             this.letterTitle.textContent = 'No letters yet';

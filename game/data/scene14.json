@@ -7,16 +7,49 @@
     "characters": [],
     "objects": [
         {
+            "id": "flower-left",
+            "image": "assets/objects/flower.png",
+            "x": 50,
+            "y": 685,
+            "scale": 0.3,
+            "filter": "brightness(1.15) sepia(0.08) hue-rotate(70deg) saturate(0.8)",
+            "interactive": false,
+            "zIndex": 2
+        },
+        {
+            "id": "flower-left-2",
+            "image": "assets/objects/flower.png",
+            "x": 140,
+            "y": 735,
+            "scale": 0.25,
+            "filter": "brightness(1.15) sepia(0.08) hue-rotate(70deg) saturate(0.8)",
+            "interactive": false,
+            "zIndex": 2
+        },
+        {
+            "id": "flowers",
+            "type": "hotspot",
+            "x": 110,
+            "y": 690,
+            "width": 320,
+            "height": 200,
+            "interactive": true
+        },
+        {
             "id": "counter",
             "type": "hotspot",
             "x": 400,
             "y": 300,
             "width": 600,
             "height": 400,
-            "interactive": true
+            "interactive": true,
+            "visible": false
         }
     ],
     "sequence": [
+        { "type": "waitForClick", "target": "flowers" },
+        { "type": "dialogue", "speaker": "Hero", "text": "These will have to do... I should probably get a snack too." },
+        { "type": "showObject", "target": "counter" },
         { "type": "waitForClick", "target": "counter" },
         { "type": "dialogue", "speaker": "Hero", "text": "I think that's all I need." },
         { "type": "transition" }

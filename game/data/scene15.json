@@ -10,6 +10,7 @@
             "x": 250,
             "y": 1020,
             "scale": 0.8,
+            "filter": "brightness(1.15) sepia(0.08) hue-rotate(70deg) saturate(0.8)",
             "visible": true,
             "interactive": false,
             "zIndex": 2

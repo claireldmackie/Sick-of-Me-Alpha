@@ -9,9 +9,10 @@
             "id": "hero",
             "x": 250,
             "y": 1020,
+            "scale": 0.8,
             "visible": true,
             "interactive": false,
-            "zIndex": 2
+            "zIndex": 5
         }
     ],
     "objects": [
@@ -19,19 +20,19 @@
             "id": "mailbox-closed",
             "image": "assets/objects/mailbox-closed.png",
             "x": 1600,
-            "y": 650,
+            "y": 570,
             "scale": 1.0,
             "flipX": true,
             "visible": true,
             "interactive": true,
             "zIndex": 3,
-            "hitbox": { "x": 1430, "y": 650, "width": 173, "height": 378 }
+            "hitbox": { "x": 1430, "y": 570, "width": 173, "height": 378 }
         },
         {
             "id": "mailbox-open",
             "image": "assets/objects/mailbox-open.png",
             "x": 1600,
-            "y": 650,
+            "y": 570,
             "scale": 1.0,
             "flipX": true,
             "visible": false,
@@ -42,7 +43,7 @@
             "id": "mailbox-letters",
             "image": "assets/objects/mailbox-letters.png",
             "x": 1200,
-            "y": 970,
+            "y": 890,
             "scale": 0.6,
             "visible": false,
             "interactive": true,
@@ -72,6 +73,7 @@
         { "type": "dialogue", "speaker": "Hero", "text": "So many god damn letters." },
         { "type": "dialogue", "speaker": "Hero", "text": "..." },
         { "type": "dialogue", "speaker": "Hero", "text": "I guess I should go to the store." },
+        { "type": "hideObject", "target": "mailbox-letters" },
         { "type": "showObject", "target": "next-arrow" },
         { "type": "waitForClick", "target": "next-arrow" },
         { "type": "transition" }

@@ -167,6 +167,7 @@ class Game {
         const tick = () => {
             requestAnimationFrame(tick);
             if (this._transitioning) return;
+            if (this.sceneManager.fading) return;
             if (!this.sceneManager.currentScene) return;
             if (this.input.blocked) return;
             const hero = this.sceneManager.currentScene.characters?.find(c => c.id === 'hero');
