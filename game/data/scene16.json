@@ -1,6 +1,6 @@
 {
     "id": "scene16",
-    "background": "assets/backgrounds/bg-11.png",
+    "background": "assets/backgrounds/bg-16.png",
     "nextScene": "data/scene17.json",
     "fadeDuration": 100,
     "initialState": {},

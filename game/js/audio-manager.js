@@ -1,7 +1,7 @@
 class AudioManager {
     constructor() {
         this.music = null;
-        this.volume = 0.45;
+        this.volume = 0.15;
         this.fadeInterval = null;
         this.playing = false;
     }
@@ -51,6 +51,16 @@ class AudioManager {
 
     getVolume() {
         return this.volume;
+    }
+
+    pause() {
+        if (!this.music || !this.playing) return;
+        this.music.pause();
+    }
+
+    resume() {
+        if (!this.music || !this.playing) return;
+        this.music.play().catch(() => {});
     }
 
     stop() {

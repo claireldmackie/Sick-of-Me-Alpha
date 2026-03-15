@@ -196,11 +196,13 @@ class UIManager {
     showPause() {
         this.pauseOverlay.classList.remove('hidden');
         this._syncInputBlock();
+        if (this.audioManager) this.audioManager.pause();
     }
 
     hidePause() {
         this.pauseOverlay.classList.add('hidden');
         this._syncInputBlock();
+        if (this.audioManager) this.audioManager.resume();
         if (this.onResume) this.onResume();
     }
 

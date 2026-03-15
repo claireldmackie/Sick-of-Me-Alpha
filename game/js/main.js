@@ -88,9 +88,7 @@ class Game {
             this.letterManager.setCollected(saveData.letters || []);
             this.sceneProgress = saveData.sceneProgress || {};
             this.browsingCompleted = false;
-            if (saveData.sceneIndex >= 4) {
-                this.audioManager.play();
-            }
+            this._syncMusic(saveData.sceneIndex);
             this.loadSceneByIndex(saveData.sceneIndex, saveData.sequenceIndex);
         };
 
@@ -302,6 +300,20 @@ class Game {
         this.loadSceneWithProgress(nextIndex);
     }
 
+    _storeScenes = [12, 13, 14, 15];
+
+    _syncMusic(index) {
+        if (this._storeScenes.includes(index)) {
+            if (this.audioManager.playing) this.audioManager.pause();
+        } else if (index >= 4) {
+            if (!this.audioManager.playing) {
+                this.audioManager.play();
+            } else {
+                this.audioManager.resume();
+            }
+        }
+    }
+
     async loadCompletedScene(index, enterFromRight) {
         this.currentSceneIndex = index;
         this.browsingCompleted = true;
@@ -321,9 +333,7 @@ class Game {
                 }
             }
 
-            if (index >= 4 && !this.audioManager.playing) {
-                this.audioManager.play();
-            }
+            this._syncMusic(index);
 
             await this.sceneManager.fadeIn();
         } catch (e) {
@@ -348,9 +358,7 @@ class Game {
             const progress = this.sceneProgress[index];
             const seqLength = this.sceneManager.currentScene?.sequence?.length || 0;
 
-            if (index >= 4 && !this.audioManager.playing) {
-                this.audioManager.play();
-            }
+            this._syncMusic(index);
 
             if (progress !== undefined && progress >= seqLength) {
                 this.browsingCompleted = true;
@@ -382,7 +390,7 @@ class Game {
         const gameW = 1920;
         const gameH = 1080;
 
-        const scale = Math.max(windowW / gameW, windowH / gameH);
+        const scale = Math.min(windowW / gameW, windowH / gameH);
         const offsetX = (windowW - gameW * scale) / 2;
         const offsetY = (windowH - gameH * scale) / 2;
 

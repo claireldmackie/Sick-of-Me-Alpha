@@ -6,10 +6,10 @@
 
 html, body {
     background: #000;
-    overflow: hidden;
     width: 100%;
     height: 100%;
     font-family: 'Reenie Beanie', cursive;
+    overflow: hidden;
 }
 
 #game-container {
@@ -452,11 +452,11 @@ html, body {
 }
 
 #letter-paper {
-    width: 550px;
-    height: 700px;
+    width: 680px;
+    height: 800px;
     background: #f0eeeb;
     box-shadow: 2px 4px 20px rgba(0, 0, 0, 0.1);
-    padding: 60px 50px;
+    padding: 60px 55px;
     overflow-y: auto;
     display: flex;
     align-items: center;
@@ -465,7 +465,7 @@ html, body {
 
 #letter-content {
     font-family: 'Reenie Beanie', cursive;
-    font-size: 24px;
+    font-size: 30px;
     color: #444;
     line-height: 0.9;
     white-space: pre-line;
