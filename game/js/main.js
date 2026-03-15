@@ -392,7 +392,7 @@ class Game {
     async start() {
         await this.sceneManager.loadConfig('data/config.json');
         await this.letterManager.loadLetterData('data/letters.json');
-        this.audioManager.load('assets/audio/music.mp3');
+        this.audioManager.load('assets/audio/music.wav');
         this.ui.showHomepage();
     }
 

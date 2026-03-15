@@ -1,7 +1,7 @@
 class AudioManager {
     constructor() {
         this.music = null;
-        this.volume = 0.75;
+        this.volume = 0.45;
         this.fadeInterval = null;
         this.playing = false;
     }
@@ -19,7 +19,7 @@ class AudioManager {
         this.music.play().catch(() => {});
     }
 
-    fadeIn(duration = 3000) {
+    fadeIn(duration = 6000) {
         if (!this.music || this.playing) return;
         this.playing = true;
         this.music.volume = 0;
