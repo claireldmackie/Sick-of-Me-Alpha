@@ -594,7 +594,9 @@ class SceneManager {
 
     showSkipButton(visible) {
         const btn = document.getElementById('skip-btn');
-        if (btn) btn.style.display = visible ? 'block' : 'none';
+        const devCheck = document.getElementById('dev-toggle-check');
+        const devOn = devCheck && devCheck.checked;
+        if (btn) btn.style.display = (visible && devOn) ? 'block' : 'none';
     }
 
     waitForAnyClick() {

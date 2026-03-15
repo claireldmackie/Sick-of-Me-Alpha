@@ -66,6 +66,7 @@ class Game {
         this._wireUI();
         this._wireReset();
         this._wireSceneSelector();
+        this._wireDevToggle();
         this._startGameLoop();
         this.fitToWindow();
         window.addEventListener('resize', () => this.fitToWindow());
@@ -159,6 +160,19 @@ class Game {
             if (!list.classList.contains('hidden') && !list.contains(e.target) && e.target !== btn) {
                 list.classList.add('hidden');
             }
+        });
+    }
+
+    _wireDevToggle() {
+        const checkbox = document.getElementById('dev-toggle-check');
+        const devTools = document.getElementById('dev-tools');
+        if (!checkbox || !devTools) return;
+
+        this.devMode = false;
+
+        checkbox.addEventListener('change', () => {
+            this.devMode = checkbox.checked;
+            devTools.classList.toggle('hidden', !this.devMode);
         });
     }
 

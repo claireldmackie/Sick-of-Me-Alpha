@@ -608,7 +608,7 @@ html, body {
 
 #tutorial-prompt {
     position: absolute;
-    top: 50%;
+    top: 58%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 12;
@@ -616,6 +616,7 @@ html, body {
     transition: opacity 0.8s ease-in;
     background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0.1) 55%, rgba(0, 0, 0, 0) 75%);
     padding: 80px 120px;
+    pointer-events: none;
 }
 
 #tutorial-prompt.visible {
@@ -718,10 +719,29 @@ html, body {
 
 /* ── Dev Tools ── */
 
+#dev-toggle {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    z-index: 101;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 11px;
+    cursor: pointer;
+    user-select: none;
+}
+
+#dev-toggle input {
+    cursor: pointer;
+}
+
 #dev-tools {
     position: absolute;
-    bottom: 16px;
-    left: 16px;
+    bottom: 32px;
+    left: 8px;
     z-index: 100;
     display: flex;
     flex-direction: column;
