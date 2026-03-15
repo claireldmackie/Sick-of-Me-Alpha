@@ -16,6 +16,7 @@ class UIManager {
         this.onSaveGame = null;
         this.onResume = null;
         this.onQuitToMenu = null;
+        this._savedSinceLoad = false;
 
         this._bindElements();
         this._bindEvents();
@@ -42,7 +43,6 @@ class UIManager {
         this.saveActions = document.getElementById('save-actions');
         this.loadActions = document.getElementById('load-actions');
         this.saveActionsCancel = document.getElementById('save-actions-cancel');
-        this.btnCopy = document.getElementById('btn-copy');
         this.btnDelete = document.getElementById('btn-delete');
         this.btnLoadDelete = document.getElementById('btn-load-delete');
         this.btnStartGame = document.getElementById('btn-start-game');
@@ -67,6 +67,7 @@ class UIManager {
         this.btnNewGame.addEventListener('click', () => {
             this.hideAll();
             this.showHUD();
+            this._savedSinceLoad = false;
             if (this.onNewGame) this.onNewGame();
         });
         this.btnQuitHome.addEventListener('click', () => {
@@ -79,24 +80,46 @@ class UIManager {
         this.pauseOverlay.querySelector('.close-btn').addEventListener('click', () => this.hidePause());
         this.btnSave.addEventListener('click', () => this.showSaveSlots('save'));
         this.btnQuitPause.addEventListener('click', () => {
-            this.showConfirm('Are you sure you want to\nquit without saving?', () => {
-                this.hideConfirm();
+            if (this._savedSinceLoad) {
                 this.hideAll();
                 if (this.onQuitToMenu) this.onQuitToMenu();
                 this.showHomepage();
-            }, () => {
-                this.hideConfirm();
-            });
+            } else {
+                this.showConfirm('Are you sure you want to\nquit without saving?', () => {
+                    this.hideConfirm();
+                    this.hideAll();
+                    if (this.onQuitToMenu) this.onQuitToMenu();
+                    this.showHomepage();
+                }, () => {
+                    this.hideConfirm();
+                });
+            }
         });
 
-        this.savePanel.querySelector('.close-btn').addEventListener('click', () => this.hideSavePanel());
+        this.btnSaveBack = document.getElementById('save-back-btn');
+        this.btnSaveQuit = document.getElementById('btn-save-quit');
+
+        this.btnSaveBack.addEventListener('click', () => {
+            const mode = this.panelMode;
+            this.hideSavePanel();
+            if (mode === 'load') {
+                this.showHomepage();
+            } else {
+                this.showPause();
+            }
+        });
+
+        this.btnSaveQuit.addEventListener('click', () => {
+            this.hideAll();
+            if (this.onQuitToMenu) this.onQuitToMenu();
+            this.showHomepage();
+        });
 
         this.saveSlots.forEach(slot => {
             const index = parseInt(slot.dataset.slot);
             slot.addEventListener('click', () => this.handleSlotClick(index));
         });
 
-        this.btnCopy.addEventListener('click', () => this.enterCopyMode());
         this.btnDelete.addEventListener('click', () => this.enterDeleteMode());
         this.btnLoadDelete.addEventListener('click', () => this._loadPanelDelete());
         this.btnStartGame.addEventListener('click', () => this._loadPanelStart());
@@ -193,6 +216,7 @@ class UIManager {
         this.saveActions.classList.toggle('hidden', mode !== 'save');
         this.loadActions.classList.toggle('hidden', mode !== 'load');
         this.saveActionsCancel.classList.add('hidden');
+        this.btnSaveQuit.classList.add('hidden');
         this._updateLoadActions();
 
         this.updateSaveSlotDisplay();
@@ -245,13 +269,17 @@ class UIManager {
                 this.showConfirm('Are you sure you want\nto overwrite this save?', () => {
                     this.hideConfirm();
                     if (this.onSaveGame) this.onSaveGame(index);
+                    this._savedSinceLoad = true;
                     this.updateSaveSlotDisplay();
+                    this.btnSaveQuit.classList.remove('hidden');
                 }, () => {
                     this.hideConfirm();
                 });
             } else {
                 if (this.onSaveGame) this.onSaveGame(index);
+                this._savedSinceLoad = true;
                 this.updateSaveSlotDisplay();
+                this.btnSaveQuit.classList.remove('hidden');
             }
             return;
         }
@@ -356,6 +384,7 @@ class UIManager {
                 this.hideConfirm();
                 this.hideAll();
                 this.showHUD();
+                this._savedSinceLoad = false;
                 if (this.onNewGame) this.onNewGame();
             }, () => {
                 this.hideConfirm();
@@ -365,6 +394,7 @@ class UIManager {
         const slotIndex = this.selectedSlot;
         this.hideAll();
         this.showHUD();
+        this._savedSinceLoad = false;
         if (this.onLoadSave) this.onLoadSave(save, slotIndex);
     }
 

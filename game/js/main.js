@@ -23,7 +23,8 @@ class Game {
             'data/scene7.json', 'data/scene8.json', 'data/scene9.json',
             'data/scene10.json', 'data/scene11.json', 'data/scene12.json',
             'data/scene13.json', 'data/scene14.json', 'data/scene15.json',
-            'data/scene16.json', 'data/scene17.json', 'data/scene18.json',
+            'data/scene16.json', 'data/scene17.json', 'data/scene17b.json',
+            'data/scene18.json',
             'data/scene19.json', 'data/scene20.json', 'data/scene21.json',
             'data/scene22.json'
         ];
@@ -33,7 +34,8 @@ class Game {
             'Cows', 'Dirt Road 2', 'Bus Stop',
             'Town Entrance', 'Town', 'Convenience Store',
             'Store Shelves', 'Store (Counter)', 'Convenience Store (Cont.)',
-            'Town (After Store)', 'Town Continued (Drew)', 'Town Continued (Lady)',
+            'Town (After Store)', 'Town Continued (Drew)', 'Town (Clinic)',
+            'Town Continued (Lady)',
             'Front of Bridge', 'End of Bridge', 'Forest',
             'Grave'
         ];
@@ -42,7 +44,7 @@ class Game {
         this.sceneProgress = {};
         this.browsingCompleted = false;
         this._transitioning = false;
-        this.outdoorChain = [3, 4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19, 20, 21];
+        this.outdoorChain = [3, 4, 5, 6, 7, 8, 9, 10, 16, 17, 18, 19, 20, 21, 22];
 
         this.sceneManager.onSceneEnd = (nextScene) => {
             this._saveSceneProgress(this.sceneManager.sequenceIndex);
@@ -278,9 +280,7 @@ class Game {
         this._transitioning = true;
         this._saveSceneProgress(this.sceneManager.sequenceIndex);
         this.sceneManager.stop();
-        this.loadCompletedScene(prevSceneIndex).then(() => {
-            this._transitioning = false;
-        });
+        this.loadCompletedScene(prevSceneIndex, true);
     }
 
     _navigateForward() {
@@ -299,57 +299,80 @@ class Game {
 
         this._transitioning = true;
         this.sceneManager.stop();
-        this.loadSceneWithProgress(nextIndex).then(() => {
-            this._transitioning = false;
-        });
+        this.loadSceneWithProgress(nextIndex);
     }
 
-    async loadCompletedScene(index) {
+    async loadCompletedScene(index, enterFromRight) {
         this.currentSceneIndex = index;
         this.browsingCompleted = true;
-        await this.sceneManager.loadScene(this.scenes[index]);
+        try {
+            await this.sceneManager.loadScene(this.scenes[index]);
 
-        const progress = this.sceneProgress[index];
-        if (progress !== undefined) {
-            this.sceneManager.fastForwardTo(progress);
+            const progress = this.sceneProgress[index];
+            if (progress !== undefined) {
+                this.sceneManager.fastForwardTo(progress);
+            }
+
+            if (enterFromRight) {
+                const hero = this.sceneManager.currentScene?.characters?.find(c => c.id === 'hero');
+                if (hero) {
+                    hero.x = 1850;
+                    hero.flipX = true;
+                }
+            }
+
+            if (index >= 4 && !this.audioManager.playing) {
+                this.audioManager.play();
+            }
+
+            await this.sceneManager.fadeIn();
+        } catch (e) {
+            console.error('Scene load error:', e);
+            this.sceneManager.fading = false;
+        } finally {
+            this._transitioning = false;
         }
-
-        if (index >= 4 && !this.audioManager.playing) {
-            this.audioManager.play();
-        }
-
-        await this.sceneManager.fadeIn();
     }
 
     async loadSceneWithProgress(index) {
         if (index >= this.scenes.length) {
             this.showEndScreen();
+            this._transitioning = false;
             return;
         }
 
         this.currentSceneIndex = index;
-        await this.sceneManager.loadScene(this.scenes[index]);
+        try {
+            await this.sceneManager.loadScene(this.scenes[index]);
 
-        const progress = this.sceneProgress[index];
-        const seqLength = this.sceneManager.currentScene?.sequence?.length || 0;
+            const progress = this.sceneProgress[index];
+            const seqLength = this.sceneManager.currentScene?.sequence?.length || 0;
 
-        if (index >= 4 && !this.audioManager.playing) {
-            this.audioManager.play();
-        }
+            if (index >= 4 && !this.audioManager.playing) {
+                this.audioManager.play();
+            }
 
-        if (progress !== undefined && progress >= seqLength) {
-            this.browsingCompleted = true;
-            this.sceneManager.fastForwardTo(progress);
-            await this.sceneManager.fadeIn();
-        } else if (progress !== undefined && progress > 0) {
-            this.browsingCompleted = false;
-            this.sceneManager.fastForwardTo(progress);
-            await this.sceneManager.fadeIn();
-            await this.sceneManager.runSequence();
-        } else {
-            this.browsingCompleted = false;
-            await this.sceneManager.fadeIn();
-            await this.sceneManager.runSequence();
+            if (progress !== undefined && progress >= seqLength) {
+                this.browsingCompleted = true;
+                this.sceneManager.fastForwardTo(progress);
+                await this.sceneManager.fadeIn();
+                this._transitioning = false;
+            } else if (progress !== undefined && progress > 0) {
+                this.browsingCompleted = false;
+                this.sceneManager.fastForwardTo(progress);
+                await this.sceneManager.fadeIn();
+                this._transitioning = false;
+                await this.sceneManager.runSequence();
+            } else {
+                this.browsingCompleted = false;
+                await this.sceneManager.fadeIn();
+                this._transitioning = false;
+                await this.sceneManager.runSequence();
+            }
+        } catch (e) {
+            console.error('Scene load error:', e);
+            this.sceneManager.fading = false;
+            this._transitioning = false;
         }
     }
 
@@ -379,14 +402,20 @@ class Game {
             return;
         }
         this.currentSceneIndex = index;
-        await this.sceneManager.loadScene(this.scenes[index]);
+        try {
+            await this.sceneManager.loadScene(this.scenes[index]);
 
-        if (jumpToStep !== undefined && jumpToStep > 0) {
-            this.sceneManager.fastForwardTo(jumpToStep);
+            if (jumpToStep !== undefined && jumpToStep > 0) {
+                this.sceneManager.fastForwardTo(jumpToStep);
+            }
+
+            await this.sceneManager.fadeIn();
+            await this.sceneManager.runSequence();
+        } catch (e) {
+            console.error('Scene load error:', e);
+            this.sceneManager.fading = false;
+            this._transitioning = false;
         }
-
-        await this.sceneManager.fadeIn();
-        await this.sceneManager.runSequence();
     }
 
     async loadSceneByFile(file) {
@@ -394,9 +423,15 @@ class Game {
         if (index !== -1) {
             this.currentSceneIndex = index;
         }
-        await this.sceneManager.loadScene(file);
-        await this.sceneManager.fadeIn();
-        await this.sceneManager.runSequence();
+        try {
+            await this.sceneManager.loadScene(file);
+            await this.sceneManager.fadeIn();
+            await this.sceneManager.runSequence();
+        } catch (e) {
+            console.error('Scene load error:', e);
+            this.sceneManager.fading = false;
+            this._transitioning = false;
+        }
 
         if (!this.sceneManager.currentScene?.nextScene && file.includes('scene20')) {
             this.sceneManager.stop();

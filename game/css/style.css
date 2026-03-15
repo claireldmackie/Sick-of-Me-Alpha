@@ -220,6 +220,29 @@ html, body {
     z-index: 5;
 }
 
+.back-btn {
+    position: absolute;
+    top: 195px;
+    left: 560px;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s, transform 0.15s;
+    z-index: 5;
+    color: #fff;
+    font-size: 28px;
+    font-family: Georgia, 'Times New Roman', serif;
+}
+
+.back-btn:hover {
+    opacity: 1;
+    transform: translateX(-2px);
+}
+
+
 .close-btn:hover {
     opacity: 1;
     transform: scale(1.15);
