@@ -81,6 +81,13 @@ class SceneManager {
         if (sceneData.closeupImage) {
             imageSources.push(sceneData.closeupImage);
         }
+        if (sceneData.sequence) {
+            for (const step of sceneData.sequence) {
+                if (step.type === 'setCharacterImage' && step.image) {
+                    imageSources.push(step.image);
+                }
+            }
+        }
 
         await this.imageLoader.loadMultiple(imageSources);
 
@@ -101,7 +108,7 @@ class SceneManager {
         if (!this.currentScene || !this.currentScene.sequence) return;
 
         const seq = this.currentScene.sequence;
-        const stateTypes = ['showCharacter', 'hideCharacter', 'showObject', 'hideObject', 'setState', 'collectLetter'];
+        const stateTypes = ['showCharacter', 'hideCharacter', 'showObject', 'hideObject', 'setState', 'collectLetter', 'setCharacterImage'];
 
         for (let i = 0; i < targetIndex && i < seq.length; i++) {
             const step = seq[i];
@@ -114,6 +121,10 @@ class SceneManager {
             else if (step.type === 'setState') Object.assign(this.sceneState, step.state);
             else if (step.type === 'collectLetter' && this.letterManager) {
                 this.letterManager.collect(step.letterId);
+            }
+            else if (step.type === 'setCharacterImage') {
+                const char = this.currentScene.characters?.find(c => c.id === step.target);
+                if (char) char.image = step.image;
             }
         }
 
@@ -408,6 +419,16 @@ class SceneManager {
                 this.updateHitTargets();
                 this.render();
                 break;
+
+            case 'setCharacterImage': {
+                const char = this.currentScene?.characters?.find(c => c.id === step.target);
+                if (char && step.image) {
+                    await this.imageLoader.loadMultiple([step.image]);
+                    char.image = step.image;
+                    this.render();
+                }
+                break;
+            }
 
             case 'hideCharacter':
                 this.setCharacterVisible(step.target, false);
@@ -707,6 +728,7 @@ class SceneManager {
         const h = this.renderer.height;
         const duration = (this.currentScene && this.currentScene.fadeDuration) || 1000;
         const startTime = performance.now();
+        this.fading = true;
 
         return new Promise((resolve) => {
             const animate = (now) => {

@@ -22,6 +22,12 @@ class InputManager {
             e.preventDefault();
             this.keysDown.delete(e.key.toLowerCase());
         });
+        document.addEventListener('visibilitychange', () => {
+            this.keysDown.clear();
+        });
+        window.addEventListener('blur', () => {
+            this.keysDown.clear();
+        });
     }
 
     isKeyDown(key) {
