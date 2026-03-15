@@ -32,11 +32,10 @@
     "sequence": [
         { "type": "waitForClick", "target": "veronica" },
         { "type": "dialogue", "speaker": "Hero", "text": "Is she okay?" },
-        { "type": "pause", "duration": 600 },
+        { "type": "pause", "duration": 500 },
         { "type": "setCharacterImage", "target": "veronica", "image": "assets/characters/veronica-threequarter.png" },
-        { "type": "pause", "duration": 600 },
+        { "type": "pause", "duration": 500 },
         { "type": "setCharacterImage", "target": "veronica", "image": "assets/characters/veronica-faceup.png" },
-        { "type": "pause", "duration": 400 },
         { "type": "dialogue", "speaker": "Veronica", "text": "Oh, hey [Hero]! Didn't see you there!" },
         { "type": "dialogue", "speaker": "Veronica", "text": "It's been a while... I guess we've never really talked one on one, have we?" },
         { "type": "dialogue", "speaker": "Hero", "text": "I-" },
