@@ -66,9 +66,13 @@
         { "type": "closeupDialogue", "speaker": "Hero", "text": "I didn't need to see that..." },
         { "type": "hideCloseup" },
         { "type": "dialogue", "speaker": "Unknown", "text": "*Thump thump*" },
-        { "type": "waitForClick", "target": "lamp" },
-        { "type": "dialogue", "speaker": "Hero", "text": "Hm, it's broken." },
-        { "type": "waitForClick", "target": "door" },
+        { "type": "waitForClickBranch", "branches": {
+            "lamp": [
+                { "type": "dialogue", "speaker": "Hero", "text": "Hm, it's broken." },
+                { "type": "waitForClick", "target": "door" }
+            ],
+            "door": []
+        }},
         { "type": "pause", "duration": 500 },
         { "type": "transition" }
     ]

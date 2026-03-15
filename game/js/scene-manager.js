@@ -414,6 +414,23 @@ class SceneManager {
                 this.waitingForTarget = null;
                 break;
 
+            case 'waitForClickBranch': {
+                const targets = Object.keys(step.branches);
+                this.waitingForTarget = targets;
+                this.updateHitTargets();
+                this.render();
+                const clicked = await this.waitForTargetClick(targets);
+                this.waitingForTarget = null;
+                const branchSteps = step.branches[clicked];
+                if (branchSteps) {
+                    for (const s of branchSteps) {
+                        if (this.stopped) break;
+                        await this.executeStep(s);
+                    }
+                }
+                break;
+            }
+
             case 'showCharacter':
                 this.setCharacterVisible(step.target, true);
                 this.updateHitTargets();
