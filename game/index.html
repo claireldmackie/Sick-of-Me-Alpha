@@ -147,7 +147,7 @@
         <div id="dialogue-box" class="hidden">
             <span id="dialogue-speaker"></span>
             <p id="dialogue-text"></p>
-            <button id="skip-btn" title="Skip dialogue (dev only)">Skip &gt;&gt;</button>
+            <button id="skip-btn" class="hidden" title="Skip dialogue (dev only)">Skip &gt;&gt;</button>
         </div>
 
         <div id="narration-box" class="hidden">
@@ -161,8 +161,8 @@
                 <p id="closeup-text"></p>
             </div>
         </div>
-        <!-- Dev: Scene Selector & Reset (always visible) -->
-        <div id="dev-tools">
+        <!-- Dev: Scene Selector & Reset (hidden for testing) -->
+        <div id="dev-tools" class="hidden">
             <div id="scene-selector">
                 <button id="btn-select-scene">Select Scene</button>
                 <div id="scene-list" class="hidden"></div>
