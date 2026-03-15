@@ -608,13 +608,13 @@ html, body {
 
 #tutorial-prompt {
     position: absolute;
-    top: 58%;
+    top: 68%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 12;
     opacity: 0;
     transition: opacity 0.8s ease-in;
-    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0.1) 55%, rgba(0, 0, 0, 0) 75%);
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.5) 30%, rgba(0, 0, 0, 0.2) 55%, rgba(0, 0, 0, 0) 75%);
     padding: 80px 120px;
     pointer-events: none;
 }
