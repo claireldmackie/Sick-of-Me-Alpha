@@ -1,15 +1,45 @@
 class AudioManager {
     constructor() {
+        this.tracks = {};
         this.music = null;
+        this.currentTrack = null;
         this.volume = 0.15;
         this.fadeInterval = null;
         this.playing = false;
     }
 
-    load(src) {
-        this.music = new Audio(src);
-        this.music.loop = true;
-        this.music.volume = 0;
+    load(name, src) {
+        const audio = new Audio(src);
+        audio.loop = true;
+        audio.volume = 0;
+        this.tracks[name] = audio;
+        if (!this.music) {
+            this.music = audio;
+            this.currentTrack = name;
+        }
+    }
+
+    switchTo(name, fadeDuration = 3000) {
+        const next = this.tracks[name];
+        if (!next || name === this.currentTrack) return;
+
+        clearInterval(this.fadeInterval);
+        this.fadeInterval = null;
+
+        if (this.music) {
+            this.music.pause();
+            this.music.currentTime = 0;
+            this.music.volume = 0;
+        }
+
+        this.music = next;
+        this.currentTrack = name;
+
+        if (this.playing) {
+            this.music.volume = 0;
+            this.music.play().catch(() => {});
+            this._fadeToVolume(this.volume, fadeDuration);
+        }
     }
 
     play() {
@@ -19,27 +49,12 @@ class AudioManager {
         this.music.play().catch(() => {});
     }
 
-    fadeIn(duration = 6000) {
+    fadeIn(duration = 10000) {
         if (!this.music || this.playing) return;
         this.playing = true;
         this.music.volume = 0;
         this.music.play().catch(() => {});
-
-        const steps = 60;
-        const stepTime = duration / steps;
-        let current = 0;
-
-        clearInterval(this.fadeInterval);
-        this.fadeInterval = setInterval(() => {
-            current++;
-            const progress = current / steps;
-            this.music.volume = Math.min(this.volume, progress * this.volume);
-            if (current >= steps) {
-                clearInterval(this.fadeInterval);
-                this.fadeInterval = null;
-                this.music.volume = this.volume;
-            }
-        }, stepTime);
+        this._fadeToVolume(this.volume, duration);
     }
 
     setVolume(value) {
@@ -53,14 +68,43 @@ class AudioManager {
         return this.volume;
     }
 
+    _fadeToVolume(target, duration) {
+        clearInterval(this.fadeInterval);
+        const steps = 60;
+        const stepTime = duration / steps;
+        const startVol = this.music.volume;
+        let current = 0;
+
+        this.fadeInterval = setInterval(() => {
+            current++;
+            const progress = current / steps;
+            this.music.volume = startVol + (target - startVol) * progress;
+            if (current >= steps) {
+                clearInterval(this.fadeInterval);
+                this.fadeInterval = null;
+                this.music.volume = target;
+            }
+        }, stepTime);
+    }
+
+    arm() {
+        if (!this.music) return;
+        this.playing = true;
+        this.music.volume = 0;
+    }
+
     pause() {
         if (!this.music || !this.playing) return;
+        clearInterval(this.fadeInterval);
+        this.fadeInterval = null;
         this.music.pause();
     }
 
-    resume() {
+    resume(duration = 3000) {
         if (!this.music || !this.playing) return;
+        this.music.volume = 0;
         this.music.play().catch(() => {});
+        this._fadeToVolume(this.volume, duration);
     }
 
     stop() {

@@ -301,13 +301,23 @@ class Game {
     }
 
     _storeScenes = [12, 13, 14, 15];
+    _bridgeStart = 20;
 
     _syncMusic(index) {
+        const wantTrack = index >= this._bridgeStart ? 'bridge' : 'homesick';
+        if (this.audioManager.currentTrack !== wantTrack) {
+            this.audioManager.switchTo(wantTrack);
+        }
+
         if (this._storeScenes.includes(index)) {
-            if (this.audioManager.playing) this.audioManager.pause();
+            if (this.audioManager.playing) {
+                this.audioManager.pause();
+            } else if (index >= 4) {
+                this.audioManager.arm();
+            }
         } else if (index >= 4) {
             if (!this.audioManager.playing) {
-                this.audioManager.play();
+                this.audioManager.fadeIn();
             } else {
                 this.audioManager.resume();
             }
@@ -390,7 +400,10 @@ class Game {
         const gameW = 1920;
         const gameH = 1080;
 
-        const scale = Math.min(windowW / gameW, windowH / gameH);
+        const scaleX = windowW / gameW;
+        const scaleY = windowH / gameH;
+        const diff = Math.abs(scaleX - scaleY);
+        const scale = diff < 0.01 ? Math.max(scaleX, scaleY) : Math.min(scaleX, scaleY);
         const offsetX = (windowW - gameW * scale) / 2;
         const offsetY = (windowH - gameH * scale) / 2;
 
@@ -400,7 +413,8 @@ class Game {
     async start() {
         await this.sceneManager.loadConfig('data/config.json');
         await this.letterManager.loadLetterData('data/letters.json');
-        this.audioManager.load('assets/audio/music.wav');
+        this.audioManager.load('homesick', 'assets/audio/music.wav');
+        this.audioManager.load('bridge', 'assets/audio/music.mp3');
         this.ui.showHomepage();
     }
 
@@ -416,6 +430,8 @@ class Game {
             if (jumpToStep !== undefined && jumpToStep > 0) {
                 this.sceneManager.fastForwardTo(jumpToStep);
             }
+
+            this._syncMusic(index);
 
             await this.sceneManager.fadeIn();
             await this.sceneManager.runSequence();
@@ -433,6 +449,7 @@ class Game {
         }
         try {
             await this.sceneManager.loadScene(file);
+            this._syncMusic(this.currentSceneIndex);
             await this.sceneManager.fadeIn();
             await this.sceneManager.runSequence();
         } catch (e) {
