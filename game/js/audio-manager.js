@@ -102,9 +102,20 @@ class AudioManager {
 
     resume(duration = 3000) {
         if (!this.music || !this.playing) return;
+        if (!this.music.paused) return;
         this.music.volume = 0;
         this.music.play().catch(() => {});
         this._fadeToVolume(this.volume, duration);
+    }
+
+    get muted() {
+        return this.music ? this.music.muted : false;
+    }
+
+    toggleMute() {
+        if (!this.music) return false;
+        this.music.muted = !this.music.muted;
+        return this.music.muted;
     }
 
     stop() {

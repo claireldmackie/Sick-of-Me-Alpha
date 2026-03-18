@@ -318,7 +318,7 @@ class Game {
         } else if (index >= 4) {
             if (!this.audioManager.playing) {
                 this.audioManager.fadeIn();
-            } else {
+            } else if (this.audioManager.music && this.audioManager.music.paused) {
                 this.audioManager.resume();
             }
         }

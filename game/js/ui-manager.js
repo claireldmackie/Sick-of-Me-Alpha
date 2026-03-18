@@ -58,6 +58,9 @@ class UIManager {
         this.btnLetterNext = document.getElementById('letter-next');
 
         this.hudHamburger = document.getElementById('hud-hamburger');
+        this.hudVolume = document.getElementById('hud-volume');
+        this.volIconOn = document.getElementById('vol-icon-on');
+        this.volIconOff = document.getElementById('vol-icon-off');
         this.hudEnvelope = document.getElementById('hud-envelope');
         this.letterBadge = document.getElementById('letter-badge');
     }
@@ -75,6 +78,7 @@ class UIManager {
         });
 
         this.hudHamburger.addEventListener('click', () => this.showPause());
+        this.hudVolume.addEventListener('click', () => this._toggleMute());
         this.hudEnvelope.addEventListener('click', () => this.showLetterViewer());
 
         this.pauseOverlay.querySelector('.close-btn').addEventListener('click', () => this.hidePause());
@@ -543,6 +547,13 @@ class UIManager {
     }
 
     /* ── Utilities ── */
+
+    _toggleMute() {
+        if (!this.audioManager) return;
+        const muted = this.audioManager.toggleMute();
+        this.volIconOn.classList.toggle('hidden', muted);
+        this.volIconOff.classList.toggle('hidden', !muted);
+    }
 
     _updateSliderFill() {
         if (!this.volumeSlider) return;

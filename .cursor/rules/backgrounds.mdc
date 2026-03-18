@@ -1,0 +1,57 @@
+---
+description: Background manifest -- maps every scene to its game asset and source file. MUST consult before changing any background.
+globs: game/data/scene*.json,game/assets/backgrounds/**,backgrounds/**
+alwaysApply: false
+---
+
+# Background Manifest
+
+Before changing, adding, or referencing any background file, ALWAYS check this manifest. Do NOT guess based on file numbering -- the source folder and game assets use different numbering schemes.
+
+## Rules
+
+1. The game loads backgrounds from `game/assets/backgrounds/`. These files are the live game assets.
+2. The `backgrounds/` folder at the project root contains source exports. Its numbering does NOT match the game scene numbers.
+3. When the user says "use the background from the backgrounds folder," look up the correct file here first.
+4. Never rename or overwrite files in `game/assets/backgrounds/` without confirming the mapping below.
+5. Scene 15 reuses `bg-12.png` (same as Scene 12). Not every scene has a unique background.
+
+## Scene-to-Background Mapping
+
+| Scene | Name | Scene JSON | Game Asset | Source File (backgrounds/) |
+|-------|------|-----------|------------|---------------------------|
+| 1 | Bedroom | scene1.json | bg-1.png | -- |
+| 1.5 | Stairwell | scene1-5.json | bg-1-5.png | -- |
+| 2 | Living Room | scene2.json | bg-2.png | -- |
+| 3 | House Exterior | scene3.json | bg-3.png | -- |
+| 4 | House Lane | scene4.json | bg-4.png | -- |
+| 5 | Dirt Path | scene5.json | bg-5.png | -- |
+| 6 | Neighbour's Lane | scene6.json | bg-6.png | -- |
+| 7 | Cows | scene7.json | bg-7.png | -- |
+| 8 | Dirt Road 2 | scene8.json | bg-8.png | -- |
+| 9 | Bus Stop | scene9.json | bg-9.png | -- |
+| 10 | Town Entrance | scene10.json | bg-10.png | -- |
+| 11 | Town | scene11.json | bg-11.png | scene 11 - Town.png |
+| 12 | Convenience Store | scene12.json | bg-12.png | scene 12 - Convenience Store.png |
+| 13 | Store Shelves | scene13.json | bg-13.png | scene 13 - Store Shelves.png |
+| 14 | Store Counter | scene14.json | bg-14.png | scene 14 - Store Counter.png |
+| 15 | Convenience Store Cont. | scene15.json | bg-12.png (reused) | scene 15 - Convenience Store Cont.png |
+| 16 | Town (After Store) | scene16.json | bg-16.png | -- |
+| 17 | Town Continued (Drew) | scene17.json | bg-17.png | -- |
+| 17b | Town (Clinic) | scene17b.json | bg-17b.png | scene 17b - Clinic.png |
+| 18 | Town Continued (Lady) | scene18.json | bg-18.png | -- |
+| 19 | Front of Bridge (Calvin) | scene19.json | bg-19.png | -- |
+| 20 | End of Bridge | scene20.json | bg-20.png | -- |
+| 21 | Forest | scene21.json | bg-21.png | -- |
+| 22 | Grave | scene22.json | bg-22.png | -- |
+| 20a | Ending A: Connect | scene20a.json | bg-20a.png | -- |
+| 20b | Ending B: Leave | scene20b.json | bg-20b.png | -- |
+| 20c | Ending C: Reflect | scene20c.json | bg-20c.png | -- |
+
+## Adding a New Background
+
+1. Export the image and place it in `backgrounds/` with the naming pattern `scene {number} - {Name}.png`
+2. Copy it into `game/assets/backgrounds/` as `bg-{number}.png` (lowercase, no spaces)
+3. Update the scene JSON to reference `assets/backgrounds/bg-{number}.png`
+4. Update this manifest table with the new entry
+5. If deploying to MVP, also copy the file into the MVP repo's `assets/backgrounds/`

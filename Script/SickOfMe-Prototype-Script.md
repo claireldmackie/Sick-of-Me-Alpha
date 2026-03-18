@@ -120,7 +120,8 @@ Scene 1 (Bedroom)
                               --> Scene 15 (Convenience Store Cont.)
                                 --> Scene 16 (Town After Store)
                                   --> Scene 17 (Town Continued -- Drew)
-                                    --> Scene 18 (Town Continued -- Lady)
+                                    --> Scene 17b (Town -- Clinic)
+                                      --> Scene 18 (Town Continued -- Lady)
                                       --> Scene 19 (Front of Bridge -- Calvin)
                                         --> Scene 20 (End of Bridge)
                                           --> Scene 21 (Forest)
@@ -488,10 +489,10 @@ Scene 1 (Bedroom)
 
 ### SCENE 16 -- TOWN (AFTER STORE)
 **File:** `scene16.json` | **Background:** bg-16.png
-**Setting:** Back in town after leaving the store. A mailbox/bill and a closed clinic.
+**Setting:** Back in town after leaving the store. A mailbox with overdue mail.
 
 **Characters on screen:** Hero (visible)
-**Interactive objects:** Clinic (hotspot, hidden initially), Next Arrow (hidden initially)
+**Interactive objects:** Next Arrow (hidden initially)
 
 **Sequence:**
 
@@ -500,12 +501,9 @@ Scene 1 (Bedroom)
 3. **Hero:** "\*sigh\* I'm not going to read that one yet..."
 4. *[Letter #3 is collected and displayed to player]*
 5. **Hero:** "How many of these did I miss?"
-8. *[Clinic hotspot appears]*
-9. **>>> PLAYER CLICKS: Clinic**
-10. **Hero:** "When did the clinic shut down?"
-11. *[Next arrow appears]*
-12. **>>> PLAYER CLICKS/WALKS TO: Next Arrow**
-13. *[Transition to next scene]*
+6. *[Next arrow appears]*
+7. **>>> PLAYER CLICKS/WALKS TO: Next Arrow**
+8. *[Transition to next scene]*
 
 ---
 
@@ -538,6 +536,23 @@ Scene 1 (Bedroom)
 18. *[Next arrow appears]*
 19. **>>> PLAYER CLICKS/WALKS TO: Next Arrow**
 20. *[Transition to next scene]*
+
+---
+
+### SCENE 17B -- TOWN (CLINIC)
+**File:** `scene17b.json` | **Background:** bg-17b.png
+**Setting:** The town street with a view of the closed-down clinic.
+
+**Characters on screen:** Hero (visible)
+**Interactive objects:** Clinic (hotspot), Next Arrow (hidden initially)
+
+**Sequence:**
+
+1. **>>> PLAYER CLICKS: Clinic**
+2. **Hero:** "When did the clinic shut down?"
+3. *[Next arrow appears]*
+4. **>>> PLAYER CLICKS/WALKS TO: Next Arrow**
+5. *[Transition to next scene]*
 
 ---
 
@@ -764,7 +779,7 @@ All three endings show a final background image, pause for 3 seconds, then show 
 - Speed: 7px per frame
 
 ### Backward Navigation
-- Outdoor scenes form a linear chain: House Ext (3) → House Lane (4) → Dirt Path (5) → Neighbour's (6) → Cows (7) → Dirt Road (8) → Bus Stop (9) → Town Entrance (10) → Town (11) → [store 12-15 skipped] → After Store (16) → Drew (17) → Lady (18) → Bridge (19) → End Bridge (20) → Forest (21)
+- Outdoor scenes form a linear chain: House Ext (3) → House Lane (4) → Dirt Path (5) → Neighbour's (6) → Cows (7) → Dirt Road (8) → Bus Stop (9) → Town Entrance (10) → Town (11) → [store 12-15 skipped] → After Store (16) → Drew (17) → Clinic (17b) → Lady (18) → Bridge (19) → End Bridge (20) → Forest (21)
 - Walking left off-screen in any outdoor scene returns to the previous outdoor scene
 - Going back from scene 16 jumps to scene 11 (skipping store interiors)
 - Scene 3 is the earliest -- cannot go further back
