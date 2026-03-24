@@ -841,7 +841,7 @@ class SceneManager {
         videoEl.loop = step.loop !== false;
         videoEl.muted = step.muted !== false;
 
-        const phoneRect = step.phoneRect || { x: 714, y: 239, w: 92, h: 112 };
+        const phoneRect = step.phoneRect || { x: 710, y: 259, w: 92, h: 112 };
         const charId = step.character || 'drew-closeup';
         const char = this.currentScene?.characters?.find(c => c.id === charId);
 
