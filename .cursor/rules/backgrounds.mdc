@@ -36,14 +36,15 @@ Before changing, adding, or referencing any background file, ALWAYS check this m
 | 13 | Store Shelves | scene13.json | bg-13.png | scene 13 - Store Shelves.png |
 | 14 | Store Counter | scene14.json | bg-14.png | scene 14 - Store Counter.png |
 | 15 | Convenience Store Cont. | scene15.json | bg-12.png (reused) | scene 15 - Convenience Store Cont.png |
-| 16 | Town (After Store) | scene16.json | bg-16.png | -- |
-| 17 | Town Continued (Drew) | scene17.json | bg-17.png | -- |
+| 16 | Town (After Store) | scene16.json | bg-16.png | scene 16 - Town After Store.png |
+| 17 | Town Continued (Drew) | scene17.json | bg-17.png (town), bg-17-overlay.png (sky overlay during dialogue) | scene 17 - Town Continued Drew.png (overlay) |
 | 17b | Town (Clinic) | scene17b.json | bg-17b.png | scene 17b - Clinic.png |
-| 18 | Town Continued (Lady) | scene18.json | bg-18.png | -- |
-| 19 | Front of Bridge (Calvin) | scene19.json | bg-19.png | -- |
-| 20 | End of Bridge | scene20.json | bg-20.png | -- |
-| 21 | Forest | scene21.json | bg-21.png | -- |
-| 22 | Grave | scene22.json | bg-22.png | -- |
+| 18 | Town Continued (Lady) | scene18.json | bg-18.png | scene 18 - Town Continued Lady.png |
+| 19 | Front of Bridge (Calvin) | scene19.json | bg-19.png | scene 19 - Front of Bridge.png |
+| 20 | End of Bridge | scene20.json | bg-20.png | scene 20 - End of Bridge.png |
+| 20b | Forest Path | scene20b.json | bg-21.png | scene 21 - Forest.png |
+| 21 | Forest (Tree People) | scene21.json | bg-22.png | scene 22 - Grave.png |
+| 22 | Grave | scene22.json | bg-22.png (shared) | -- |
 | 20a | Ending A: Connect | scene20a.json | bg-20a.png | -- |
 | 20b | Ending B: Leave | scene20b.json | bg-20b.png | -- |
 | 20c | Ending C: Reflect | scene20c.json | bg-20c.png | -- |

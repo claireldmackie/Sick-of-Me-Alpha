@@ -95,20 +95,10 @@ class InputManager {
     }
 
     isInsideTarget(coords, target) {
-        if (target.hitbox) {
-            return coords.x >= target.hitbox.x &&
-                   coords.x <= target.hitbox.x + target.hitbox.width &&
-                   coords.y >= target.hitbox.y &&
-                   coords.y <= target.hitbox.y + target.hitbox.height;
-        }
-
-        if (target.x !== undefined && target.width !== undefined) {
-            return coords.x >= target.x &&
-                   coords.x <= target.x + target.width &&
-                   coords.y >= target.y &&
-                   coords.y <= target.y + target.height;
-        }
-
-        return false;
+        if (target.x === undefined || target.width === undefined) return false;
+        return coords.x >= target.x &&
+               coords.x <= target.x + target.width &&
+               coords.y >= target.y &&
+               coords.y <= target.y + target.height;
     }
 }

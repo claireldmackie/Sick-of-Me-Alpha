@@ -1,0 +1,64 @@
+# Code Standards for Sick of Me
+
+These rules apply to all game code under `game/`.
+
+## Constants
+
+- All numeric literals that represent game dimensions, speeds, thresholds, durations, or indices must be defined in `game/js/constants.js` and referenced by name (e.g. `GAME.WIDTH`, `AUDIO.FADE_IN_MS`).
+- Never hardcode values like `1920`, `1080`, `0.15`, `30`, `7`, etc. inline.
+- Group constants by domain: `GAME`, `AUDIO`, `SCENES`, `RENDER`.
+- Use `Object.freeze()` for all constant objects.
+
+## Method Length
+
+- No method should exceed ~50 lines. If it does, extract helpers with descriptive names.
+- Step handlers in `scene-manager.js` go in `_stepHandlers` map, not a switch statement. Each handler is a small private method (e.g. `_handleDialogue`, `_handleShowObject`).
+- Use the naming convention `_handle<StepType>` for step handler methods.
+
+## Scene Manager Step Types
+
+- When adding a new step type:
+  1. Add a handler method `_handle<StepType>(step)` to `SceneManager`.
+  2. Register it in `_initStepHandlers()`.
+  3. If the step modifies visual state (show/hide/set), also handle it in `_fastForwardStep()`.
+  4. If the step should be skippable during dialogue skip, add it to the `skippable` array in `_trySkipStep()`.
+
+## Error Handling
+
+- All `fetch()` calls must check `response.ok` before calling `.json()`.
+- All `JSON.parse()` calls must be wrapped in try/catch.
+- Audio `.play()` rejections should log with `console.warn`, never be silently swallowed.
+- Scene loading errors must be caught and logged; never let them crash the game loop.
+
+## CSS
+
+- Never duplicate styles. If two selectors share properties, combine them with a comma-separated selector or extract a shared base class.
+- Verify there are no duplicate selector blocks before adding new rules.
+- Use section comments (`/* -- Section Name -- */`) to organize the stylesheet.
+- The `#bg-overlay` HTML element is removed. Background overlays are drawn on the canvas via `_bgOverlayImage` / `_bgOverlayOpacity` in `SceneManager.render()`.
+
+## Cache Busting
+
+- All `<script>` and `<link>` tags in `index.html` use a shared version number (`?v=N`).
+- When ANY JS or CSS file changes, bump ALL version numbers together to the same value.
+- Never use different version numbers for different files.
+
+## Save System
+
+- `SaveManager.save()` must persist all fields including `sceneProgress`.
+- `SaveManager.load()` must handle corrupt/invalid JSON gracefully (return `null`).
+- The save key prefix is defined in `SCENES.SAVE_KEY_PREFIX`, not hardcoded.
+
+## HTML
+
+- Do not add `data-*` attributes that are never read by JavaScript.
+- Close buttons are bound in JS via `.close-btn` class selector, not via `data-close`.
+- Do not add HTML elements that are only used by CSS and never by JS if the same effect can be achieved on the canvas.
+
+## General
+
+- Use `const` by default; only use `let` when reassignment is needed.
+- Prefer early returns over deep nesting.
+- Private methods and properties are prefixed with `_`.
+- Hit targets always use flat `{ id, x, y, width, height }` objects. Do not use nested `target.hitbox` structures.
+- All scene JSON files must follow the standard structure: `id`, `background`, `characters`, `objects`, `sequence`, and optional `nextScene`, `fadeDuration`, `initialState`.

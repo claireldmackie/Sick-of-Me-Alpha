@@ -98,20 +98,19 @@ class Renderer {
 
     drawHoverGlow(x, y, width, height) {
         const ctx = this.ctx;
-        const pad = 8;
+        const pad = RENDER.HOVER_PAD;
         const gx = x - pad;
         const gy = y - pad;
         const gw = width + pad * 2;
         const gh = height + pad * 2;
-        const radius = 12;
 
         ctx.save();
         ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = RENDER.HOVER_BLUR;
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.roundRect(gx, gy, gw, gh, radius);
+        ctx.roundRect(gx, gy, gw, gh, RENDER.HOVER_RADIUS);
         ctx.stroke();
         ctx.restore();
     }
@@ -121,7 +120,7 @@ class Renderer {
         ctx.save();
         ctx.translate(x, y);
 
-        const s = size || 30;
+        const s = size || RENDER.DEFAULT_ARROW_SIZE;
         const r = s * 0.35;
 
         ctx.beginPath();

@@ -26,7 +26,7 @@ class Game {
             'data/scene16.json', 'data/scene17.json', 'data/scene17b.json',
             'data/scene18.json',
             'data/scene19.json', 'data/scene20.json', 'data/scene21.json',
-            'data/scene22.json'
+            'data/scene20b.json', 'data/scene22.json'
         ];
         this.sceneNames = [
             'Bedroom', 'Stairwell', 'Living Room', 'House Exterior',
@@ -36,15 +36,15 @@ class Game {
             'Store Shelves', 'Store (Counter)', 'Convenience Store (Cont.)',
             'Town (After Store)', 'Town Continued (Drew)', 'Town (Clinic)',
             'Town Continued (Lady)',
-            'Front of Bridge', 'End of Bridge', 'Forest',
-            'Grave'
+            'Front of Bridge', 'End of Bridge', 'Forest (Tree People)',
+            'Forest Path', 'Grave'
         ];
         this.currentSceneIndex = 0;
         this.activeSlot = null;
         this.sceneProgress = {};
         this.browsingCompleted = false;
         this._transitioning = false;
-        this.outdoorChain = [3, 4, 5, 6, 7, 8, 9, 10, 16, 17, 18, 19, 20, 21, 22];
+        this.outdoorChain = [3, 4, 5, 6, 7, 8, 9, 10, 16, 17, 18, 19, 20, 21, 22, 23];
 
         this.sceneManager.onSceneEnd = (nextScene) => {
             this._saveSceneProgress(this.sceneManager.sequenceIndex);
@@ -121,9 +121,9 @@ class Game {
         btn.addEventListener('click', () => {
             this.sceneManager.stop();
             this.audioManager.stop();
-            this.saveManager.delete(0);
-            this.saveManager.delete(1);
-            this.saveManager.delete(2);
+            for (let i = 0; i < SCENES.SAVE_SLOT_COUNT; i++) {
+                this.saveManager.delete(i);
+            }
             this.letterManager.setCollected([]);
             this.sceneProgress = {};
             this.browsingCompleted = false;
@@ -177,12 +177,16 @@ class Game {
     }
 
     _startGameLoop() {
-        const speed = 7;
-        const tick = () => {
+        let lastTime = performance.now();
+        const tick = (now) => {
             requestAnimationFrame(tick);
+            const dt = Math.min((now - lastTime) / 1000, 0.1);
+            lastTime = now;
+
+            if (!this.sceneManager.currentScene) return;
+            this.sceneManager.render();
             if (this._transitioning) return;
             if (this.sceneManager.fading) return;
-            if (!this.sceneManager.currentScene) return;
             if (this.input.blocked) return;
             const hero = this.sceneManager.currentScene.characters?.find(c => c.id === 'hero');
             if (!hero || hero.visible === false) return;
@@ -199,6 +203,7 @@ class Game {
                 dir = 'right';
             }
 
+            const speed = GAME.HERO_SPEED * dt;
             if (dir === 'left') {
                 hero.x -= speed;
                 hero.flipX = true;
@@ -208,11 +213,10 @@ class Game {
             }
 
             if (dir) {
-                hero.x = Math.round(Math.max(0, Math.min(1920, hero.x)));
+                hero.x = Math.round(Math.max(0, Math.min(GAME.WIDTH, hero.x)));
                 this._checkEdgeTransition(hero, dir);
                 this._checkBackwardTransition(hero);
             }
-            this.sceneManager.render();
         };
         requestAnimationFrame(tick);
     }
@@ -221,7 +225,7 @@ class Game {
         const sm = this.sceneManager;
 
         if (this.browsingCompleted) {
-            if (dir === 'right' && hero.x >= 1900) {
+            if (dir === 'right' && hero.x >= GAME.FAR_EDGE) {
                 this._navigateForward();
             }
             return;
@@ -237,10 +241,10 @@ class Game {
             const obj = scene.objects.find(o => o.id === targetId && o.type === 'arrow' && o.visible !== false);
             if (!obj) continue;
 
-            const atRightEdge = dir === 'right' && hero.x >= 1900;
-            const atLeftEdge = dir === 'left' && hero.x <= 20;
-            const arrowIsRight = obj.direction === 'right' || obj.x > 960;
-            const arrowIsLeft = obj.direction === 'left' || obj.x < 960;
+            const atRightEdge = dir === 'right' && hero.x >= GAME.FAR_EDGE;
+            const atLeftEdge = dir === 'left' && hero.x <= GAME.EDGE_THRESHOLD;
+            const arrowIsRight = obj.direction === 'right' || obj.x > GAME.CENTER_X;
+            const arrowIsLeft = obj.direction === 'left' || obj.x < GAME.CENTER_X;
             const arrowIsDown = obj.direction === 'down';
 
             if ((atRightEdge && (arrowIsRight || arrowIsDown)) || (atLeftEdge && arrowIsLeft)) {
@@ -266,7 +270,7 @@ class Game {
     }
 
     _checkBackwardTransition(hero) {
-        if (hero.x > 20) return;
+        if (hero.x > GAME.EDGE_THRESHOLD) return;
         if (this._transitioning) return;
         if (!this._canNavigate()) return;
 
@@ -300,22 +304,27 @@ class Game {
         this.loadSceneWithProgress(nextIndex);
     }
 
-    _storeScenes = [12, 13, 14, 15];
-    _bridgeStart = 20;
+    _storeScenes = SCENES.STORE_INDICES;
+    _bridgeStart = SCENES.BRIDGE_START;
 
     _syncMusic(index) {
-        const wantTrack = index >= this._bridgeStart ? 'bridge' : 'homesick';
-        if (this.audioManager.currentTrack !== wantTrack) {
-            this.audioManager.switchTo(wantTrack);
+        if (index < this._bridgeStart) {
+            if (this.audioManager.currentTrack !== 'homesick') {
+                this.audioManager.switchTo('homesick');
+            }
+        } else {
+            if (this.audioManager.currentTrack !== 'bridge') {
+                this.audioManager.switchTo('bridge');
+            }
         }
 
         if (this._storeScenes.includes(index)) {
             if (this.audioManager.playing) {
                 this.audioManager.pause();
-            } else if (index >= 4) {
+            } else if (index >= this._bridgeStart) {
                 this.audioManager.arm();
             }
-        } else if (index >= 4) {
+        } else if (index >= this._bridgeStart) {
             if (!this.audioManager.playing) {
                 this.audioManager.fadeIn();
             } else if (this.audioManager.music && this.audioManager.music.paused) {
@@ -324,31 +333,40 @@ class Game {
         }
     }
 
+    async _loadSceneCore(file, { fastForwardTo, enterFromRight, syncMusicIndex, runSequence = false } = {}) {
+        await this.sceneManager.loadScene(file);
+        if (fastForwardTo !== undefined && fastForwardTo > 0) {
+            this.sceneManager.fastForwardTo(fastForwardTo);
+        }
+        if (enterFromRight) {
+            const hero = this.sceneManager.currentScene?.characters?.find(c => c.id === 'hero');
+            if (hero) {
+                hero.x = GAME.HERO_ENTER_RIGHT_X;
+                hero.flipX = true;
+            }
+        }
+        if (syncMusicIndex !== undefined) this._syncMusic(syncMusicIndex);
+        await this.sceneManager.fadeIn();
+        if (runSequence) await this.sceneManager.runSequence();
+    }
+
+    _handleSceneError(e) {
+        console.error('Scene load error:', e);
+        this.sceneManager.fading = false;
+        this._transitioning = false;
+    }
+
     async loadCompletedScene(index, enterFromRight) {
         this.currentSceneIndex = index;
         this.browsingCompleted = true;
         try {
-            await this.sceneManager.loadScene(this.scenes[index]);
-
-            const progress = this.sceneProgress[index];
-            if (progress !== undefined) {
-                this.sceneManager.fastForwardTo(progress);
-            }
-
-            if (enterFromRight) {
-                const hero = this.sceneManager.currentScene?.characters?.find(c => c.id === 'hero');
-                if (hero) {
-                    hero.x = 1850;
-                    hero.flipX = true;
-                }
-            }
-
-            this._syncMusic(index);
-
-            await this.sceneManager.fadeIn();
+            await this._loadSceneCore(this.scenes[index], {
+                fastForwardTo: this.sceneProgress[index],
+                enterFromRight,
+                syncMusicIndex: index,
+            });
         } catch (e) {
-            console.error('Scene load error:', e);
-            this.sceneManager.fading = false;
+            this._handleSceneError(e);
         } finally {
             this._transitioning = false;
         }
@@ -375,37 +393,30 @@ class Game {
                 this.sceneManager.fastForwardTo(progress);
                 await this.sceneManager.fadeIn();
                 this._transitioning = false;
-            } else if (progress !== undefined && progress > 0) {
-                this.browsingCompleted = false;
-                this.sceneManager.fastForwardTo(progress);
-                await this.sceneManager.fadeIn();
-                this._transitioning = false;
-                await this.sceneManager.runSequence();
             } else {
                 this.browsingCompleted = false;
+                if (progress !== undefined && progress > 0) {
+                    this.sceneManager.fastForwardTo(progress);
+                }
                 await this.sceneManager.fadeIn();
                 this._transitioning = false;
                 await this.sceneManager.runSequence();
             }
         } catch (e) {
-            console.error('Scene load error:', e);
-            this.sceneManager.fading = false;
-            this._transitioning = false;
+            this._handleSceneError(e);
         }
     }
 
     fitToWindow() {
         const windowW = window.innerWidth;
         const windowH = window.innerHeight;
-        const gameW = 1920;
-        const gameH = 1080;
 
-        const scaleX = windowW / gameW;
-        const scaleY = windowH / gameH;
+        const scaleX = windowW / GAME.WIDTH;
+        const scaleY = windowH / GAME.HEIGHT;
         const diff = Math.abs(scaleX - scaleY);
-        const scale = diff < 0.01 ? Math.max(scaleX, scaleY) : Math.min(scaleX, scaleY);
-        const offsetX = (windowW - gameW * scale) / 2;
-        const offsetY = (windowH - gameH * scale) / 2;
+        const scale = diff < GAME.SCALE_SNAP_THRESHOLD ? Math.max(scaleX, scaleY) : Math.min(scaleX, scaleY);
+        const offsetX = (windowW - GAME.WIDTH * scale) / 2;
+        const offsetY = (windowH - GAME.HEIGHT * scale) / 2;
 
         this.container.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
     }
@@ -413,8 +424,8 @@ class Game {
     async start() {
         await this.sceneManager.loadConfig('data/config.json');
         await this.letterManager.loadLetterData('data/letters.json');
-        this.audioManager.load('homesick', 'assets/audio/music.wav');
-        this.audioManager.load('bridge', 'assets/audio/music.mp3');
+        this.audioManager.load('homesick', 'assets/audio/music.wav', 0.35);
+        this.audioManager.load('bridge', 'assets/audio/music.mp3', 2.0);
         this.ui.showHomepage();
     }
 
@@ -425,37 +436,26 @@ class Game {
         }
         this.currentSceneIndex = index;
         try {
-            await this.sceneManager.loadScene(this.scenes[index]);
-
-            if (jumpToStep !== undefined && jumpToStep > 0) {
-                this.sceneManager.fastForwardTo(jumpToStep);
-            }
-
-            this._syncMusic(index);
-
-            await this.sceneManager.fadeIn();
-            await this.sceneManager.runSequence();
+            await this._loadSceneCore(this.scenes[index], {
+                fastForwardTo: jumpToStep,
+                syncMusicIndex: index,
+                runSequence: true,
+            });
         } catch (e) {
-            console.error('Scene load error:', e);
-            this.sceneManager.fading = false;
-            this._transitioning = false;
+            this._handleSceneError(e);
         }
     }
 
     async loadSceneByFile(file) {
         const index = this.scenes.indexOf(file);
-        if (index !== -1) {
-            this.currentSceneIndex = index;
-        }
+        if (index !== -1) this.currentSceneIndex = index;
         try {
-            await this.sceneManager.loadScene(file);
-            this._syncMusic(this.currentSceneIndex);
-            await this.sceneManager.fadeIn();
-            await this.sceneManager.runSequence();
+            await this._loadSceneCore(file, {
+                syncMusicIndex: this.currentSceneIndex,
+                runSequence: true,
+            });
         } catch (e) {
-            console.error('Scene load error:', e);
-            this.sceneManager.fading = false;
-            this._transitioning = false;
+            this._handleSceneError(e);
         }
 
         if (!this.sceneManager.currentScene?.nextScene && file.includes('scene20')) {
@@ -474,14 +474,14 @@ class Game {
         this.renderer.clear();
         const ctx = this.renderer.ctx;
         ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, 1920, 1080);
+        ctx.fillRect(0, 0, GAME.WIDTH, GAME.HEIGHT);
         ctx.fillStyle = '#fff';
         ctx.font = '48px Georgia, serif';
         ctx.textAlign = 'center';
-        ctx.fillText('End of Demo', 960, 500);
+        ctx.fillText('End of Demo', GAME.CENTER_X, 500);
         ctx.font = '28px Georgia, serif';
         ctx.fillStyle = '#999';
-        ctx.fillText('Thank you for playing.', 960, 560);
+        ctx.fillText('Thank you for playing.', GAME.CENTER_X, 560);
     }
 }
 

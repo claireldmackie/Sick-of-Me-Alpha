@@ -25,16 +25,14 @@
             "interactive": true
         },
         {
-            "id": "next-arrow",
-            "type": "arrow",
-            "x": 1905,
-            "y": 540,
-            "direction": "right",
-            "size": 15,
-            "color": "rgba(255, 255, 255, 0.4)",
+            "id": "bridge-entrance",
+            "type": "hotspot",
+            "x": 750,
+            "y": 150,
+            "width": 420,
+            "height": 550,
             "visible": false,
-            "interactive": false,
-            "zIndex": 10
+            "interactive": false
         }
     ],
     "sequence": [
@@ -60,8 +58,8 @@
         { "type": "dialogue", "speaker": "Calvin", "text": "Oh yeah, yeah... Sorry." },
         { "type": "dialogue", "speaker": "Calvin", "text": "Come by again sometime." },
         { "type": "dialogue", "speaker": "Hero", "text": "Maybe, Calvin." },
-        { "type": "showObject", "target": "next-arrow" },
-        { "type": "waitForClick", "target": "next-arrow" },
+        { "type": "showObject", "target": "bridge-entrance" },
+        { "type": "waitForClick", "target": "bridge-entrance" },
         { "type": "transition" }
     ]
 }

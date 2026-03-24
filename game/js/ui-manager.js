@@ -5,7 +5,7 @@ class UIManager {
         this.inputManager = inputManager || null;
         this.audioManager = audioManager || null;
 
-        this.panelMode = null;       // 'save' | 'load' | 'copy-source' | 'copy-dest' | 'delete-select'
+        this.panelMode = null;
         this.selectedSlot = null;
         this.copySourceSlot = null;
         this.currentLetterIndex = 0;
@@ -19,8 +19,16 @@ class UIManager {
         this._savedSinceLoad = false;
 
         this._bindElements();
-        this._bindEvents();
+        this._bindHomepageEvents();
+        this._bindHudEvents();
+        this._bindPauseEvents();
+        this._bindSaveEvents();
+        this._bindLetterEvents();
+        this._bindVolumeEvents();
+        this._bindGlobalEvents();
     }
+
+    /* ── Element Binding ── */
 
     _bindElements() {
         this.homepage = document.getElementById('homepage-screen');
@@ -47,6 +55,8 @@ class UIManager {
         this.btnLoadDelete = document.getElementById('btn-load-delete');
         this.btnStartGame = document.getElementById('btn-start-game');
         this.btnCancelAction = document.getElementById('btn-cancel-action');
+        this.btnSaveBack = document.getElementById('save-back-btn');
+        this.btnSaveQuit = document.getElementById('btn-save-quit');
 
         this.confirmMessage = document.getElementById('confirm-message');
         this.btnConfirmYes = document.getElementById('btn-confirm-yes');
@@ -63,9 +73,12 @@ class UIManager {
         this.volIconOff = document.getElementById('vol-icon-off');
         this.hudEnvelope = document.getElementById('hud-envelope');
         this.letterBadge = document.getElementById('letter-badge');
+        this.volumeSlider = document.getElementById('volume-slider');
     }
 
-    _bindEvents() {
+    /* ── Event Binding (split by area) ── */
+
+    _bindHomepageEvents() {
         this.btnContinue.addEventListener('click', () => this.showSaveSlots('load'));
         this.btnNewGame.addEventListener('click', () => {
             this.hideAll();
@@ -73,14 +86,16 @@ class UIManager {
             this._savedSinceLoad = false;
             if (this.onNewGame) this.onNewGame();
         });
-        this.btnQuitHome.addEventListener('click', () => {
-            this.hideAll();
-        });
+        this.btnQuitHome.addEventListener('click', () => this.hideAll());
+    }
 
+    _bindHudEvents() {
         this.hudHamburger.addEventListener('click', () => this.showPause());
         this.hudVolume.addEventListener('click', () => this._toggleMute());
         this.hudEnvelope.addEventListener('click', () => this.showLetterViewer());
+    }
 
+    _bindPauseEvents() {
         this.pauseOverlay.querySelector('.close-btn').addEventListener('click', () => this.hidePause());
         this.btnSave.addEventListener('click', () => this.showSaveSlots('save'));
         this.btnQuitPause.addEventListener('click', () => {
@@ -99,18 +114,14 @@ class UIManager {
                 });
             }
         });
+    }
 
-        this.btnSaveBack = document.getElementById('save-back-btn');
-        this.btnSaveQuit = document.getElementById('btn-save-quit');
-
+    _bindSaveEvents() {
         this.btnSaveBack.addEventListener('click', () => {
             const mode = this.panelMode;
             this.hideSavePanel();
-            if (mode === 'load') {
-                this.showHomepage();
-            } else {
-                this.showPause();
-            }
+            if (mode === 'load') this.showHomepage();
+            else this.showPause();
         });
 
         this.btnSaveQuit.addEventListener('click', () => {
@@ -128,28 +139,29 @@ class UIManager {
         this.btnLoadDelete.addEventListener('click', () => this._loadPanelDelete());
         this.btnStartGame.addEventListener('click', () => this._loadPanelStart());
         this.btnCancelAction.addEventListener('click', () => this.cancelSpecialMode());
-
         this.confirmDialog.querySelector('.close-btn').addEventListener('click', () => this.hideConfirm());
+    }
 
+    _bindLetterEvents() {
         this.letterViewer.querySelector('.close-btn').addEventListener('click', () => this.hideLetterViewer());
         this.btnLetterPrev.addEventListener('click', () => this.navigateLetter(-1));
         this.btnLetterNext.addEventListener('click', () => this.navigateLetter(1));
+    }
 
-        this.volumeSlider = document.getElementById('volume-slider');
-        if (this.volumeSlider) {
-            if (this.audioManager) {
-                this.volumeSlider.value = Math.round(this.audioManager.getVolume() * 100);
-            }
-            this._updateSliderFill();
-            this.volumeSlider.addEventListener('input', () => {
-                const val = Number(this.volumeSlider.value) / 100;
-                this._updateSliderFill();
-                if (this.audioManager) {
-                    this.audioManager.setVolume(val);
-                }
-            });
+    _bindVolumeEvents() {
+        if (!this.volumeSlider) return;
+        if (this.audioManager) {
+            this.volumeSlider.value = Math.round(this.audioManager.getVolume() / AUDIO.VOLUME_MAX * 100);
         }
+        this._updateSliderFill();
+        this.volumeSlider.addEventListener('input', () => {
+            const val = Number(this.volumeSlider.value) / 100 * AUDIO.VOLUME_MAX;
+            this._updateSliderFill();
+            if (this.audioManager) this.audioManager.setVolume(val);
+        });
+    }
 
+    _bindGlobalEvents() {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') this._handleEscape();
         });
@@ -187,26 +199,19 @@ class UIManager {
 
     /* ── HUD ── */
 
-    showHUD() {
-        this.hud.classList.remove('hidden');
-    }
-
-    hideHUD() {
-        this.hud.classList.add('hidden');
-    }
+    showHUD() { this.hud.classList.remove('hidden'); }
+    hideHUD() { this.hud.classList.add('hidden'); }
 
     /* ── Pause ── */
 
     showPause() {
         this.pauseOverlay.classList.remove('hidden');
         this._syncInputBlock();
-        if (this.audioManager) this.audioManager.pause();
     }
 
     hidePause() {
         this.pauseOverlay.classList.add('hidden');
         this._syncInputBlock();
-        if (this.audioManager) this.audioManager.resume();
         if (this.onResume) this.onResume();
     }
 
@@ -262,81 +267,86 @@ class UIManager {
     }
 
     handleSlotClick(index) {
-        if (this.panelMode === 'load') {
-            this.selectedSlot = index;
-            this.updateSaveSlotDisplay();
-            this._updateLoadActions();
-            return;
-        }
+        const modeHandlers = {
+            load: () => this._handleSlotLoad(index),
+            save: () => this._handleSlotSave(index),
+            'copy-source': () => this._handleSlotCopySource(index),
+            'copy-dest': () => this._handleSlotCopyDest(index),
+            'delete-select': () => this._handleSlotDeleteSelect(index),
+        };
+        const handler = modeHandlers[this.panelMode];
+        if (handler) handler();
+    }
 
-        if (this.panelMode === 'save') {
-            const existing = this.saveManager.load(index);
-            if (existing) {
-                this.showConfirm('Are you sure you want\nto overwrite this save?', () => {
-                    this.hideConfirm();
-                    if (this.onSaveGame) this.onSaveGame(index);
-                    this._savedSinceLoad = true;
-                    this.updateSaveSlotDisplay();
-                    this.btnSaveQuit.classList.remove('hidden');
-                }, () => {
-                    this.hideConfirm();
-                });
-            } else {
+    _handleSlotLoad(index) {
+        this.selectedSlot = index;
+        this.updateSaveSlotDisplay();
+        this._updateLoadActions();
+    }
+
+    _handleSlotSave(index) {
+        const existing = this.saveManager.load(index);
+        if (existing) {
+            this.showConfirm('Are you sure you want\nto overwrite this save?', () => {
+                this.hideConfirm();
                 if (this.onSaveGame) this.onSaveGame(index);
                 this._savedSinceLoad = true;
                 this.updateSaveSlotDisplay();
                 this.btnSaveQuit.classList.remove('hidden');
-            }
-            return;
-        }
-
-        if (this.panelMode === 'copy-source') {
-            const save = this.saveManager.load(index);
-            if (!save) return;
-            this.copySourceSlot = index;
-            this.selectedSlot = index;
-            this.updateSaveSlotDisplay();
-            this.panelMode = 'copy-dest';
-            this.saveTitleText.textContent = 'Select a file to overwrite';
-            return;
-        }
-
-        if (this.panelMode === 'copy-dest') {
-            if (index === this.copySourceSlot) return;
-            const existing = this.saveManager.load(index);
-            if (existing) {
-                this.showConfirm('Are you sure you want\nto overwrite this save?', () => {
-                    this.hideConfirm();
-                    this.saveManager.copy(this.copySourceSlot, index);
-                    this.cancelSpecialMode();
-                    this.updateSaveSlotDisplay();
-                }, () => {
-                    this.hideConfirm();
-                });
-            } else {
-                this.saveManager.copy(this.copySourceSlot, index);
-                this.cancelSpecialMode();
-                this.updateSaveSlotDisplay();
-            }
-            return;
-        }
-
-        if (this.panelMode === 'delete-select') {
-            const save = this.saveManager.load(index);
-            if (!save) return;
-            this.selectedSlot = index;
-            this.updateSaveSlotDisplay();
-            this.showConfirm('Are you sure you want\nto delete this save?', () => {
+            }, () => {
                 this.hideConfirm();
-                this.saveManager.delete(index);
+            });
+        } else {
+            if (this.onSaveGame) this.onSaveGame(index);
+            this._savedSinceLoad = true;
+            this.updateSaveSlotDisplay();
+            this.btnSaveQuit.classList.remove('hidden');
+        }
+    }
+
+    _handleSlotCopySource(index) {
+        const save = this.saveManager.load(index);
+        if (!save) return;
+        this.copySourceSlot = index;
+        this.selectedSlot = index;
+        this.updateSaveSlotDisplay();
+        this.panelMode = 'copy-dest';
+        this.saveTitleText.textContent = 'Select a file to overwrite';
+    }
+
+    _handleSlotCopyDest(index) {
+        if (index === this.copySourceSlot) return;
+        const existing = this.saveManager.load(index);
+        if (existing) {
+            this.showConfirm('Are you sure you want\nto overwrite this save?', () => {
+                this.hideConfirm();
+                this.saveManager.copy(this.copySourceSlot, index);
                 this.cancelSpecialMode();
                 this.updateSaveSlotDisplay();
             }, () => {
                 this.hideConfirm();
-                this.cancelSpecialMode();
             });
-            return;
+        } else {
+            this.saveManager.copy(this.copySourceSlot, index);
+            this.cancelSpecialMode();
+            this.updateSaveSlotDisplay();
         }
+    }
+
+    _handleSlotDeleteSelect(index) {
+        const save = this.saveManager.load(index);
+        if (!save) return;
+        this.selectedSlot = index;
+        this.updateSaveSlotDisplay();
+        this.showConfirm('Are you sure you want\nto delete this save?', () => {
+            this.hideConfirm();
+            this.saveManager.delete(index);
+            this.cancelSpecialMode();
+            this.updateSaveSlotDisplay();
+        }, () => {
+            this.hideConfirm();
+            this.cancelSpecialMode();
+        });
     }
 
     enterCopyMode() {

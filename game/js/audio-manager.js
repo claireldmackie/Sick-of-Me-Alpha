@@ -1,25 +1,27 @@
 class AudioManager {
     constructor() {
         this.tracks = {};
+        this.trackVolumes = {};
         this.music = null;
         this.currentTrack = null;
-        this.volume = 0.15;
+        this.volume = AUDIO.DEFAULT_VOLUME;
         this.fadeInterval = null;
         this.playing = false;
     }
 
-    load(name, src) {
+    load(name, src, trackVolume) {
         const audio = new Audio(src);
         audio.loop = true;
         audio.volume = 0;
         this.tracks[name] = audio;
+        if (trackVolume !== undefined) this.trackVolumes[name] = trackVolume;
         if (!this.music) {
             this.music = audio;
             this.currentTrack = name;
         }
     }
 
-    switchTo(name, fadeDuration = 3000) {
+    switchTo(name, fadeDuration = AUDIO.SWITCH_FADE_MS) {
         const next = this.tracks[name];
         if (!next || name === this.currentTrack) return;
 
@@ -37,30 +39,30 @@ class AudioManager {
 
         if (this.playing) {
             this.music.volume = 0;
-            this.music.play().catch(() => {});
-            this._fadeToVolume(this.volume, fadeDuration);
+            this.music.play().catch(e => console.warn('Audio play blocked:', e.message));
+            this._fadeToVolume(this._effectiveVolume(), fadeDuration);
         }
     }
 
     play() {
         if (!this.music || this.playing) return;
         this.playing = true;
-        this.music.volume = this.volume;
-        this.music.play().catch(() => {});
+        this.music.volume = this._effectiveVolume();
+        this.music.play().catch(e => console.warn('Audio play blocked:', e.message));
     }
 
-    fadeIn(duration = 10000) {
+    fadeIn(duration = AUDIO.FADE_IN_MS) {
         if (!this.music || this.playing) return;
         this.playing = true;
         this.music.volume = 0;
-        this.music.play().catch(() => {});
-        this._fadeToVolume(this.volume, duration);
+        this.music.play().catch(e => console.warn('Audio play blocked:', e.message));
+        this._fadeToVolume(this._effectiveVolume(), duration);
     }
 
     setVolume(value) {
-        this.volume = Math.max(0, Math.min(1, value));
+        this.volume = Math.max(0, Math.min(AUDIO.VOLUME_MAX, value));
         if (this.music) {
-            this.music.volume = this.volume;
+            this.music.volume = this._effectiveVolume();
         }
     }
 
@@ -68,9 +70,14 @@ class AudioManager {
         return this.volume;
     }
 
+    _effectiveVolume() {
+        const scale = this.trackVolumes[this.currentTrack] ?? 1;
+        return Math.min(this.volume * scale, 1.0);
+    }
+
     _fadeToVolume(target, duration) {
         clearInterval(this.fadeInterval);
-        const steps = 60;
+        const steps = AUDIO.FADE_STEPS;
         const stepTime = duration / steps;
         const startVol = this.music.volume;
         let current = 0;
@@ -100,12 +107,12 @@ class AudioManager {
         this.music.pause();
     }
 
-    resume(duration = 3000) {
+    resume(duration = AUDIO.RESUME_MS) {
         if (!this.music || !this.playing) return;
         if (!this.music.paused) return;
         this.music.volume = 0;
-        this.music.play().catch(() => {});
-        this._fadeToVolume(this.volume, duration);
+        this.music.play().catch(e => console.warn('Audio play blocked:', e.message));
+        this._fadeToVolume(this._effectiveVolume(), duration);
     }
 
     get muted() {
@@ -116,6 +123,19 @@ class AudioManager {
         if (!this.music) return false;
         this.music.muted = !this.music.muted;
         return this.music.muted;
+    }
+
+    fadeOut(duration = AUDIO.FADE_OUT_MS) {
+        if (!this.music || !this.playing) return Promise.resolve();
+        return new Promise(resolve => {
+            this._fadeToVolume(0, duration);
+            setTimeout(() => {
+                this.music.pause();
+                this.music.currentTime = 0;
+                this.playing = false;
+                resolve();
+            }, duration);
+        });
     }
 
     stop() {

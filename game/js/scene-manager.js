@@ -21,6 +21,14 @@ class SceneManager {
         this.audioManager = null;
         this.playerChoices = [];
         this.fading = false;
+        this._bgOverlayImage = null;
+        this._bgOverlayOpacity = 0;
+        this._bgOffsetY = 0;
+        this._phoneVideo = null;
+        this._phoneVideoRect = null;
+        this._phoneVideoCrop = null;
+
+        this._initStepHandlers();
 
         const skipBtn = document.getElementById('skip-btn');
         if (skipBtn) {
@@ -38,9 +46,59 @@ class SceneManager {
         }
     }
 
+    _initStepHandlers() {
+        this._stepHandlers = {
+            dialogue: (step) => this._handleDialogue(step),
+            showDialogueBox: (step) => this.dialogue.show(step.speaker, step.text),
+            hideDialogueBox: () => this.dialogue.hide(),
+            narration: (step) => this._handleNarration(step),
+            waitForClick: (step) => this._handleWaitForClick(step),
+            waitForClickBranch: (step) => this._handleWaitForClickBranch(step),
+            showCharacter: (step) => this._handleShowCharacter(step),
+            setCharacterImage: (step) => this._handleSetCharacterImage(step),
+            hideCharacter: (step) => this._handleHideCharacter(step),
+            showObject: (step) => this._handleShowObject(step),
+            hideObject: (step) => this._handleHideObject(step),
+            setState: (step) => this._handleSetState(step),
+            closeup: (step) => this._handleCloseup(step),
+            closeupDialogue: (step) => this._handleCloseupDialogue(step),
+            hideCloseup: () => this.dialogue.hideCloseup(),
+            pause: (step) => this.sleep(step.duration || 1000),
+            collectLetter: (step) => this._handleCollectLetter(step),
+            tutorial: () => this.showTutorial(),
+            showTutorial: () => this._handleShowTutorial(),
+            hideTutorial: () => this._handleHideTutorial(),
+            showInteractTutorial: () => this._handleShowInteractTutorial(),
+            hideInteractTutorial: () => this._handleHideInteractTutorial(),
+            showMoveTutorial: () => this._handleShowMoveTutorial(),
+            dialogueOptions: (step) => this._handleDialogueOptions(step),
+            determineEnding: (step) => this._handleDetermineEnding(step),
+            showNote: (step) => this._handleShowNote(step),
+            showBgOverlay: (step) => this._handleShowBgOverlay(step),
+            hideBgOverlay: () => this._handleHideBgOverlay(),
+            panDown: (step) => this._handlePanDown(step),
+            clickToStart: () => this._handleClickToStart(),
+            playPhoneVideo: (step) => this._handlePlayPhoneVideo(step),
+            hidePhoneVideo: () => this._handleHidePhoneVideo(),
+            switchTrack: (step) => this._handleSwitchTrack(step),
+            startMusic: (step) => this._handleStartMusic(step),
+            stopMusic: (step) => this._handleStopMusic(step),
+            showCredits: () => this.showCreditsOverlay(),
+            transition: () => this.fadeOut(),
+        };
+    }
+
+    /* ── Scene Loading ── */
+
     async loadConfig(configFile) {
-        const response = await fetch(configFile + '?v=' + Date.now());
-        this.config = await response.json();
+        try {
+            const response = await fetch(configFile + '?v=' + Date.now());
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            this.config = await response.json();
+        } catch (e) {
+            console.error('Failed to load config:', e);
+            this.config = {};
+        }
     }
 
     applyCharacterDefaults(sceneData) {
@@ -59,36 +117,19 @@ class SceneManager {
 
     async loadScene(sceneFile) {
         const response = await fetch(sceneFile + '?v=' + Date.now());
+        if (!response.ok) throw new Error(`Failed to load scene ${sceneFile}: HTTP ${response.status}`);
         const sceneData = await response.json();
         this.applyCharacterDefaults(sceneData);
         this.currentScene = sceneData;
         this.sceneState = { ...(sceneData.initialState || {}) };
         this.sequenceIndex = 0;
         this.waitingForTarget = null;
+        this._bgOverlayImage = null;
+        this._bgOverlayOpacity = 0;
+        this._bgOffsetY = 0;
+        this._stopPhoneVideo();
 
-        const imageSources = [];
-        if (sceneData.background) imageSources.push(sceneData.background);
-        if (sceneData.characters) {
-            for (const char of sceneData.characters) {
-                if (char.image) imageSources.push(char.image);
-            }
-        }
-        if (sceneData.objects) {
-            for (const obj of sceneData.objects) {
-                if (obj.image) imageSources.push(obj.image);
-            }
-        }
-        if (sceneData.closeupImage) {
-            imageSources.push(sceneData.closeupImage);
-        }
-        if (sceneData.sequence) {
-            for (const step of sceneData.sequence) {
-                if (step.type === 'setCharacterImage' && step.image) {
-                    imageSources.push(step.image);
-                }
-            }
-        }
-
+        const imageSources = this._collectImageSources(sceneData);
         await this.imageLoader.loadMultiple(imageSources);
 
         this.updateHitTargets();
@@ -98,40 +139,124 @@ class SceneManager {
         ctx.fillRect(0, 0, this.renderer.width, this.renderer.height);
     }
 
-    getState() {
-        return {
-            sequenceIndex: this.sequenceIndex
-        };
+    _collectImageSources(sceneData) {
+        const sources = [];
+        if (sceneData.background) sources.push(sceneData.background);
+        if (sceneData.characters) {
+            for (const char of sceneData.characters) {
+                if (char.image) sources.push(char.image);
+            }
+        }
+        if (sceneData.objects) {
+            for (const obj of sceneData.objects) {
+                if (obj.image) sources.push(obj.image);
+            }
+        }
+        if (sceneData.closeupImage) sources.push(sceneData.closeupImage);
+        if (sceneData.sequence) {
+            for (const step of sceneData.sequence) {
+                if ((step.type === 'setCharacterImage' || step.type === 'showBgOverlay') && step.image) {
+                    sources.push(step.image);
+                }
+            }
+        }
+        return sources;
     }
+
+    getState() {
+        return { sequenceIndex: this.sequenceIndex };
+    }
+
+    /* ── Fast Forward ── */
 
     fastForwardTo(targetIndex) {
         if (!this.currentScene || !this.currentScene.sequence) return;
 
         const seq = this.currentScene.sequence;
-        const stateTypes = ['showCharacter', 'hideCharacter', 'showObject', 'hideObject', 'setState', 'collectLetter', 'setCharacterImage'];
+        const stateTypes = [
+            'showCharacter', 'hideCharacter', 'showObject', 'hideObject',
+            'setState', 'collectLetter', 'setCharacterImage',
+            'switchTrack', 'startMusic', 'stopMusic', 'showBgOverlay', 'hideBgOverlay'
+        ];
 
         for (let i = 0; i < targetIndex && i < seq.length; i++) {
             const step = seq[i];
             if (!stateTypes.includes(step.type)) continue;
-
-            if (step.type === 'showCharacter') this.setCharacterVisible(step.target, true);
-            else if (step.type === 'hideCharacter') this.setCharacterVisible(step.target, false);
-            else if (step.type === 'showObject') this.setObjectVisible(step.target, true);
-            else if (step.type === 'hideObject') this.setObjectVisible(step.target, false);
-            else if (step.type === 'setState') Object.assign(this.sceneState, step.state);
-            else if (step.type === 'collectLetter' && this.letterManager) {
-                this.letterManager.collect(step.letterId);
-            }
-            else if (step.type === 'setCharacterImage') {
-                const char = this.currentScene.characters?.find(c => c.id === step.target);
-                if (char) char.image = step.image;
-            }
+            this._fastForwardStep(step);
         }
 
         this.sequenceIndex = targetIndex;
         this.updateHitTargets();
         this.render();
     }
+
+    _fastForwardStep(step) {
+        switch (step.type) {
+            case 'showCharacter': this.setCharacterVisible(step.target, true); break;
+            case 'hideCharacter': this.setCharacterVisible(step.target, false); break;
+            case 'showObject': this.setObjectVisible(step.target, true); break;
+            case 'hideObject': this.setObjectVisible(step.target, false); break;
+            case 'setState': Object.assign(this.sceneState, step.state); break;
+            case 'collectLetter':
+                if (this.letterManager) this.letterManager.collect(step.letterId);
+                break;
+            case 'setCharacterImage': {
+                const char = this.currentScene.characters?.find(c => c.id === step.target);
+                if (char) char.image = step.image;
+                break;
+            }
+            case 'switchTrack':
+                if (this.audioManager && step.track) this.audioManager.switchTo(step.track);
+                break;
+            case 'startMusic':
+                if (this.audioManager) this.audioManager.play();
+                break;
+            case 'stopMusic':
+                if (this.audioManager) this.audioManager.stop();
+                break;
+            case 'showBgOverlay':
+                this._bgOverlayImage = this.imageLoader.get(step.image) || null;
+                this._bgOverlayOpacity = this._bgOverlayImage ? 1 : 0;
+                break;
+            case 'hideBgOverlay':
+                this._bgOverlayImage = null;
+                this._bgOverlayOpacity = 0;
+                break;
+            case 'panDown':
+                this._bgOffsetY = 0;
+                break;
+            case 'clickToStart': {
+                const el = document.getElementById('click-to-start');
+                if (el) { el.classList.add('hidden'); el.classList.remove('visible'); el.style.pointerEvents = 'none'; }
+                break;
+            }
+            case 'showInteractTutorial': {
+                const el = document.getElementById('tutorial-interact');
+                if (el) { el.classList.remove('hidden', 'fading-out'); el.classList.add('visible'); }
+                break;
+            }
+            case 'hideInteractTutorial': {
+                const el = document.getElementById('tutorial-interact');
+                if (el) { el.classList.add('hidden'); el.classList.remove('visible', 'fading-out'); }
+                break;
+            }
+            case 'showMoveTutorial': {
+                const el = document.getElementById('tutorial-move');
+                if (el) { el.classList.add('hidden'); el.classList.remove('visible', 'fading-out'); }
+                break;
+            }
+            case 'playPhoneVideo':
+            case 'hidePhoneVideo':
+                this._stopPhoneVideo();
+                break;
+            case 'showDialogueBox':
+            case 'hideDialogueBox':
+                this.dialogue.hide();
+                break;
+        }
+    }
+
+    /* ── Sequence Runner ── */
 
     stop() {
         this.stopped = true;
@@ -162,39 +287,9 @@ class SceneManager {
             if (this.stopped) return;
             const step = scene.sequence[this.sequenceIndex];
 
-            if (this.skipRequested) {
-                const skippable = ['dialogue', 'narration', 'pause', 'closeup', 'closeupDialogue', 'hideCloseup'];
-                if (skippable.includes(step.type)) {
-                    if (step.type === 'hideCloseup') this.dialogue.hideCloseup();
-                    this.sequenceIndex++;
-                    continue;
-                }
-                if (step.type === 'showCharacter') {
-                    this.setCharacterVisible(step.target, true);
-                    this.sequenceIndex++;
-                    continue;
-                }
-                if (step.type === 'showObject') {
-                    this.setObjectVisible(step.target, true);
-                    this.sequenceIndex++;
-                    continue;
-                }
-                if (step.type === 'setState') {
-                    Object.assign(this.sceneState, step.state);
-                    this.sequenceIndex++;
-                    continue;
-                }
-                if (step.type === 'collectLetter') {
-                    if (this.letterManager) this.letterManager.collect(step.letterId);
-                    this.sequenceIndex++;
-                    continue;
-                }
-                this.skipRequested = false;
-                this.showSkipButton(false);
-                this.dialogue.hide();
-                this.dialogue.hideCloseup();
-                this.updateHitTargets();
-                this.render();
+            if (this.skipRequested && this._trySkipStep(step)) {
+                this.sequenceIndex++;
+                continue;
             }
 
             await this.executeStep(step);
@@ -209,99 +304,169 @@ class SceneManager {
         }
     }
 
+    _trySkipStep(step) {
+        const skippable = ['dialogue', 'narration', 'pause', 'closeup', 'closeupDialogue', 'hideCloseup', 'showBgOverlay', 'hideBgOverlay', 'panDown', 'clickToStart', 'showInteractTutorial', 'hideInteractTutorial', 'showMoveTutorial', 'showDialogueBox', 'hideDialogueBox', 'playPhoneVideo', 'hidePhoneVideo'];
+        if (skippable.includes(step.type)) {
+            if (step.type === 'hideCloseup') this.dialogue.hideCloseup();
+            if (step.type === 'hideBgOverlay') {
+                this._bgOverlayImage = null;
+                this._bgOverlayOpacity = 0;
+            }
+            if (step.type === 'panDown') this._bgOffsetY = 0;
+            if (step.type === 'clickToStart') {
+                const el = document.getElementById('click-to-start');
+                if (el) { el.classList.add('hidden'); el.classList.remove('visible'); el.style.pointerEvents = 'none'; }
+            }
+            if (step.type === 'hideInteractTutorial') {
+                const el = document.getElementById('tutorial-interact');
+                if (el) { el.classList.add('hidden'); el.classList.remove('visible', 'fading-out'); }
+            }
+            if (step.type === 'hidePhoneVideo' || step.type === 'playPhoneVideo') {
+                this._stopPhoneVideo();
+            }
+            return true;
+        }
+        if (step.type === 'showCharacter') {
+            this.setCharacterVisible(step.target, true);
+            return true;
+        }
+        if (step.type === 'showObject') {
+            this.setObjectVisible(step.target, true);
+            return true;
+        }
+        if (step.type === 'setState') {
+            Object.assign(this.sceneState, step.state);
+            return true;
+        }
+        if (step.type === 'collectLetter') {
+            if (this.letterManager) this.letterManager.collect(step.letterId);
+            return true;
+        }
+        this.skipRequested = false;
+        this.showSkipButton(false);
+        this.dialogue.hide();
+        this.dialogue.hideCloseup();
+        this.updateHitTargets();
+        this.render();
+        return false;
+    }
+
+    /* ── Hit Targets ── */
+
     updateHitTargets() {
         if (!this.currentScene) return;
-
-        const targets = [];
-
-        if (this.currentScene.characters) {
-            for (const char of this.currentScene.characters) {
-                if (!char.interactive || char.visible === false) continue;
-                if (char.hitbox) {
-                    targets.push({ id: char.id, ...char.hitbox });
-                } else if (char.x !== undefined) {
-                    const img = this.imageLoader.get(char.image);
-                    const scale = char.scale || 1;
-                    const w = img ? img.naturalWidth * scale : 100;
-                    const h = img ? img.naturalHeight * scale : 100;
-                    const anchorX = char.anchorX ?? 0.5;
-                    const anchorY = char.anchorY ?? 1.0;
-                    targets.push({
-                        id: char.id,
-                        x: char.x - w * anchorX,
-                        y: char.y - h * anchorY,
-                        width: w,
-                        height: h
-                    });
-                }
-            }
-        }
-
-        if (this.currentScene.objects) {
-            for (const obj of this.currentScene.objects) {
-                if (!obj.interactive || obj.visible === false) continue;
-                if (obj.type === 'hotspot') {
-                    targets.push({
-                        id: obj.id,
-                        x: obj.x,
-                        y: obj.y,
-                        width: obj.width,
-                        height: obj.height
-                    });
-                } else if (obj.type === 'arrow') {
-                    const s = obj.size || 30;
-                    targets.push({
-                        id: obj.id,
-                        x: obj.x - s * 0.5,
-                        y: obj.y - s,
-                        width: s * 1.7,
-                        height: s * 2
-                    });
-                } else if (obj.image) {
-                    if (obj.hitbox) {
-                        targets.push({ id: obj.id, ...obj.hitbox });
-                    } else {
-                        const img = this.imageLoader.get(obj.image);
-                        const scale = obj.scale || 1;
-                        const w = img ? img.naturalWidth * scale : 50;
-                        const h = img ? img.naturalHeight * scale : 50;
-                        targets.push({
-                            id: obj.id,
-                            x: obj.x,
-                            y: obj.y,
-                            width: w,
-                            height: h
-                        });
-                    }
-                }
-            }
-        }
-
+        const targets = [
+            ...this._buildCharacterTargets(),
+            ...this._buildObjectTargets(),
+        ];
         this.input.setHitTargets(targets);
     }
+
+    _buildCharacterTargets() {
+        const targets = [];
+        if (!this.currentScene.characters) return targets;
+
+        for (const char of this.currentScene.characters) {
+            if (!char.interactive || char.visible === false) continue;
+            if (char.hitbox) {
+                targets.push({ id: char.id, ...char.hitbox });
+            } else if (char.x !== undefined) {
+                const img = this.imageLoader.get(char.image);
+                const scale = char.scale || 1;
+                const w = img ? img.naturalWidth * scale : 100;
+                const h = img ? img.naturalHeight * scale : 100;
+                const anchorX = char.anchorX ?? 0.5;
+                const anchorY = char.anchorY ?? 1.0;
+                targets.push({
+                    id: char.id,
+                    x: char.x - w * anchorX,
+                    y: char.y - h * anchorY,
+                    width: w,
+                    height: h
+                });
+            }
+        }
+        return targets;
+    }
+
+    _buildObjectTargets() {
+        const targets = [];
+        if (!this.currentScene.objects) return targets;
+
+        for (const obj of this.currentScene.objects) {
+            if (!obj.interactive || obj.visible === false) continue;
+            if (obj.type === 'hotspot') {
+                targets.push({ id: obj.id, x: obj.x, y: obj.y, width: obj.width, height: obj.height });
+            } else if (obj.type === 'arrow') {
+                const s = obj.size || RENDER.DEFAULT_ARROW_SIZE;
+                targets.push({ id: obj.id, x: obj.x - s * 0.5, y: obj.y - s, width: s * 1.7, height: s * 2 });
+            } else if (obj.image) {
+                if (obj.hitbox) {
+                    targets.push({ id: obj.id, ...obj.hitbox });
+                } else {
+                    const img = this.imageLoader.get(obj.image);
+                    const scale = obj.scale || 1;
+                    const w = img ? img.naturalWidth * scale : 50;
+                    const h = img ? img.naturalHeight * scale : 50;
+                    targets.push({ id: obj.id, x: obj.x, y: obj.y, width: w, height: h });
+                }
+            }
+        }
+        return targets;
+    }
+
+    /* ── Rendering ── */
 
     render() {
         const scene = this.currentScene;
         if (!scene) return;
 
         this.renderer.clear();
+        this._renderBackground(scene);
+        this._renderDarkOverlay();
+        this._renderDrawables(scene);
+        this._renderHoverGlow();
+    }
 
+    _renderBackground(scene) {
         const bgImg = this.imageLoader.get(scene.background);
-        if (bgImg) {
-            this.renderer.drawBackground(bgImg);
-        }
+        const ctx = this.renderer.ctx;
+        const w = this.renderer.width;
+        const h = this.renderer.height;
 
-        if (this.sceneState.dark) {
-            this.renderer.drawDarkOverlay(this.sceneState.darkOpacity || 0.6);
-            if (this.sceneState.tvGlow) {
-                this.renderer.drawTVGlow(
-                    this.sceneState.tvGlow.x,
-                    this.sceneState.tvGlow.y,
-                    this.sceneState.tvGlow.radius
-                );
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, w, h);
+
+        if (bgImg) {
+            if (this._bgOffsetY > 0) {
+                ctx.drawImage(bgImg, 0, this._bgOffsetY, w, h);
+                const edgeY = this._bgOffsetY;
+                const gradH = Math.min(200, h - edgeY);
+                const grad = ctx.createLinearGradient(0, edgeY, 0, edgeY + gradH);
+                grad.addColorStop(0, 'rgba(0,0,0,1)');
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, edgeY, w, gradH);
+            } else {
+                ctx.drawImage(bgImg, 0, 0, w, h);
             }
         }
 
+    }
+
+    _renderDarkOverlay() {
+        if (!this.sceneState.dark) return;
+        this.renderer.drawDarkOverlay(this.sceneState.darkOpacity || 0.6);
+        if (this.sceneState.tvGlow) {
+            this.renderer.drawTVGlow(
+                this.sceneState.tvGlow.x,
+                this.sceneState.tvGlow.y,
+                this.sceneState.tvGlow.radius
+            );
+        }
+    }
+
+    _renderDrawables(scene) {
         const drawables = [];
 
         if (scene.objects) {
@@ -309,46 +474,70 @@ class SceneManager {
                 if (obj.visible === false) continue;
                 if (obj.type === 'hotspot') continue;
                 if (obj.type === 'arrow') {
-                    drawables.push({
-                        type: 'arrow',
-                        data: obj,
-                        y: obj.y,
-                        zIndex: obj.zIndex || 10
-                    });
+                    drawables.push({ type: 'arrow', data: obj, y: obj.y, zIndex: obj.zIndex || 10 });
                     continue;
                 }
-                drawables.push({
-                    type: 'object',
-                    data: obj,
-                    y: obj.y + (obj.height || 0),
-                    zIndex: obj.zIndex || 0
-                });
+                drawables.push({ type: 'object', data: obj, y: obj.y + (obj.height || 0), zIndex: obj.zIndex || 0 });
             }
         }
 
         if (scene.characters) {
             for (const char of scene.characters) {
                 if (char.visible === false) continue;
-                drawables.push({
-                    type: 'character',
-                    data: char,
-                    y: char.y,
-                    zIndex: char.zIndex || 1
-                });
+                drawables.push({ type: 'character', data: char, y: char.y, zIndex: char.zIndex || 1 });
             }
+        }
+
+        if (this._bgOverlayImage && this._bgOverlayOpacity > 0) {
+            drawables.push({ type: 'bgOverlay', data: null, y: 0, zIndex: 4 });
+        }
+
+        if (this._phoneVideo && this._phoneVideoRect && !this._phoneVideo.paused) {
+            drawables.push({ type: 'phoneVideo', data: null, y: 0, zIndex: 6 });
         }
 
         drawables.sort((a, b) => a.zIndex - b.zIndex || a.y - b.y);
 
         for (const d of drawables) {
+            if (d.type === 'bgOverlay') {
+                const ctx = this.renderer.ctx;
+                ctx.save();
+                ctx.globalAlpha = this._bgOverlayOpacity;
+                ctx.drawImage(this._bgOverlayImage, 0, 0, this.renderer.width, this.renderer.height);
+                ctx.restore();
+                continue;
+            }
+            if (d.type === 'phoneVideo') {
+                const ctx = this.renderer.ctx;
+                const r = this._phoneVideoRect;
+                try {
+                    ctx.save();
+                    ctx.beginPath();
+                    const rad = 8;
+                    ctx.moveTo(r.x + rad, r.y);
+                    ctx.lineTo(r.x + r.w - rad, r.y);
+                    ctx.quadraticCurveTo(r.x + r.w, r.y, r.x + r.w, r.y + rad);
+                    ctx.lineTo(r.x + r.w, r.y + r.h - rad);
+                    ctx.quadraticCurveTo(r.x + r.w, r.y + r.h, r.x + r.w - rad, r.y + r.h);
+                    ctx.lineTo(r.x + rad, r.y + r.h);
+                    ctx.quadraticCurveTo(r.x, r.y + r.h, r.x, r.y + r.h - rad);
+                    ctx.lineTo(r.x, r.y + rad);
+                    ctx.quadraticCurveTo(r.x, r.y, r.x + rad, r.y);
+                    ctx.closePath();
+                    ctx.clip();
+                    const crop = this._phoneVideoCrop;
+                    if (crop) {
+                        ctx.drawImage(this._phoneVideo, crop.x, crop.y, crop.w, crop.h, r.x, r.y, r.w, r.h);
+                    } else {
+                        ctx.drawImage(this._phoneVideo, r.x, r.y, r.w, r.h);
+                    }
+                    ctx.restore();
+                } catch (e) { /* video not ready yet */ }
+                continue;
+            }
             const item = d.data;
             if (d.type === 'arrow') {
-                this.renderer.drawArrow(
-                    item.x, item.y,
-                    item.direction || 'right',
-                    item.size || 30,
-                    item.color
-                );
+                this.renderer.drawArrow(item.x, item.y, item.direction || 'right', item.size || RENDER.DEFAULT_ARROW_SIZE, item.color);
                 continue;
             }
             const img = this.imageLoader.get(item.image);
@@ -368,11 +557,9 @@ class SceneManager {
             if (customFilter || brightness !== null) ctx.filter = 'none';
             if (opacity < 1.0) ctx.globalAlpha = 1.0;
         }
-
-        this.drawHoverGlow();
     }
 
-    drawHoverGlow() {
+    _renderHoverGlow() {
         if (!this.waitingForTarget || !this.input.hoveredTarget) return;
         const waiting = Array.isArray(this.waitingForTarget) ? this.waitingForTarget : [this.waitingForTarget];
         if (!waiting.includes(this.input.hoveredTarget)) return;
@@ -384,202 +571,333 @@ class SceneManager {
         this.renderer.drawHoverGlow(target.x, target.y, target.width, target.height);
     }
 
+    /* ── Step Execution ── */
+
     async executeStep(step) {
-        switch (step.type) {
-            case 'dialogue': {
-                const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
-                this.showSkipButton(remaining >= 3);
-                this.dialogue.show(step.speaker, step.text);
-                await this.waitForAnyClick();
-                this.dialogue.hide();
-                this.showSkipButton(false);
-                break;
+        const handler = this._stepHandlers[step.type];
+        if (handler) {
+            await handler(step);
+        } else {
+            console.warn('Unknown step type:', step.type);
+        }
+    }
+
+    async _handleDialogue(step) {
+        const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
+        this.showSkipButton(remaining >= 3);
+        this.dialogue.show(step.speaker, step.text);
+        await this.waitForAnyClick();
+        this.dialogue.hide();
+        this.showSkipButton(false);
+    }
+
+    async _handleNarration(step) {
+        const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
+        this.showSkipButton(remaining >= 3);
+        this.dialogue.showNarrationText(step.text);
+        await this.waitForAnyClick();
+        this.dialogue.hide();
+        this.showSkipButton(false);
+    }
+
+    async _handleWaitForClick(step) {
+        this.waitingForTarget = step.target;
+        this.updateHitTargets();
+        this.render();
+        await this.waitForTargetClick(step.target);
+        this.waitingForTarget = null;
+    }
+
+    async _handleWaitForClickBranch(step) {
+        const targets = Object.keys(step.branches);
+        this.waitingForTarget = targets;
+        this.updateHitTargets();
+        this.render();
+        const clicked = await this.waitForTargetClick(targets);
+        this.waitingForTarget = null;
+        const branchSteps = step.branches[clicked];
+        if (branchSteps) {
+            for (const s of branchSteps) {
+                if (this.stopped) break;
+                await this.executeStep(s);
             }
+        }
+    }
 
-            case 'narration': {
-                const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
-                this.showSkipButton(remaining >= 3);
-                this.dialogue.showNarrationText(step.text);
-                await this.waitForAnyClick();
-                this.dialogue.hide();
-                this.showSkipButton(false);
-                break;
-            }
+    _handleShowCharacter(step) {
+        this.setCharacterVisible(step.target, true);
+        this.updateHitTargets();
+        this.render();
+    }
 
-            case 'waitForClick':
-                this.waitingForTarget = step.target;
-                this.updateHitTargets();
-                this.render();
-                await this.waitForTargetClick(step.target);
-                this.waitingForTarget = null;
-                break;
+    async _handleSetCharacterImage(step) {
+        const char = this.currentScene?.characters?.find(c => c.id === step.target);
+        if (char && step.image) {
+            await this.imageLoader.loadMultiple([step.image]);
+            char.image = step.image;
+            this.render();
+        }
+    }
 
-            case 'waitForClickBranch': {
-                const targets = Object.keys(step.branches);
-                this.waitingForTarget = targets;
-                this.updateHitTargets();
-                this.render();
-                const clicked = await this.waitForTargetClick(targets);
-                this.waitingForTarget = null;
-                const branchSteps = step.branches[clicked];
-                if (branchSteps) {
-                    for (const s of branchSteps) {
-                        if (this.stopped) break;
-                        await this.executeStep(s);
-                    }
-                }
-                break;
-            }
+    _handleHideCharacter(step) {
+        this.setCharacterVisible(step.target, false);
+        this.updateHitTargets();
+        this.render();
+    }
 
-            case 'showCharacter':
-                this.setCharacterVisible(step.target, true);
-                this.updateHitTargets();
-                this.render();
-                break;
+    _handleShowObject(step) {
+        this.setObjectVisible(step.target, true);
+        this.updateHitTargets();
+        this.render();
+    }
 
-            case 'setCharacterImage': {
-                const char = this.currentScene?.characters?.find(c => c.id === step.target);
-                if (char && step.image) {
-                    await this.imageLoader.loadMultiple([step.image]);
-                    char.image = step.image;
-                    this.render();
-                }
-                break;
-            }
+    _handleHideObject(step) {
+        this.setObjectVisible(step.target, false);
+        this.updateHitTargets();
+        this.render();
+    }
 
-            case 'hideCharacter':
-                this.setCharacterVisible(step.target, false);
-                this.updateHitTargets();
-                this.render();
-                break;
+    _handleSetState(step) {
+        Object.assign(this.sceneState, step.state);
+        this.render();
+    }
 
-            case 'showObject':
-                this.setObjectVisible(step.target, true);
-                this.updateHitTargets();
-                this.render();
-                break;
+    _handleCloseup(step) {
+        this.dialogue.showCloseup(step.image || null);
+    }
 
-            case 'hideObject':
-                this.setObjectVisible(step.target, false);
-                this.updateHitTargets();
-                this.render();
-                break;
+    async _handleCloseupDialogue(step) {
+        const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
+        this.showSkipButton(remaining >= 3);
+        this.dialogue.showCloseupText(step.speaker, step.text, step.html);
+        await this.waitForAnyClick();
+        this.dialogue.hide();
+        this.showSkipButton(false);
+    }
 
-            case 'setState':
-                Object.assign(this.sceneState, step.state);
-                this.render();
-                break;
+    async _handleCollectLetter(step) {
+        if (!this.letterManager) return;
+        this.letterManager.collect(step.letterId);
+        if (this.uiManager) {
+            this.uiManager.addUnreadLetter();
+            await this.uiManager.showSingleLetter(step.letterId);
+        }
+    }
 
-            case 'closeup':
-                this.dialogue.showCloseup(step.image || null);
-                break;
+    _handleShowTutorial() {
+        const el = document.getElementById('tutorial-prompt');
+        if (el) {
+            el.classList.remove('hidden', 'fading-out', 'visible');
+            el.offsetHeight;
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => el.classList.add('visible'));
+            });
+        }
+    }
 
-            case 'closeupDialogue': {
-                const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
-                this.showSkipButton(remaining >= 3);
-                this.dialogue.showCloseupText(step.speaker, step.text, step.html);
-                await this.waitForAnyClick();
-                this.dialogue.hide();
-                this.showSkipButton(false);
-                break;
-            }
+    _handleHideTutorial() {
+        const el = document.getElementById('tutorial-prompt');
+        if (el) {
+            el.classList.remove('visible');
+            el.classList.add('fading-out');
+            setTimeout(() => {
+                el.classList.add('hidden');
+                el.classList.remove('fading-out');
+            }, 500);
+        }
+    }
 
-            case 'hideCloseup':
-                this.dialogue.hideCloseup();
-                break;
+    _handleShowInteractTutorial() {
+        const el = document.getElementById('tutorial-interact');
+        if (el) {
+            el.classList.remove('hidden', 'fading-out', 'visible');
+            el.offsetHeight;
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => el.classList.add('visible'));
+            });
+        }
+    }
 
-            case 'pause':
-                await this.sleep(step.duration || 1000);
-                break;
-
-            case 'collectLetter':
-                if (this.letterManager) {
-                    this.letterManager.collect(step.letterId);
-                    if (this.uiManager) {
-                        this.uiManager.addUnreadLetter();
-                        await this.uiManager.showSingleLetter(step.letterId);
-                    }
-                }
-                break;
-
-            case 'tutorial': {
-                await this.showTutorial(step.text);
-                break;
-            }
-
-            case 'showTutorial': {
-                const el = document.getElementById('tutorial-prompt');
-                if (el) {
-                    el.classList.remove('hidden', 'fading-out', 'visible');
-                    el.offsetHeight;
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => el.classList.add('visible'));
-                    });
-                }
-                break;
-            }
-
-            case 'hideTutorial': {
-                const el = document.getElementById('tutorial-prompt');
-                if (el) {
+    _handleShowMoveTutorial() {
+        return new Promise((resolve) => {
+            const el = document.getElementById('tutorial-move');
+            if (!el) { resolve(); return; }
+            el.classList.remove('hidden', 'fading-out', 'visible');
+            requestAnimationFrame(() => el.classList.add('visible'));
+            const keys = ['a', 'd', 'arrowleft', 'arrowright'];
+            const handler = (e) => {
+                if (keys.includes(e.key.toLowerCase())) {
+                    document.removeEventListener('keydown', handler);
                     el.classList.remove('visible');
                     el.classList.add('fading-out');
                     setTimeout(() => {
                         el.classList.add('hidden');
                         el.classList.remove('fading-out');
+                        resolve();
                     }, 500);
                 }
-                break;
-            }
+            };
+            document.addEventListener('keydown', handler);
+        });
+    }
 
-            case 'dialogueOptions': {
-                const chosen = await this.showDialogueOptions(step.speaker, step.prompt, step.options);
-                this.playerChoices.push(chosen.category);
-                if (chosen.followUp) {
-                    this.dialogue.show(step.speaker, chosen.followUp);
-                    await this.waitForAnyClick();
-                    this.dialogue.hide();
-                }
-                break;
-            }
-
-            case 'determineEnding': {
-                const ending = this.determineEnding();
-                const endingMap = step.endings || {};
-                const nextScene = endingMap[ending];
-                if (nextScene) {
-                    this.currentScene.nextScene = nextScene;
-                }
-                break;
-            }
-
-            case 'showNote': {
-                if (this.uiManager) {
-                    await this.uiManager.showNote(step.title || '', step.text || '', step.cssClass || '');
-                }
-                break;
-            }
-
-            case 'startMusic': {
-                if (this.audioManager) {
-                    this.audioManager.fadeIn(step.fadeDuration || 3000);
-                }
-                break;
-            }
-
-            case 'showCredits': {
-                await this.showCreditsOverlay();
-                break;
-            }
-
-            case 'transition':
-                await this.fadeOut();
-                break;
-
-            default:
-                console.warn('Unknown step type:', step.type);
+    _handleHideInteractTutorial() {
+        const el = document.getElementById('tutorial-interact');
+        if (el) {
+            el.classList.remove('visible');
+            el.classList.add('fading-out');
+            setTimeout(() => {
+                el.classList.add('hidden');
+                el.classList.remove('fading-out');
+            }, 500);
         }
     }
+
+    async _handleDialogueOptions(step) {
+        const chosen = await this.showDialogueOptions(step.speaker, step.prompt, step.options);
+        this.playerChoices.push(chosen.category);
+        if (chosen.followUp) {
+            this.dialogue.show(step.speaker, chosen.followUp);
+            await this.waitForAnyClick();
+            this.dialogue.hide();
+        }
+    }
+
+    _handleDetermineEnding(step) {
+        const ending = this.determineEnding();
+        const endingMap = step.endings || {};
+        const nextScene = endingMap[ending];
+        if (nextScene) this.currentScene.nextScene = nextScene;
+    }
+
+    async _handleShowNote(step) {
+        if (this.uiManager) {
+            await this.uiManager.showNote(step.title || '', step.text || '', step.cssClass || '');
+        }
+    }
+
+    async _handleShowBgOverlay(step) {
+        const img = this.imageLoader.get(step.image);
+        if (img) {
+            this._bgOverlayImage = img;
+            this._bgOverlayOpacity = 0;
+            await this._animateOverlay(0, 1, step.fadeDuration || RENDER.OVERLAY_FADE_MS);
+        }
+    }
+
+    async _handleHideBgOverlay() {
+        if (this._bgOverlayImage) {
+            await this._animateOverlay(1, 0, RENDER.OVERLAY_FADE_MS);
+            this._bgOverlayImage = null;
+            this._bgOverlayOpacity = 0;
+            this.render();
+        }
+    }
+
+    _handlePanDown(step) {
+        const duration = step.duration || RENDER.PAN_DOWN_MS;
+        return new Promise(resolve => {
+            this._bgOffsetY = GAME.HEIGHT;
+            const start = performance.now();
+            const animate = (now) => {
+                const t = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - t, 3);
+                this._bgOffsetY = GAME.HEIGHT * (1 - eased);
+                if (t < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    this._bgOffsetY = 0;
+                    resolve();
+                }
+            };
+            requestAnimationFrame(animate);
+        });
+    }
+
+    _handleClickToStart() {
+        return new Promise(resolve => {
+            const el = document.getElementById('click-to-start');
+            if (!el) { resolve(); return; }
+            el.classList.remove('hidden');
+            requestAnimationFrame(() => el.classList.add('visible'));
+            const onClick = () => {
+                document.removeEventListener('click', onClick);
+                el.classList.remove('visible');
+                el.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    el.classList.add('hidden');
+                    resolve();
+                }, 800);
+            };
+            document.addEventListener('click', onClick);
+        });
+    }
+
+    async _handlePlayPhoneVideo(step) {
+        const videoEl = document.getElementById('phone-video');
+        if (!videoEl) return;
+
+        videoEl.src = step.src + '?v=' + Date.now();
+        videoEl.loop = step.loop !== false;
+        videoEl.muted = step.muted !== false;
+
+        const phoneRect = step.phoneRect || { x: 714, y: 239, w: 92, h: 112 };
+        const charId = step.character || 'drew-closeup';
+        const char = this.currentScene?.characters?.find(c => c.id === charId);
+
+        if (char) {
+            const img = this.imageLoader.get(char.image);
+            const scale = char.scale || 1;
+            const anchorX = char.anchorX ?? 0.5;
+            const anchorY = char.anchorY ?? 1.0;
+            const imgW = img ? img.width : 1206;
+            const imgH = img ? img.height : 685;
+            const drawX = char.x - imgW * scale * anchorX;
+            const drawY = char.y - imgH * scale * anchorY;
+
+            this._phoneVideoRect = {
+                x: drawX + phoneRect.x * scale,
+                y: drawY + phoneRect.y * scale,
+                w: phoneRect.w * scale,
+                h: phoneRect.h * scale,
+            };
+        }
+
+        this._phoneVideoCrop = step.videoCrop || null;
+        this._phoneVideo = videoEl;
+        try { await videoEl.play(); } catch (e) {
+            console.warn('Phone video autoplay blocked:', e);
+        }
+    }
+
+    _handleHidePhoneVideo() {
+        this._stopPhoneVideo();
+    }
+
+    _stopPhoneVideo() {
+        if (this._phoneVideo) {
+            this._phoneVideo.pause();
+            this._phoneVideo.removeAttribute('src');
+            this._phoneVideo.load();
+        }
+        this._phoneVideo = null;
+        this._phoneVideoRect = null;
+        this._phoneVideoCrop = null;
+    }
+
+    _handleSwitchTrack(step) {
+        if (this.audioManager && step.track) this.audioManager.switchTo(step.track);
+    }
+
+    _handleStartMusic(step) {
+        if (this.audioManager) this.audioManager.fadeIn(step.fadeDuration || AUDIO.START_MUSIC_MS);
+    }
+
+    async _handleStopMusic(step) {
+        if (this.audioManager) await this.audioManager.fadeOut(step.fadeDuration || AUDIO.FADE_OUT_MS);
+    }
+
+    /* ── Helpers ── */
 
     setCharacterVisible(id, visible) {
         if (!this.currentScene || !this.currentScene.characters) return;
@@ -597,14 +915,11 @@ class SceneManager {
         const seq = this.currentScene.sequence;
         let count = 0;
         const dialogueTypes = ['dialogue', 'narration', 'closeupDialogue'];
+        const passthrough = ['closeup', 'hideCloseup', 'showCharacter', 'showObject', 'pause'];
         for (let i = fromIndex; i < seq.length; i++) {
-            if (dialogueTypes.includes(seq[i].type)) {
-                count++;
-            } else if (seq[i].type === 'closeup' || seq[i].type === 'hideCloseup' || seq[i].type === 'showCharacter' || seq[i].type === 'showObject' || seq[i].type === 'pause') {
-                continue;
-            } else {
-                break;
-            }
+            if (dialogueTypes.includes(seq[i].type)) count++;
+            else if (passthrough.includes(seq[i].type)) continue;
+            else break;
         }
         return count;
     }
@@ -741,11 +1056,28 @@ class SceneManager {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    _animateOverlay(from, to, duration) {
+        return new Promise(resolve => {
+            const start = performance.now();
+            const tick = (now) => {
+                const progress = Math.min((now - start) / duration, 1);
+                this._bgOverlayOpacity = from + (to - from) * progress;
+                this.render();
+                if (progress < 1) {
+                    requestAnimationFrame(tick);
+                } else {
+                    resolve();
+                }
+            };
+            requestAnimationFrame(tick);
+        });
+    }
+
     async fadeOut() {
         const ctx = this.renderer.ctx;
         const w = this.renderer.width;
         const h = this.renderer.height;
-        const duration = (this.currentScene && this.currentScene.fadeDuration) || 1000;
+        const duration = (this.currentScene && this.currentScene.fadeDuration) || RENDER.DEFAULT_FADE_MS;
         const startTime = performance.now();
         this.fading = true;
 
@@ -772,7 +1104,7 @@ class SceneManager {
         const ctx = this.renderer.ctx;
         const w = this.renderer.width;
         const h = this.renderer.height;
-        const duration = (this.currentScene && this.currentScene.fadeDuration) || 1000;
+        const duration = (this.currentScene && this.currentScene.fadeDuration) || RENDER.DEFAULT_FADE_MS;
         const startTime = performance.now();
         this.fading = true;
 

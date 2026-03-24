@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Reenie+Beanie&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=13">
+    <link rel="stylesheet" href="css/style.css?v=1">
 </head>
 <body>
     <div id="game-container">
@@ -35,15 +35,15 @@
                 </svg>
             </button>
             <button id="hud-volume" class="hud-icon" title="Mute / Unmute">
-                <svg id="vol-icon-on" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg id="vol-icon-on" viewBox="-1 -1 36 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 12v8h6l8 8V4l-8 8H4z"/>
                     <path d="M24 10a6 6 0 0 1 0 12"/>
                     <path d="M27 6a11 11 0 0 1 0 20"/>
                 </svg>
-                <svg id="vol-icon-off" class="hidden" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg id="vol-icon-off" class="hidden" viewBox="-1 -1 36 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 12v8h6l8 8V4l-8 8H4z"/>
-                    <line x1="24" y1="12" x2="32" y2="20"/>
-                    <line x1="32" y1="12" x2="24" y2="20"/>
+                    <line x1="23" y1="12" x2="30" y2="20"/>
+                    <line x1="30" y1="12" x2="23" y2="20"/>
                 </svg>
             </button>
             <button id="hud-envelope" class="hud-icon" title="Letters">
@@ -58,7 +58,7 @@
         <!-- Pause Menu -->
         <div id="pause-overlay" class="screen-overlay hidden">
             <div class="modal-panel">
-                <button class="close-btn" data-close="pause"><img src="assets/ui/x-close.png" alt="Close"></button>
+                <button class="close-btn"><img src="assets/ui/x-close.png" alt="Close"></button>
                 <div class="panel-content">
                     <img src="assets/ui/volume-title.png" alt="Volume" class="panel-title-img">
                     <div class="volume-row">
@@ -113,7 +113,7 @@
         <!-- Confirmation Dialog -->
         <div id="confirm-dialog" class="screen-overlay hidden">
             <div class="modal-panel">
-                <button class="close-btn" data-close="confirm"><img src="assets/ui/x-close.png" alt="Close"></button>
+                <button class="close-btn"><img src="assets/ui/x-close.png" alt="Close"></button>
                 <div class="panel-content confirm-content">
                     <p id="confirm-message"></p>
                     <button id="btn-confirm-yes" class="ui-btn"><span>Yes</span></button>
@@ -126,7 +126,7 @@
         <div id="letter-viewer" class="screen-overlay hidden">
             <div class="letter-container">
                 <p id="letter-title">Letter #1</p>
-                <button class="close-btn letter-close" data-close="letter"><img src="assets/ui/x-close.png" alt="Close"></button>
+                <button class="close-btn letter-close"><img src="assets/ui/x-close.png" alt="Close"></button>
                 <button id="letter-prev" class="letter-arrow letter-arrow-left" aria-label="Previous letter">&#8592;</button>
                 <div id="letter-paper">
                     <p id="letter-content"></p>
@@ -135,9 +135,28 @@
             </div>
         </div>
 
-        <!-- Tutorial Prompt -->
+        <!-- Tutorial Prompt (movement keys) -->
         <div id="tutorial-prompt" class="hidden">
-            <img src="assets/ui/controls.png" alt="Controls">
+            <img src="assets/ui/controls-move.png?v=1" alt="Movement Controls">
+        </div>
+
+        <!-- Tutorial Prompt (interact) -->
+        <div id="tutorial-interact" class="hidden">
+            <span>Hover over objects and click to interact</span>
+            <img src="assets/ui/controls-interact.png?v=1" alt="Click">
+        </div>
+
+        <!-- Tutorial Prompt (move right) -->
+        <div id="tutorial-move" class="hidden">
+            <span>Use the arrow keys to move to the next room &rarr;</span>
+        </div>
+
+        <!-- Hidden video for phone screen playback -->
+        <video id="phone-video" muted playsinline style="display:none;"></video>
+
+        <!-- Click to Start Prompt -->
+        <div id="click-to-start" class="hidden">
+            <span>Click to Start</span>
         </div>
 
         <!-- Dialogue Options (branching) -->
@@ -151,11 +170,11 @@
             <div class="credits-content">
                 <h1>Sick of Me</h1>
                 <p>Thank you for playing.</p>
-                <button class="close-btn credits-close" data-close="credits"><img src="assets/ui/x-close.png" alt="Close"></button>
+                <button class="close-btn credits-close"><img src="assets/ui/x-close.png" alt="Close"></button>
             </div>
         </div>
 
-        <!-- Gameplay overlays (existing) -->
+        <!-- Gameplay overlays -->
         <div id="dialogue-box" class="hidden">
             <span id="dialogue-speaker"></span>
             <p id="dialogue-text"></p>
@@ -173,6 +192,7 @@
                 <p id="closeup-text"></p>
             </div>
         </div>
+
         <!-- Dev: Scene Selector & Reset -->
         <div id="dev-tools" class="hidden">
             <div id="scene-selector">
@@ -189,14 +209,15 @@
         </label>
     </div>
 
-    <script src="js/audio-manager.js?v=4"></script>
-    <script src="js/engine.js?v=4"></script>
-    <script src="js/input.js?v=3"></script>
-    <script src="js/dialogue.js?v=3"></script>
-    <script src="js/save-manager.js?v=3"></script>
-    <script src="js/letter-manager.js?v=3"></script>
-    <script src="js/scene-manager.js?v=10"></script>
-    <script src="js/ui-manager.js?v=9"></script>
-    <script src="js/main.js?v=15"></script>
+    <script src="js/constants.js?v=1"></script>
+    <script src="js/audio-manager.js?v=1"></script>
+    <script src="js/engine.js?v=1"></script>
+    <script src="js/input.js?v=1"></script>
+    <script src="js/dialogue.js?v=1"></script>
+    <script src="js/save-manager.js?v=1"></script>
+    <script src="js/letter-manager.js?v=1"></script>
+    <script src="js/scene-manager.js?v=1"></script>
+    <script src="js/ui-manager.js?v=1"></script>
+    <script src="js/main.js?v=1"></script>
 </body>
 </html>

@@ -5,8 +5,14 @@ class LetterManager {
     }
 
     async loadLetterData(dataFile) {
-        const response = await fetch(dataFile + '?v=' + Date.now());
-        this.letters = await response.json();
+        try {
+            const response = await fetch(dataFile + '?v=' + Date.now());
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            this.letters = await response.json();
+        } catch (e) {
+            console.error('Failed to load letter data:', e);
+            this.letters = [];
+        }
     }
 
     setCollected(ids) {

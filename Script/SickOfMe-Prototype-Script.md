@@ -124,8 +124,9 @@ Scene 1 (Bedroom)
                                       --> Scene 18 (Town Continued -- Lady)
                                       --> Scene 19 (Front of Bridge -- Calvin)
                                         --> Scene 20 (End of Bridge)
-                                          --> Scene 21 (Forest)
-                                            --> Scene 22 (Grave -- Branching Choices)
+                                          --> Scene 20b (Forest Path)
+                                            --> Scene 21 (Forest -- Tree People)
+                                              --> Scene 22 (Grave -- Branching Choices)
                                               --> Ending A: "Connect" (scene20a)
                                               --> Ending B: "Leave" (scene20b)
                                               --> Ending C: "Reflect" (scene20c)
@@ -508,7 +509,7 @@ Scene 1 (Bedroom)
 ---
 
 ### SCENE 17 -- TOWN CONTINUED (DREW)
-**File:** `scene17.json` | **Background:** bg-17.png
+**File:** `scene17.json` | **Background:** bg-17.png | **Overlay:** bg-17-overlay.png (sky with stars, shown during Drew dialogue)
 **Setting:** Further down the town street. Drew is standing in the middle of the road.
 
 **Characters on screen:** Hero (visible)
@@ -517,22 +518,24 @@ Scene 1 (Bedroom)
 **Sequence:**
 
 1. **>>> PLAYER CLICKS: Drew**
-2. **Hero:** "Why are you in the road?"
-3. **Drew:** "..."
-4. **Hero:** "Hello?"
-5. **Drew:** "..."
-6. **Drew:** "This is so like you."
-7. **Hero:** "???"
-8. **Drew:** "Heh..."
-9. **Drew:** "This is so you."
-10. **Drew:** "..."
-11. **Drew:** "You when you walked up to me."
-12. **Drew:** "..."
-13. **Drew:** "Me right now."
-14. **Drew:** "..."
-15. **Drew:** "Us thirty seconds ago."
-16. **Hero:** "Do you have anything else to say??"
-17. **Drew:** "I can't afford groceries this month."
+2. *[Sky overlay fades in over 0.8s]*
+3. **Hero:** "Why are you in the road?"
+4. **Drew:** "..."
+5. **Hero:** "Hello?"
+6. **Drew:** "..."
+7. **Drew:** "This is so like you."
+8. **Hero:** "???"
+9. **Drew:** "Heh..."
+10. **Drew:** "This is so you."
+11. **Drew:** "..."
+12. **Drew:** "You when you walked up to me."
+13. **Drew:** "..."
+14. **Drew:** "Me right now."
+15. **Drew:** "..."
+16. **Drew:** "Us thirty seconds ago."
+17. **Hero:** "Do you have anything else to say??"
+18. **Drew:** "I can't afford groceries this month."
+19. *[Sky overlay fades out over 0.8s]*
 18. *[Next arrow appears]*
 19. **>>> PLAYER CLICKS/WALKS TO: Next Arrow**
 20. *[Transition to next scene]*
@@ -650,9 +653,23 @@ Scene 1 (Bedroom)
 
 ---
 
-### SCENE 21 -- FOREST
-**File:** `scene21.json` | **Background:** bg-21.png
-**Setting:** A dark forest path. People are sitting in a tree.
+### SCENE 20B -- FOREST PATH
+**File:** `scene20b.json` | **Background:** bg-21.png
+**Setting:** A dark forest path with a deer visible in the distance.
+
+**Characters on screen:** Hero (visible)
+**Interactive objects:** Next Arrow (visible)
+
+**Sequence:**
+
+1. **>>> PLAYER CLICKS/WALKS TO: Next Arrow**
+2. *[Transition to next scene]*
+
+---
+
+### SCENE 21 -- FOREST (TREE PEOPLE)
+**File:** `scene21.json` | **Background:** bg-22.png
+**Setting:** A large tree in the dark woods. People are sitting in its branches.
 
 **Characters on screen:** Hero (visible)
 **Interactive objects:** Tree Creatures (hotspot), Bush (hotspot, hidden initially), Next Arrow (hidden initially)
@@ -779,7 +796,7 @@ All three endings show a final background image, pause for 3 seconds, then show 
 - Speed: 7px per frame
 
 ### Backward Navigation
-- Outdoor scenes form a linear chain: House Ext (3) → House Lane (4) → Dirt Path (5) → Neighbour's (6) → Cows (7) → Dirt Road (8) → Bus Stop (9) → Town Entrance (10) → Town (11) → [store 12-15 skipped] → After Store (16) → Drew (17) → Clinic (17b) → Lady (18) → Bridge (19) → End Bridge (20) → Forest (21)
+- Outdoor scenes form a linear chain: House Ext (3) → House Lane (4) → Dirt Path (5) → Neighbour's (6) → Cows (7) → Dirt Road (8) → Bus Stop (9) → Town Entrance (10) → Town (11) → [store 12-15 skipped] → After Store (16) → Drew (17) → Clinic (17b) → Lady (18) → Bridge (19) → End Bridge (20) → Forest Path (20b) → Forest/Tree People (21)
 - Walking left off-screen in any outdoor scene returns to the previous outdoor scene
 - Going back from scene 16 jumps to scene 11 (skipping store interiors)
 - Scene 3 is the earliest -- cannot go further back

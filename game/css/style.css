@@ -71,36 +71,7 @@ html, body {
 
 /* ── Buttons ── */
 
-.ui-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 425px;
-    height: 60px;
-    background: url('../assets/ui/button-normal.png') center/contain no-repeat;
-    border: none;
-    cursor: pointer;
-    font-family: 'Reenie Beanie', cursive;
-    font-size: 36px;
-    color: #e0e0e0;
-    letter-spacing: 1px;
-    transition: transform 0.1s;
-}
-
-.ui-btn:hover {
-    background-image: url('../assets/ui/button-hover.png');
-    transform: scale(1.03);
-}
-
-.ui-btn span {
-    pointer-events: none;
-}
-
-.ui-btn .btn-text-img {
-    height: 36px;
-    pointer-events: none;
-}
-
+.ui-btn,
 .ui-btn-text {
     display: flex;
     align-items: center;
@@ -117,9 +88,19 @@ html, body {
     transition: transform 0.1s;
 }
 
+.ui-btn:hover,
 .ui-btn-text:hover {
     background-image: url('../assets/ui/button-hover.png');
     transform: scale(1.03);
+}
+
+.ui-btn span {
+    pointer-events: none;
+}
+
+.ui-btn .btn-text-img {
+    height: 36px;
+    pointer-events: none;
 }
 
 /* ── HUD ── */
@@ -135,6 +116,7 @@ html, body {
 }
 
 .hud-icon {
+    position: relative;
     width: 48px;
     height: 48px;
     background: none;
@@ -147,10 +129,6 @@ html, body {
 
 .hud-icon:hover {
     color: rgba(255, 255, 255, 0.85);
-}
-
-.hud-icon {
-    position: relative;
 }
 
 .hud-icon svg {
@@ -499,7 +477,8 @@ html, body {
 
 /* ── Existing Dialogue / Narration / Closeup ── */
 
-#dialogue-box {
+#dialogue-box,
+#closeup-dialogue-box {
     position: absolute;
     bottom: 40px;
     left: 50%;
@@ -512,10 +491,13 @@ html, body {
     padding: 24px 32px;
     color: #fff;
     font-family: Georgia, 'Times New Roman', serif;
-    z-index: 10;
 }
 
-#dialogue-speaker {
+#dialogue-box { z-index: 10; }
+#closeup-dialogue-box { z-index: 25; }
+
+#dialogue-speaker,
+#closeup-speaker {
     display: block;
     font-size: 22px;
     font-weight: bold;
@@ -526,8 +508,6 @@ html, body {
 }
 
 #dialogue-text {
-    font-size: 28px;
-    line-height: 1.5;
     padding-right: 100px;
 }
 
@@ -596,32 +576,7 @@ html, body {
     object-fit: contain;
 }
 
-#closeup-dialogue-box {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    max-width: 1400px;
-    background: rgba(0, 0, 0, 0.85);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    padding: 24px 32px;
-    color: #fff;
-    font-family: Georgia, 'Times New Roman', serif;
-    z-index: 25;
-}
-
-#closeup-speaker {
-    display: block;
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: #ddd;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
+#dialogue-text,
 #closeup-text {
     font-size: 28px;
     line-height: 1.5;
@@ -637,8 +592,9 @@ html, body {
     z-index: 12;
     opacity: 0;
     transition: opacity 0.8s ease-in;
-    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.8) 35%, rgba(0, 0, 0, 0.6) 55%, rgba(0, 0, 0, 0) 80%);
-    padding: 50px 80px;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 16px;
+    padding: 30px 50px;
     pointer-events: none;
 }
 
@@ -654,6 +610,111 @@ html, body {
 #tutorial-prompt img {
     max-width: 500px;
     height: auto;
+}
+
+/* ── Tutorial Interact Prompt ── */
+
+#tutorial-interact {
+    position: absolute;
+    top: 68%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 12;
+    opacity: 0;
+    transition: opacity 0.8s ease-in;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 16px;
+    padding: 30px 50px;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+#tutorial-interact.visible {
+    opacity: 1;
+}
+
+#tutorial-interact.fading-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
+
+#tutorial-interact span {
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 42px;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+}
+
+#tutorial-interact img {
+    max-height: 160px;
+    width: auto;
+}
+
+/* ── Tutorial Move Prompt ── */
+
+#tutorial-move {
+    position: absolute;
+    top: 68%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 12;
+    opacity: 0;
+    transition: opacity 0.8s ease-in;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 16px;
+    padding: 30px 50px;
+    pointer-events: none;
+}
+
+#tutorial-move.visible {
+    opacity: 1;
+}
+
+#tutorial-move.fading-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
+
+#tutorial-move span {
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 42px;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+}
+
+/* ── Click to Start Prompt ── */
+
+#click-to-start {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 12;
+    opacity: 0;
+    transition: opacity 0.8s ease-in;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 16px;
+    padding: 30px 50px;
+    pointer-events: none;
+    cursor: pointer;
+}
+
+#click-to-start.visible {
+    opacity: 1;
+}
+
+#click-to-start span {
+    font-family: 'Reenie Beanie', cursive;
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.7);
+    animation: pulse-fade 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse-fade {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
 }
 
 /* ── Dialogue Options ── */

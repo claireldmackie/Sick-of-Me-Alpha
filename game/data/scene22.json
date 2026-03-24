@@ -55,6 +55,9 @@
         { "type": "dialogue", "speaker": "Hero", "text": "I wrote a letter for you..." },
         { "type": "collectLetter", "letterId": "letter-hero" },
         { "type": "dialogue", "speaker": "Hero", "text": "I wrote you a letter explaining how I feel, but now it all feels wrong." },
+        { "type": "stopMusic", "fadeDuration": 2000 },
+        { "type": "switchTrack", "track": "homesick" },
+        { "type": "startMusic", "fadeDuration": 3000 },
         { "type": "dialogue", "speaker": "Hero", "text": "It's different when I'm sitting here, I have to face the fact that you're really gone." },
 
         {

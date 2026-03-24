@@ -1,6 +1,6 @@
 class SaveManager {
     constructor() {
-        this.prefix = 'sickofme_save_';
+        this.prefix = SCENES.SAVE_KEY_PREFIX;
     }
 
     save(slotIndex, data) {
@@ -9,14 +9,21 @@ class SaveManager {
             sequenceIndex: data.sequenceIndex,
             sceneName: data.sceneName || '',
             timestamp: Date.now(),
-            letters: data.letters || []
+            letters: data.letters || [],
+            sceneProgress: data.sceneProgress || {}
         };
         localStorage.setItem(this.prefix + slotIndex, JSON.stringify(saveData));
     }
 
     load(slotIndex) {
         const raw = localStorage.getItem(this.prefix + slotIndex);
-        return raw ? JSON.parse(raw) : null;
+        if (!raw) return null;
+        try {
+            return JSON.parse(raw);
+        } catch (e) {
+            console.warn('Corrupt save data in slot', slotIndex, e);
+            return null;
+        }
     }
 
     delete(slotIndex) {
@@ -31,7 +38,7 @@ class SaveManager {
     }
 
     getAll() {
-        return [0, 1, 2].map(i => this.load(i));
+        return Array.from({ length: SCENES.SAVE_SLOT_COUNT }, (_, i) => this.load(i));
     }
 
     hasSaves() {

@@ -55,7 +55,6 @@
         { "type": "dialogue", "speaker": "Hero", "text": "..." },
         { "type": "dialogue", "speaker": "Erma", "text": "Anyway, nice to see you up and about..." },
         { "type": "dialogue", "speaker": "Hero", "text": "Yeah, thanks." },
-        { "type": "startMusic", "fadeDuration": 4000 },
         { "type": "showObject", "target": "next-arrow" },
         { "type": "waitForClick", "target": "next-arrow" },
         { "type": "transition" }
