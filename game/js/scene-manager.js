@@ -28,6 +28,7 @@ class SceneManager {
         this._phoneVideo = null;
         this._phoneVideoRect = null;
         this._phoneVideoCrop = null;
+        this.manualTrackOverride = false;
 
         this._initStepHandlers();
 
@@ -929,25 +930,28 @@ class SceneManager {
             let cycleRAF;
 
             if (cycling) {
-                this._nightFade = 1;
+                this._nightFade = 0;
+                const holdDayPct = 0.15;
+                const dayToNightPct = 0.25;
+                const holdNightPct = 0.20;
+                const nightToDayPct = 0.25;
+
                 cycleRAF = requestAnimationFrame(function animateCycle(now) {
                     if (!cycling) return;
-                    const t = (now - cycleStart) / cycleDuration;
-                    // keep full night for 1.5s before cycling begins
-                    const adjusted = Math.max(0, t - 1500 / cycleDuration);
-                    const cycle = Math.floor(adjusted);
-                    const p = adjusted % 1;
-                    const transDur = 0.25;
-                    const holdDay = 0.2;
-                    const holdNight = holdDay + transDur;
-                    const nightEnd = holdNight + 0.2;
-                    const dayStart = nightEnd + transDur;
-                    if (p < holdDay) this._nightFade = 0;
-                    else if (p < holdNight) this._nightFade = (p - holdDay) / transDur;
-                    else if (p < nightEnd) this._nightFade = 1;
-                    else if (p < dayStart) this._nightFade = 1 - (p - nightEnd) / transDur;
-                    else this._nightFade = 0;
-                    if (adjusted <= 0) this._nightFade = 1;
+                    const p = ((now - cycleStart) / cycleDuration) % 1;
+
+                    if (p < holdDayPct) {
+                        this._nightFade = 0;
+                    } else if (p < holdDayPct + dayToNightPct) {
+                        this._nightFade = (p - holdDayPct) / dayToNightPct;
+                    } else if (p < holdDayPct + dayToNightPct + holdNightPct) {
+                        this._nightFade = 1;
+                    } else if (p < holdDayPct + dayToNightPct + holdNightPct + nightToDayPct) {
+                        this._nightFade = 1 - (p - holdDayPct - dayToNightPct - holdNightPct) / nightToDayPct;
+                    } else {
+                        this._nightFade = 0;
+                    }
+
                     cycleRAF = requestAnimationFrame(animateCycle);
                 }.bind(this));
             }
@@ -955,7 +959,7 @@ class SceneManager {
             setTimeout(() => {
                 el.classList.remove('hidden');
                 requestAnimationFrame(() => el.classList.add('visible'));
-            }, 1500);
+            }, 2500);
 
             const onClick = () => {
                 document.removeEventListener('click', onClick);
@@ -1046,7 +1050,10 @@ class SceneManager {
     }
 
     _handleSwitchTrack(step) {
-        if (this.audioManager && step.track) this.audioManager.switchTo(step.track);
+        if (this.audioManager && step.track) {
+            this.audioManager.switchTo(step.track);
+            this.manualTrackOverride = true;
+        }
     }
 
     _handleStartMusic(step) {

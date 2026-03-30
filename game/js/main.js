@@ -310,6 +310,11 @@ class Game {
     _bridgeStart = SCENES.BRIDGE_START;
 
     _syncMusic(index) {
+        if (this.sceneManager.manualTrackOverride) {
+            this.sceneManager.manualTrackOverride = false;
+            return;
+        }
+
         if (index < this._bridgeStart) {
             if (this.audioManager.currentTrack !== 'homesick') {
                 this.audioManager.switchTo('homesick');
