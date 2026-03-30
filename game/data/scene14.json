@@ -1,6 +1,8 @@
 {
     "id": "scene14",
     "background": "assets/backgrounds/bg-14.png",
+    "glowColor": "rgba(140, 180, 255, 1)",
+    "glowAlpha": 0.9,
     "nextScene": "data/scene15.json",
     "fadeDuration": 100,
     "initialState": {},
@@ -33,7 +35,8 @@
             "y": 690,
             "width": 320,
             "height": 200,
-            "interactive": true
+            "interactive": true,
+            "glowTarget": "flower-left"
         },
         {
             "id": "counter",

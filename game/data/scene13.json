@@ -1,6 +1,8 @@
 {
     "id": "scene13",
     "background": "assets/backgrounds/bg-13.png",
+    "glowColor": "rgba(140, 180, 255, 1)",
+    "glowAlpha": 0.9,
     "nextScene": "data/scene14.json",
     "fadeDuration": 100,
     "initialState": {},

@@ -1,7 +1,7 @@
 const GAME = Object.freeze({
     WIDTH: 1920,
     HEIGHT: 1080,
-    HERO_SPEED: 420,
+    HERO_SPEED: 480,
     EDGE_THRESHOLD: 20,
     FAR_EDGE: 1900,
     CENTER_X: 960,
@@ -31,6 +31,9 @@ const RENDER = Object.freeze({
     HOVER_PAD: 8,
     HOVER_RADIUS: 12,
     HOVER_BLUR: 20,
+    GLOW_BLUR: 24,
+    GLOW_ALPHA: 0.65,
+    GLOW_COLOR: 'rgba(255, 250, 220, 1)',
     DEFAULT_ARROW_SIZE: 30,
     DEFAULT_FADE_MS: 1000,
     OVERLAY_FADE_MS: 800,

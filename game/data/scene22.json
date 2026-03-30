@@ -1,6 +1,6 @@
 {
     "id": "scene22",
-    "background": "assets/backgrounds/bg-22.png",
+    "background": "assets/backgrounds/bg-27.png",
     "fadeDuration": 1000,
     "initialState": {},
     "characters": [
@@ -17,29 +17,29 @@
         {
             "id": "grave",
             "type": "hotspot",
-            "x": 800,
-            "y": 400,
+            "x": 950,
+            "y": 180,
             "width": 300,
-            "height": 400,
+            "height": 450,
             "interactive": true
         },
         {
             "id": "basket",
             "type": "hotspot",
-            "x": 1150,
-            "y": 500,
-            "width": 200,
-            "height": 200,
+            "x": 1500,
+            "y": 450,
+            "width": 280,
+            "height": 280,
             "interactive": true,
             "visible": false
         },
         {
             "id": "grave-letter",
             "type": "hotspot",
-            "x": 700,
-            "y": 700,
-            "width": 200,
-            "height": 150,
+            "x": 900,
+            "y": 180,
+            "width": 350,
+            "height": 500,
             "interactive": true,
             "visible": false
         }
@@ -55,9 +55,6 @@
         { "type": "dialogue", "speaker": "Hero", "text": "I wrote a letter for you..." },
         { "type": "collectLetter", "letterId": "letter-hero" },
         { "type": "dialogue", "speaker": "Hero", "text": "I wrote you a letter explaining how I feel, but now it all feels wrong." },
-        { "type": "stopMusic", "fadeDuration": 2000 },
-        { "type": "switchTrack", "track": "homesick" },
-        { "type": "startMusic", "fadeDuration": 3000 },
         { "type": "dialogue", "speaker": "Hero", "text": "It's different when I'm sitting here, I have to face the fact that you're really gone." },
 
         {
@@ -117,11 +114,15 @@
 
         { "type": "dialogue", "speaker": "Hero", "text": "I'm going to miss you." },
 
+        { "type": "stopMusic", "fadeDuration": 2000 },
+        { "type": "switchTrack", "track": "homesick" },
+        { "type": "startMusic", "fadeDuration": 3000 },
+
         {
             "type": "determineEnding",
             "endings": {
                 "connect": "data/scene20a.json",
-                "leave": "data/scene20b.json",
+                "leave": "data/scene-ending-leave.json",
                 "reflect": "data/scene20c.json"
             }
         },

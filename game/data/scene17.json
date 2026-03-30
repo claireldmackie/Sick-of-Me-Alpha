@@ -1,7 +1,7 @@
 {
     "id": "scene17",
     "background": "assets/backgrounds/bg-17.png",
-    "nextScene": "data/scene17b.json",
+    "nextScene": "data/scene18.json",
     "fadeDuration": 100,
     "initialState": {},
     "characters": [
@@ -42,7 +42,8 @@
             "y": 340,
             "width": 250,
             "height": 500,
-            "interactive": true
+            "interactive": true,
+            "glowTarget": "drew-body"
         },
         {
             "id": "next-arrow",
@@ -51,7 +52,7 @@
             "y": 540,
             "direction": "right",
             "size": 15,
-            "color": "rgba(255, 255, 255, 0.4)",
+            "color": "rgba(0, 0, 0, 0)",
             "visible": false,
             "interactive": false,
             "zIndex": 10

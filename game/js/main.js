@@ -23,10 +23,11 @@ class Game {
             'data/scene7.json', 'data/scene8.json', 'data/scene9.json',
             'data/scene10.json', 'data/scene11.json', 'data/scene12.json',
             'data/scene13.json', 'data/scene14.json', 'data/scene15.json',
-            'data/scene16.json', 'data/scene17.json', 'data/scene17b.json',
-            'data/scene18.json',
-            'data/scene19.json', 'data/scene20.json', 'data/scene21.json',
-            'data/scene20b.json', 'data/scene22.json'
+            'data/scene16.json', 'data/scene17b.json', 'data/scene17c.json',
+            'data/scene17.json', 'data/scene18.json',
+            'data/scene19.json', 'data/scene20.json', 'data/scene23.json',
+            'data/scene21.json', 'data/scene24.json', 'data/scene25.json',
+            'data/scene20b.json', 'data/scene26.json', 'data/scene22.json'
         ];
         this.sceneNames = [
             'Bedroom', 'Stairwell', 'Living Room', 'House Exterior',
@@ -34,17 +35,18 @@ class Game {
             'Cows', 'Dirt Road 2', 'Bus Stop',
             'Town Entrance', 'Town', 'Convenience Store',
             'Store Shelves', 'Store (Counter)', 'Convenience Store (Cont.)',
-            'Town (After Store)', 'Town Continued (Drew)', 'Town (Clinic)',
-            'Town Continued (Lady)',
-            'Front of Bridge', 'End of Bridge', 'Forest (Tree People)',
-            'Forest Path', 'Grave'
+            'Town (After Store)', 'Clinic', 'Residential Street',
+            'Drew', 'Lady',
+            'Bridge', 'Forest Entrance', 'Deep Forest',
+            'Gnarled Tree', 'Dark Forest', 'City Overlook',
+            'Dense Forest', 'Grave Approach', 'Grave'
         ];
         this.currentSceneIndex = 0;
         this.activeSlot = null;
         this.sceneProgress = {};
         this.browsingCompleted = false;
         this._transitioning = false;
-        this.outdoorChain = [3, 4, 5, 6, 7, 8, 9, 10, 16, 17, 18, 19, 20, 21, 22, 23];
+        this.outdoorChain = [3, 4, 5, 6, 7, 8, 9, 10, 16, 17, 18, 19, 20, 22, 23, 24, 25, 26, 29];
 
         this.sceneManager.onSceneEnd = (nextScene) => {
             this._saveSceneProgress(this.sceneManager.sequenceIndex);

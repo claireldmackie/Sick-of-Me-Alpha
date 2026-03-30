@@ -1,0 +1,35 @@
+{
+    "id": "scene24",
+    "background": "assets/backgrounds/bg-24.png",
+    "nextScene": "data/scene25.json",
+    "fadeDuration": 100,
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "next-arrow",
+            "type": "arrow",
+            "x": 1905,
+            "y": 540,
+            "direction": "right",
+            "size": 15,
+            "color": "rgba(0, 0, 0, 0)",
+            "visible": true,
+            "interactive": true,
+            "zIndex": 10
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "next-arrow" },
+        { "type": "transition" }
+    ]
+}

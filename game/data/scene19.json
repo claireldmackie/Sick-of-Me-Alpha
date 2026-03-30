@@ -27,10 +27,10 @@
         {
             "id": "bridge-entrance",
             "type": "hotspot",
-            "x": 750,
-            "y": 150,
-            "width": 420,
-            "height": 550,
+            "x": 450,
+            "y": 100,
+            "width": 700,
+            "height": 600,
             "visible": false,
             "interactive": false
         }

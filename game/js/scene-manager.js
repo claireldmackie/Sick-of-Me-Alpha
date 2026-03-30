@@ -24,6 +24,7 @@ class SceneManager {
         this._bgOverlayImage = null;
         this._bgOverlayOpacity = 0;
         this._bgOffsetY = 0;
+        this._nightFade = 0;
         this._phoneVideo = null;
         this._phoneVideoRect = null;
         this._phoneVideoCrop = null;
@@ -115,6 +116,29 @@ class SceneManager {
         }
     }
 
+    _resetUIState() {
+        this.waitingForTarget = null;
+        this._bgOverlayImage = null;
+        this._bgOverlayOpacity = 0;
+        this._bgOffsetY = 0;
+        this._nightFade = 0;
+        this.skipRequested = false;
+        this._stopPhoneVideo();
+        this.showSkipButton(false);
+        this.dialogue.hide();
+        this.dialogue.hideCloseup?.();
+
+        const ids = ['click-to-start', 'tutorial-interact', 'tutorial-move', 'tutorial-prompt'];
+        for (const id of ids) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add('hidden');
+                el.classList.remove('visible', 'fading-out');
+                el.style.pointerEvents = '';
+            }
+        }
+    }
+
     async loadScene(sceneFile) {
         const response = await fetch(sceneFile + '?v=' + Date.now());
         if (!response.ok) throw new Error(`Failed to load scene ${sceneFile}: HTTP ${response.status}`);
@@ -123,11 +147,8 @@ class SceneManager {
         this.currentScene = sceneData;
         this.sceneState = { ...(sceneData.initialState || {}) };
         this.sequenceIndex = 0;
-        this.waitingForTarget = null;
-        this._bgOverlayImage = null;
-        this._bgOverlayOpacity = 0;
-        this._bgOffsetY = 0;
-        this._stopPhoneVideo();
+        this._resetUIState();
+        if (this.renderer._glowCache) this.renderer._glowCache.clear();
 
         const imageSources = this._collectImageSources(sceneData);
         await this.imageLoader.loadMultiple(imageSources);
@@ -142,6 +163,7 @@ class SceneManager {
     _collectImageSources(sceneData) {
         const sources = [];
         if (sceneData.background) sources.push(sceneData.background);
+        if (sceneData.nightBackground) sources.push(sceneData.nightBackground);
         if (sceneData.characters) {
             for (const char of sceneData.characters) {
                 if (char.image) sources.push(char.image);
@@ -224,6 +246,7 @@ class SceneManager {
                 break;
             case 'panDown':
                 this._bgOffsetY = 0;
+                this._nightFade = 0;
                 break;
             case 'clickToStart': {
                 const el = document.getElementById('click-to-start');
@@ -312,7 +335,7 @@ class SceneManager {
                 this._bgOverlayImage = null;
                 this._bgOverlayOpacity = 0;
             }
-            if (step.type === 'panDown') this._bgOffsetY = 0;
+            if (step.type === 'panDown') { this._bgOffsetY = 0; this._nightFade = 0; }
             if (step.type === 'clickToStart') {
                 const el = document.getElementById('click-to-start');
                 if (el) { el.classList.add('hidden'); el.classList.remove('visible'); el.style.pointerEvents = 'none'; }
@@ -430,6 +453,7 @@ class SceneManager {
 
     _renderBackground(scene) {
         const bgImg = this.imageLoader.get(scene.background);
+        const nightImg = scene.nightBackground ? this.imageLoader.get(scene.nightBackground) : null;
         const ctx = this.renderer.ctx;
         const w = this.renderer.width;
         const h = this.renderer.height;
@@ -440,6 +464,14 @@ class SceneManager {
         if (bgImg) {
             if (this._bgOffsetY > 0) {
                 ctx.drawImage(bgImg, 0, this._bgOffsetY, w, h);
+
+                if (nightImg && this._nightFade > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = this._nightFade;
+                    ctx.drawImage(nightImg, 0, this._bgOffsetY, w, h);
+                    ctx.restore();
+                }
+
                 const edgeY = this._bgOffsetY;
                 const gradH = Math.min(200, h - edgeY);
                 const grad = ctx.createLinearGradient(0, edgeY, 0, edgeY + gradH);
@@ -449,9 +481,15 @@ class SceneManager {
                 ctx.fillRect(0, edgeY, w, gradH);
             } else {
                 ctx.drawImage(bgImg, 0, 0, w, h);
+
+                if (nightImg && this._nightFade > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = this._nightFade;
+                    ctx.drawImage(nightImg, 0, 0, w, h);
+                    ctx.restore();
+                }
             }
         }
-
     }
 
     _renderDarkOverlay() {
@@ -564,11 +602,69 @@ class SceneManager {
         const waiting = Array.isArray(this.waitingForTarget) ? this.waitingForTarget : [this.waitingForTarget];
         if (!waiting.includes(this.input.hoveredTarget)) return;
 
-        const targets = this.input._hitTargets || [];
-        const target = targets.find(t => t.id === this.input.hoveredTarget);
-        if (!target) return;
+        const hoverId = this.input.hoveredTarget;
+        const scene = this.currentScene;
+        if (!scene) return;
 
-        this.renderer.drawHoverGlow(target.x, target.y, target.width, target.height);
+        const glowColor = scene.glowColor || null;
+        const glowAlpha = scene.glowAlpha || null;
+        const glowInfo = this._findGlowSource(hoverId, scene);
+        if (glowInfo) {
+            this.renderer.drawSilhouetteGlow(
+                glowInfo.img, glowInfo.x, glowInfo.y,
+                glowInfo.scale, glowInfo.anchorX, glowInfo.anchorY, glowInfo.flipX, glowColor, glowAlpha
+            );
+        } else {
+            const targets = this.input._hitTargets || [];
+            const target = targets.find(t => t.id === hoverId);
+            if (target) {
+                this.renderer.drawHoverGlow(target.x, target.y, target.width, target.height, glowColor, glowAlpha);
+            }
+        }
+    }
+
+    _findGlowSource(hoverId, scene) {
+        const char = scene.characters?.find(c => c.id === hoverId && c.visible !== false);
+        if (char?.image) {
+            const img = this.imageLoader.get(char.image);
+            if (img) return {
+                img, x: char.x, y: char.y,
+                scale: char.scale || 1,
+                anchorX: char.anchorX ?? 0.5,
+                anchorY: char.anchorY ?? 1.0,
+                flipX: char.flipX || false,
+            };
+        }
+
+        const obj = scene.objects?.find(o => o.id === hoverId && o.visible !== false);
+        if (obj) {
+            if (obj.image) {
+                const img = this.imageLoader.get(obj.image);
+                if (img) return {
+                    img, x: obj.x, y: obj.y,
+                    scale: obj.scale || 1,
+                    anchorX: obj.anchorX ?? 0,
+                    anchorY: obj.anchorY ?? 0,
+                    flipX: obj.flipX || false,
+                };
+            }
+            if (obj.glowTarget) {
+                const ref = scene.characters?.find(c => c.id === obj.glowTarget && c.visible !== false)
+                         || scene.objects?.find(o => o.id === obj.glowTarget && o.visible !== false);
+                if (ref?.image) {
+                    const img = this.imageLoader.get(ref.image);
+                    if (img) return {
+                        img, x: ref.x, y: ref.y,
+                        scale: ref.scale || 1,
+                        anchorX: ref.anchorX ?? (scene.characters?.includes(ref) ? 0.5 : 0),
+                        anchorY: ref.anchorY ?? (scene.characters?.includes(ref) ? 1.0 : 0),
+                        flipX: ref.flipX || false,
+                    };
+                }
+            }
+        }
+
+        return null;
     }
 
     /* ── Step Execution ── */
@@ -796,17 +892,24 @@ class SceneManager {
 
     _handlePanDown(step) {
         const duration = step.duration || RENDER.PAN_DOWN_MS;
+        const hasNight = !!this.currentScene?.nightBackground;
         return new Promise(resolve => {
             this._bgOffsetY = GAME.HEIGHT;
+            if (hasNight) this._nightFade = 1;
             const start = performance.now();
             const animate = (now) => {
                 const t = Math.min((now - start) / duration, 1);
                 const eased = 1 - Math.pow(1 - t, 3);
                 this._bgOffsetY = GAME.HEIGHT * (1 - eased);
+                if (hasNight) {
+                    const fadeT = Math.max(0, (t - 0.4) / 0.6);
+                    this._nightFade = 1 - fadeT;
+                }
                 if (t < 1) {
                     requestAnimationFrame(animate);
                 } else {
                     this._bgOffsetY = 0;
+                    this._nightFade = 0;
                     resolve();
                 }
             };
@@ -818,16 +921,73 @@ class SceneManager {
         return new Promise(resolve => {
             const el = document.getElementById('click-to-start');
             if (!el) { resolve(); return; }
-            el.classList.remove('hidden');
-            requestAnimationFrame(() => el.classList.add('visible'));
+
+            const hasNight = !!this.currentScene?.nightBackground;
+            let cycling = hasNight;
+            let cycleStart = performance.now();
+            const cycleDuration = 8000;
+            let cycleRAF;
+
+            if (cycling) {
+                this._nightFade = 1;
+                cycleRAF = requestAnimationFrame(function animateCycle(now) {
+                    if (!cycling) return;
+                    const t = (now - cycleStart) / cycleDuration;
+                    // keep full night for 1.5s before cycling begins
+                    const adjusted = Math.max(0, t - 1500 / cycleDuration);
+                    const cycle = Math.floor(adjusted);
+                    const p = adjusted % 1;
+                    const transDur = 0.25;
+                    const holdDay = 0.2;
+                    const holdNight = holdDay + transDur;
+                    const nightEnd = holdNight + 0.2;
+                    const dayStart = nightEnd + transDur;
+                    if (p < holdDay) this._nightFade = 0;
+                    else if (p < holdNight) this._nightFade = (p - holdDay) / transDur;
+                    else if (p < nightEnd) this._nightFade = 1;
+                    else if (p < dayStart) this._nightFade = 1 - (p - nightEnd) / transDur;
+                    else this._nightFade = 0;
+                    if (adjusted <= 0) this._nightFade = 1;
+                    cycleRAF = requestAnimationFrame(animateCycle);
+                }.bind(this));
+            }
+
+            setTimeout(() => {
+                el.classList.remove('hidden');
+                requestAnimationFrame(() => el.classList.add('visible'));
+            }, 1500);
+
             const onClick = () => {
                 document.removeEventListener('click', onClick);
+                cycling = false;
+                if (cycleRAF) cancelAnimationFrame(cycleRAF);
+
                 el.classList.remove('visible');
                 el.style.pointerEvents = 'none';
-                setTimeout(() => {
-                    el.classList.add('hidden');
-                    resolve();
-                }, 800);
+
+                if (hasNight && this._nightFade > 0.01) {
+                    const fadeFrom = this._nightFade;
+                    const fadeStart = performance.now();
+                    const fadeDur = 800;
+                    const fadeOut = (now) => {
+                        const ft = Math.min((now - fadeStart) / fadeDur, 1);
+                        this._nightFade = fadeFrom * (1 - ft);
+                        if (ft < 1) {
+                            requestAnimationFrame(fadeOut);
+                        } else {
+                            this._nightFade = 0;
+                            el.classList.add('hidden');
+                            resolve();
+                        }
+                    };
+                    requestAnimationFrame(fadeOut);
+                } else {
+                    this._nightFade = 0;
+                    setTimeout(() => {
+                        el.classList.add('hidden');
+                        resolve();
+                    }, 800);
+                }
             };
             document.addEventListener('click', onClick);
         });
@@ -908,7 +1068,10 @@ class SceneManager {
     setObjectVisible(id, visible) {
         if (!this.currentScene || !this.currentScene.objects) return;
         const obj = this.currentScene.objects.find(o => o.id === id);
-        if (obj) obj.visible = visible;
+        if (obj) {
+            obj.visible = visible;
+            obj.interactive = visible;
+        }
     }
 
     countConsecutiveDialogueSteps(fromIndex) {

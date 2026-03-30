@@ -1,7 +1,7 @@
 {
     "id": "scene17b",
     "background": "assets/backgrounds/bg-17b.png",
-    "nextScene": "data/scene18.json",
+    "nextScene": "data/scene17c.json",
     "fadeDuration": 100,
     "initialState": {},
     "characters": [
@@ -31,7 +31,7 @@
             "y": 540,
             "direction": "right",
             "size": 15,
-            "color": "rgba(255, 255, 255, 0.4)",
+            "color": "rgba(0, 0, 0, 0)",
             "visible": false,
             "interactive": false,
             "zIndex": 10

@@ -407,13 +407,14 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
+    background: url('../assets/ui/letter-bg.png') calc(50% - 50px) center / contain no-repeat;
 }
 
 #letter-title {
     position: absolute;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 160px;
+    left: 460px;
+    text-align: left;
     font-family: 'Reenie Beanie', cursive;
     font-size: 36px;
     color: #999;
@@ -430,15 +431,18 @@ html, body {
 }
 
 #letter-paper {
-    width: 680px;
-    height: 800px;
-    background: #f0eeeb;
-    box-shadow: 2px 4px 20px rgba(0, 0, 0, 0.1);
-    padding: 60px 55px;
+    position: absolute;
+    left: 420px;
+    top: 195px;
+    width: 610px;
+    height: 680px;
+    background: transparent;
+    padding: 40px;
     overflow-y: auto;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-start;
+    box-sizing: border-box;
 }
 
 #letter-content {
@@ -903,18 +907,5 @@ html, body {
 }
 
 .bill-note {
-    color: #cc0000;
-    font-size: 140px;
-    font-weight: 900;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    height: 100%;
-    font-family: 'Inter', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    line-height: 1.1;
-    border: 4px solid #cc0000;
-    padding: 20px 40px;
+    display: none;
 }

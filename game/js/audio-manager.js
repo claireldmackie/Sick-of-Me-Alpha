@@ -7,12 +7,14 @@ class AudioManager {
         this.volume = AUDIO.DEFAULT_VOLUME;
         this.fadeInterval = null;
         this.playing = false;
+        this._muted = false;
     }
 
     load(name, src, trackVolume) {
         const audio = new Audio(src);
         audio.loop = true;
         audio.volume = 0;
+        if (this._muted) audio.muted = true;
         this.tracks[name] = audio;
         if (trackVolume !== undefined) this.trackVolumes[name] = trackVolume;
         if (!this.music) {
@@ -60,6 +62,8 @@ class AudioManager {
     }
 
     setVolume(value) {
+        clearInterval(this.fadeInterval);
+        this.fadeInterval = null;
         this.volume = Math.max(0, Math.min(AUDIO.VOLUME_MAX, value));
         if (this.music) {
             this.music.volume = this._effectiveVolume();
@@ -116,13 +120,15 @@ class AudioManager {
     }
 
     get muted() {
-        return this.music ? this.music.muted : false;
+        return this._muted || false;
     }
 
     toggleMute() {
-        if (!this.music) return false;
-        this.music.muted = !this.music.muted;
-        return this.music.muted;
+        this._muted = !this._muted;
+        for (const track of Object.values(this.tracks)) {
+            track.muted = this._muted;
+        }
+        return this._muted;
     }
 
     fadeOut(duration = AUDIO.FADE_OUT_MS) {

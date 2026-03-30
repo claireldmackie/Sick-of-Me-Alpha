@@ -1,0 +1,13 @@
+{
+    "id": "scene-ending-leave",
+    "background": "assets/backgrounds/bg-ending-leave.png",
+    "nextScene": null,
+    "fadeDuration": 3000,
+    "initialState": {},
+    "characters": [],
+    "objects": [],
+    "sequence": [
+        { "type": "pause", "duration": 8000 },
+        { "type": "showCredits" }
+    ]
+}

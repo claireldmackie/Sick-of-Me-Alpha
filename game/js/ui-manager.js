@@ -64,6 +64,7 @@ class UIManager {
 
         this.letterTitle = document.getElementById('letter-title');
         this.letterContent = document.getElementById('letter-content');
+        this.letterContainer = document.querySelector('.letter-container');
         this.btnLetterPrev = document.getElementById('letter-prev');
         this.btnLetterNext = document.getElementById('letter-next');
 
@@ -506,9 +507,12 @@ class UIManager {
 
     showNote(title, content, cssClass) {
         this.letterTitle.textContent = title || '';
-        if (cssClass) {
-            this.letterContent.innerHTML = `<span class="${cssClass}">${content}</span>`;
+        const isBill = cssClass === 'bill-note';
+        if (isBill) {
+            this.letterContainer.style.backgroundImage = "url('assets/ui/letter-bg-bill.png')";
+            this.letterContent.innerHTML = '';
         } else {
+            this.letterContainer.style.backgroundImage = "url('assets/ui/letter-bg.png')";
             this.letterContent.textContent = content;
         }
         this.btnLetterPrev.classList.add('hidden');
@@ -549,9 +553,12 @@ class UIManager {
     }
 
     _applyLetterContent(letter) {
-        if (letter.cssClass) {
-            this.letterContent.innerHTML = `<span class="${letter.cssClass}">${letter.content}</span>`;
+        const isBill = letter.cssClass === 'bill-note';
+        if (isBill) {
+            this.letterContainer.style.backgroundImage = "url('assets/ui/letter-bg-bill.png')";
+            this.letterContent.innerHTML = '';
         } else {
+            this.letterContainer.style.backgroundImage = "url('assets/ui/letter-bg.png')";
             this.letterContent.textContent = letter.content;
         }
     }

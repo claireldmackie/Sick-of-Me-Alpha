@@ -11,47 +11,69 @@ Before changing, adding, or referencing any background file, ALWAYS check this m
 ## Rules
 
 1. The game loads backgrounds from `game/assets/backgrounds/`. These files are the live game assets.
-2. The `backgrounds/` folder at the project root contains source exports. Its numbering does NOT match the game scene numbers.
-3. When the user says "use the background from the backgrounds folder," look up the correct file here first.
+2. The `drop assets/final screens/` folder contains the final renditions. Its numbering represents the artist's sequential scene order.
+3. When the user says "use the background from the final screens folder," look up the correct file here first.
 4. Never rename or overwrite files in `game/assets/backgrounds/` without confirming the mapping below.
 5. Scene 15 reuses `bg-12.png` (same as Scene 12). Not every scene has a unique background.
 
-## Scene-to-Background Mapping
+## Scene-to-Background Mapping (30 scenes)
 
-| Scene | Name | Scene JSON | Game Asset | Source File (backgrounds/) |
-|-------|------|-----------|------------|---------------------------|
-| 1 | Bedroom | scene1.json | bg-1.png | -- |
-| 1.5 | Stairwell | scene1-5.json | bg-1-5.png | -- |
-| 2 | Living Room | scene2.json | bg-2.png | -- |
-| 3 | House Exterior | scene3.json | bg-3.png | -- |
-| 4 | House Lane | scene4.json | bg-4.png | -- |
-| 5 | Dirt Path | scene5.json | bg-5.png | -- |
-| 6 | Neighbour's Lane | scene6.json | bg-6.png | -- |
-| 7 | Cows | scene7.json | bg-7.png | -- |
-| 8 | Dirt Road 2 | scene8.json | bg-8.png | -- |
-| 9 | Bus Stop | scene9.json | bg-9.png | -- |
-| 10 | Town Entrance | scene10.json | bg-10.png | -- |
-| 11 | Town | scene11.json | bg-11.png | scene 11 - Town.png |
-| 12 | Convenience Store | scene12.json | bg-12.png | scene 12 - Convenience Store.png |
-| 13 | Store Shelves | scene13.json | bg-13.png | scene 13 - Store Shelves.png |
-| 14 | Store Counter | scene14.json | bg-14.png | scene 14 - Store Counter.png |
-| 15 | Convenience Store Cont. | scene15.json | bg-12.png (reused) | scene 15 - Convenience Store Cont.png |
-| 16 | Town (After Store) | scene16.json | bg-16.png | scene 16 - Town After Store.png |
-| 17 | Town Continued (Drew) | scene17.json | bg-17.png (town), bg-17-overlay.png (sky overlay during dialogue) | scene 17 - Town Continued Drew.png (overlay) |
-| 17b | Town (Clinic) | scene17b.json | bg-17b.png | scene 17b - Clinic.png |
-| 18 | Town Continued (Lady) | scene18.json | bg-18.png | scene 18 - Town Continued Lady.png |
-| 19 | Front of Bridge (Calvin) | scene19.json | bg-19.png | scene 19 - Front of Bridge.png |
-| 20 | End of Bridge | scene20.json | bg-20.png | scene 20 - End of Bridge.png |
-| 20b | Forest Path | scene20b.json | bg-21.png | scene 21 - Forest.png |
-| 21 | Forest (Tree People) | scene21.json | bg-22.png | scene 22 - Grave.png |
-| 22 | Grave | scene22.json | bg-22.png (shared) | -- |
-| 20a | Ending A: Connect | scene20a.json | bg-20a.png | -- |
-| 20b | Ending B: Leave | scene20b.json | bg-20b.png | -- |
-| 20c | Ending C: Reflect | scene20c.json | bg-20c.png | -- |
+| Idx | Scene | Name | Scene JSON | Game Asset | Final Screen |
+|-----|-------|------|-----------|------------|-------------|
+| 0 | 1 | Bedroom | scene1.json | bg-1.png (day), bg-1-night.png (night) | 2.png, 1.png |
+| 1 | 1.5 | Stairwell | scene1-5.json | bg-1-5.png | 3.png |
+| 2 | 2 | Living Room | scene2.json | bg-2.png | 4.png |
+| 3 | 3 | House Exterior | scene3.json | bg-3.png | 5.png |
+| 4 | 4 | House Lane | scene4.json | bg-4.png | 6.png |
+| 5 | 5 | Dirt Path | scene5.json | bg-5.png | 7.png |
+| 6 | 6 | Neighbour's Lane | scene6.json | bg-6.png | 8.png |
+| 7 | 7 | Cows | scene7.json | bg-7.png | 9.png |
+| 8 | 8 | Dirt Road 2 | scene8.json | bg-8.png | 10.png |
+| 9 | 9 | Bus Stop | scene9.json | bg-9.png | 11.png |
+| 10 | 10 | Town Entrance | scene10.json | bg-10.png | 12.png |
+| 11 | 11 | Town | scene11.json | bg-11.png | 13.png |
+| 12 | 12 | Convenience Store | scene12.json | bg-12.png | 14.png |
+| 13 | 13 | Store Shelves | scene13.json | bg-13.png | 15.png |
+| 14 | 14 | Store Counter | scene14.json | bg-14.png | 16.png |
+| 15 | 15 | Convenience Store (Cont.) | scene15.json | bg-12.png (reused) | 14.png (reused) |
+| 16 | 16 | Town (After Store) | scene16.json | bg-16.png | 17.png |
+| 17 | 17b | Clinic | scene17b.json | bg-17b.png | 18.png |
+| 18 | 17c | Residential Street | scene17c.json | bg-17c.png | 19.png |
+| 19 | 17 | Drew | scene17.json | bg-17.png, bg-17-overlay.png (overlay) | 20.png, 21.png |
+| 20 | 18 | Lady | scene18.json | bg-18.png | 22.png |
+| 21 | 19 | Bridge | scene19.json | bg-19.png | 23.png |
+| 22 | 20 | Forest Entrance | scene20.json | bg-20.png | 24.png |
+| 23 | 23 | Deep Forest | scene23.json | bg-23.png | 25.png |
+| 24 | 21 | Gnarled Tree | scene21.json | bg-22.png | 26.png |
+| 25 | 24 | Dark Forest | scene24.json | bg-24.png | 27.png |
+| 26 | 25 | City Overlook | scene25.json | bg-25.png | 28.png |
+| 27 | 20b | Dense Forest | scene20b.json | bg-21.png | 29.png |
+| 28 | 26 | Grave Approach | scene26.json | bg-26.png | 30.png |
+| 29 | 22 | Grave | scene22.json | bg-27.png | 31.png |
+
+## Ending Scenes
+
+| Ending | Scene JSON | Game Asset | Final Screen |
+|--------|-----------|------------|-------------|
+| Connect | scene20a.json | bg-ending-connect.png | ending2.png |
+| Leave | scene-ending-leave.json | bg-ending-leave.png | ending1.png |
+| Reflect | scene20c.json | bg-1-night.png (reused) | 1.png (reused) |
+
+## Non-Background Assets (from final screens)
+
+| File | Game Asset | Location |
+|------|-----------|----------|
+| 4a.png | living-room-chair.png | game/assets/objects/ |
+| 4b.png | living-room-lamp.png | game/assets/objects/ |
+| 4c.png | living-room-door.png | game/assets/objects/ |
+| 16a.png | store-snacks.png | game/assets/objects/ |
+| 16b.png | store-flowers.png | game/assets/objects/ |
+| 24a.png | forest-foliage-1.png | game/assets/overlays/ |
+| 25a.png | forest-foliage-2.png | game/assets/overlays/ |
 
 ## Adding a New Background
 
-1. Export the image and place it in `backgrounds/` with the naming pattern `scene {number} - {Name}.png`
+1. Place the source image in `drop assets/final screens/` with the next sequential number
 2. Copy it into `game/assets/backgrounds/` as `bg-{number}.png` (lowercase, no spaces)
 3. Update the scene JSON to reference `assets/backgrounds/bg-{number}.png`
 4. Update this manifest table with the new entry

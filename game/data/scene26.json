@@ -1,0 +1,32 @@
+{
+    "id": "scene26",
+    "background": "assets/backgrounds/bg-26.png",
+    "nextScene": "data/scene22.json",
+    "fadeDuration": 100,
+    "initialState": {},
+    "characters": [
+        {
+            "id": "hero",
+            "x": 250,
+            "y": 1020,
+            "visible": true,
+            "interactive": false,
+            "zIndex": 2
+        }
+    ],
+    "objects": [
+        {
+            "id": "gravestone",
+            "type": "hotspot",
+            "x": 750,
+            "y": 100,
+            "width": 400,
+            "height": 400,
+            "interactive": true
+        }
+    ],
+    "sequence": [
+        { "type": "waitForClick", "target": "gravestone" },
+        { "type": "transition" }
+    ]
+}

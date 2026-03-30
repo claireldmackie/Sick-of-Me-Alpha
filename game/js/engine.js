@@ -96,22 +96,87 @@ class Renderer {
         this.ctx.fillRect(0, 0, this.width, this.height);
     }
 
-    drawHoverGlow(x, y, width, height) {
+    drawHoverGlow(x, y, width, height, colorOverride = null, alphaOverride = null) {
         const ctx = this.ctx;
         const pad = RENDER.HOVER_PAD;
         const gx = x - pad;
         const gy = y - pad;
         const gw = width + pad * 2;
         const gh = height + pad * 2;
+        const base = colorOverride || 'rgba(255, 255, 255, 1)';
 
         ctx.save();
-        ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
-        ctx.shadowBlur = RENDER.HOVER_BLUR;
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-        ctx.lineWidth = 2;
+        ctx.shadowColor = base;
+        ctx.shadowBlur = RENDER.HOVER_BLUR * 1.5;
+        ctx.strokeStyle = base;
+        ctx.globalAlpha = alphaOverride || 0.5;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.roundRect(gx, gy, gw, gh, RENDER.HOVER_RADIUS);
         ctx.stroke();
+        ctx.restore();
+    }
+
+    drawSilhouetteGlow(img, x, y, scale = 1, anchorX = 0.5, anchorY = 1.0, flipX = false, colorOverride = null, alphaOverride = null) {
+        if (!img) return;
+
+        if (!this._glowCache) this._glowCache = new Map();
+        const color = colorOverride || RENDER.GLOW_COLOR;
+        const key = img.src + '|' + color;
+        let glowCanvas = this._glowCache.get(key);
+
+        if (!glowCanvas) {
+            const pad = RENDER.GLOW_BLUR * 2;
+            const iw = img.naturalWidth;
+            const ih = img.naturalHeight;
+            const cw = iw + pad * 2;
+            const ch = ih + pad * 2;
+
+            const silCanvas = document.createElement('canvas');
+            silCanvas.width = cw;
+            silCanvas.height = ch;
+            const silCtx = silCanvas.getContext('2d');
+            silCtx.drawImage(img, pad, pad);
+            silCtx.globalCompositeOperation = 'source-in';
+            silCtx.fillStyle = color;
+            silCtx.fillRect(0, 0, cw, ch);
+
+            glowCanvas = document.createElement('canvas');
+            glowCanvas.width = cw;
+            glowCanvas.height = ch;
+            const gCtx = glowCanvas.getContext('2d');
+            gCtx.filter = `blur(${RENDER.GLOW_BLUR}px)`;
+            gCtx.drawImage(silCanvas, 0, 0);
+            gCtx.filter = 'none';
+
+            gCtx.globalCompositeOperation = 'destination-out';
+            gCtx.drawImage(img, pad, pad);
+            gCtx.globalCompositeOperation = 'source-over';
+
+            this._glowCache.set(key, glowCanvas);
+        }
+
+        const pad = RENDER.GLOW_BLUR * 2;
+        const w = img.naturalWidth * scale;
+        const h = img.naturalHeight * scale;
+        const padScaled = pad * scale;
+        const drawX = x - w * anchorX - padScaled | 0;
+        const drawY = y - h * anchorY - padScaled | 0;
+        const totalW = w + padScaled * 2;
+        const totalH = h + padScaled * 2;
+
+        const ctx = this.ctx;
+        ctx.save();
+        ctx.globalAlpha = alphaOverride || RENDER.GLOW_ALPHA;
+
+        if (flipX) {
+            ctx.translate(x + w * anchorX + padScaled | 0, drawY);
+            ctx.scale(-1, 1);
+            ctx.drawImage(glowCanvas, 0, 0, totalW, totalH);
+        } else {
+            ctx.drawImage(glowCanvas, drawX, drawY, totalW, totalH);
+        }
+
         ctx.restore();
     }
 
