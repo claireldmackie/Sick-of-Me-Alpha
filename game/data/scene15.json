@@ -44,7 +44,7 @@
     ],
     "sequence": [
         { "type": "waitForClick", "target": "veronica" },
-        { "type": "dialogue", "speaker": "Veronica", "text": "Hey [Hero]" },
+        { "type": "dialogue", "speaker": "Veronica", "text": "Hey Hero" },
         { "type": "dialogue", "speaker": "Hero", "text": "Hm?" },
         { "type": "dialogue", "speaker": "Veronica", "text": "We had a party out by the bridge like we usually do, but with the routine all out of whack it was a mess! Calvin was there and he was droning on and on, worse than usual. And there was nobody to send out invitations, so everyone showed up at different times." },
         { "type": "dialogue", "speaker": "Hero", "text": "Sounds hectic." },

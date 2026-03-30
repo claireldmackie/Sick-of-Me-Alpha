@@ -8,9 +8,11 @@
             "id": "hero",
             "x": 600,
             "y": 1020,
+            "scale": 1.6,
             "visible": true,
             "interactive": false,
-            "zIndex": 2
+            "zIndex": 2,
+            "filter": "brightness(0.65) sepia(0.2) hue-rotate(210deg) saturate(1.3)"
         }
     ],
     "objects": [
@@ -27,7 +29,7 @@
             "id": "basket",
             "type": "hotspot",
             "x": 1500,
-            "y": 450,
+            "y": 600,
             "width": 280,
             "height": 280,
             "interactive": true,
@@ -37,9 +39,9 @@
             "id": "grave-letter",
             "type": "hotspot",
             "x": 900,
-            "y": 180,
-            "width": 350,
-            "height": 500,
+            "y": 100,
+            "width": 550,
+            "height": 650,
             "interactive": true,
             "visible": false
         }

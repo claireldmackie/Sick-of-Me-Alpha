@@ -9,7 +9,7 @@
             "id": "hero",
             "x": 250,
             "y": 1020,
-            "visible": true,
+            "visible": false,
             "interactive": false,
             "zIndex": 2
         }

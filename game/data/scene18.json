@@ -11,7 +11,8 @@
             "y": 1020,
             "visible": true,
             "interactive": false,
-            "zIndex": 2
+            "zIndex": 2,
+            "filter": "brightness(0.95)"
         }
     ],
     "objects": [
