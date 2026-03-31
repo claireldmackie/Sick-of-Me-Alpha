@@ -12,19 +12,21 @@
             "visible": true,
             "interactive": false,
             "zIndex": 2,
-            "filter": "brightness(0.9) sepia(0.05) hue-rotate(210deg) saturate(1.1)"
+            "filter": "brightness(0.97) sepia(0.15) hue-rotate(310deg) saturate(1.1)"
+        },
+        {
+            "id": "calvin",
+            "image": "assets/characters/calvin.png",
+            "x": 1450,
+            "y": 920,
+            "scale": 0.38,
+            "visible": true,
+            "interactive": true,
+            "zIndex": 3,
+            "hitbox": { "x": 1380, "y": 350, "width": 350, "height": 540 }
         }
     ],
     "objects": [
-        {
-            "id": "calvin",
-            "type": "hotspot",
-            "x": 800,
-            "y": 400,
-            "width": 300,
-            "height": 400,
-            "interactive": true
-        },
         {
             "id": "bridge-entrance",
             "type": "hotspot",

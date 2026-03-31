@@ -29,6 +29,8 @@ class SceneManager {
         this._phoneVideoRect = null;
         this._phoneVideoCrop = null;
         this.manualTrackOverride = false;
+        this._nightWipeMode = false;
+        this._nightWipeCanvas = null;
 
         this._initStepHandlers();
 
@@ -123,6 +125,7 @@ class SceneManager {
         this._bgOverlayOpacity = 0;
         this._bgOffsetY = 0;
         this._nightFade = 0;
+        this._nightWipeMode = false;
         this.skipRequested = false;
         this._stopPhoneVideo();
         this.showSkipButton(false);
@@ -449,7 +452,6 @@ class SceneManager {
         this._renderBackground(scene);
         this._renderDarkOverlay();
         this._renderDrawables(scene);
-        this._renderHoverGlow();
     }
 
     _renderBackground(scene) {
@@ -484,10 +486,31 @@ class SceneManager {
                 ctx.drawImage(bgImg, 0, 0, w, h);
 
                 if (nightImg && this._nightFade > 0) {
-                    ctx.save();
-                    ctx.globalAlpha = this._nightFade;
-                    ctx.drawImage(nightImg, 0, 0, w, h);
-                    ctx.restore();
+                    if (this._nightWipeMode && this._nightFade > 0 && this._nightFade < 1) {
+                        if (!this._nightWipeCanvas) {
+                            this._nightWipeCanvas = document.createElement('canvas');
+                            this._nightWipeCanvas.width = w;
+                            this._nightWipeCanvas.height = h;
+                        }
+                        const tc = this._nightWipeCanvas.getContext('2d');
+                        tc.clearRect(0, 0, w, h);
+                        tc.drawImage(nightImg, 0, 0, w, h);
+                        tc.globalCompositeOperation = 'destination-in';
+                        const softEdge = w * 0.35;
+                        const wipeX = this._nightFade * (w + softEdge) - softEdge * 0.5;
+                        const grad = tc.createLinearGradient(wipeX - softEdge, 0, wipeX, 0);
+                        grad.addColorStop(0, 'rgba(0,0,0,1)');
+                        grad.addColorStop(1, 'rgba(0,0,0,0)');
+                        tc.fillStyle = grad;
+                        tc.fillRect(0, 0, w, h);
+                        tc.globalCompositeOperation = 'source-over';
+                        ctx.drawImage(this._nightWipeCanvas, 0, 0);
+                    } else {
+                        ctx.save();
+                        ctx.globalAlpha = this._nightFade;
+                        ctx.drawImage(nightImg, 0, 0, w, h);
+                        ctx.restore();
+                    }
                 }
             }
         }
@@ -535,6 +558,11 @@ class SceneManager {
             drawables.push({ type: 'phoneVideo', data: null, y: 0, zIndex: 6 });
         }
 
+        const glowTarget = this._getHoverGlowTarget(scene);
+        if (glowTarget) {
+            drawables.push({ type: 'hoverGlow', data: glowTarget, y: glowTarget.y, zIndex: (glowTarget.zIndex || 1) - 0.1 });
+        }
+
         drawables.sort((a, b) => a.zIndex - b.zIndex || a.y - b.y);
 
         for (const d of drawables) {
@@ -544,6 +572,17 @@ class SceneManager {
                 ctx.globalAlpha = this._bgOverlayOpacity;
                 ctx.drawImage(this._bgOverlayImage, 0, 0, this.renderer.width, this.renderer.height);
                 ctx.restore();
+                continue;
+            }
+            if (d.type === 'hoverGlow') {
+                const g = d.data;
+                const glowColor = scene.glowColor || null;
+                const glowAlpha = scene.glowAlpha || null;
+                if (g.img) {
+                    this.renderer.drawSilhouetteGlow(g.img, g.x, g.y, g.scale, g.anchorX, g.anchorY, g.flipX, glowColor, glowAlpha);
+                } else if (g.rect) {
+                    this.renderer.drawHoverGlow(g.rect.x, g.rect.y, g.rect.width, g.rect.height, glowColor, glowAlpha);
+                }
                 continue;
             }
             if (d.type === 'phoneVideo') {
@@ -598,30 +637,28 @@ class SceneManager {
         }
     }
 
-    _renderHoverGlow() {
-        if (!this.waitingForTarget || !this.input.hoveredTarget) return;
+    _getHoverGlowTarget(scene) {
+        if (!this.waitingForTarget || !this.input.hoveredTarget) return null;
         const waiting = Array.isArray(this.waitingForTarget) ? this.waitingForTarget : [this.waitingForTarget];
-        if (!waiting.includes(this.input.hoveredTarget)) return;
+        if (!waiting.includes(this.input.hoveredTarget)) return null;
 
         const hoverId = this.input.hoveredTarget;
-        const scene = this.currentScene;
-        if (!scene) return;
+        if (!scene) return null;
 
-        const glowColor = scene.glowColor || null;
-        const glowAlpha = scene.glowAlpha || null;
         const glowInfo = this._findGlowSource(hoverId, scene);
         if (glowInfo) {
-            this.renderer.drawSilhouetteGlow(
-                glowInfo.img, glowInfo.x, glowInfo.y,
-                glowInfo.scale, glowInfo.anchorX, glowInfo.anchorY, glowInfo.flipX, glowColor, glowAlpha
-            );
-        } else {
-            const targets = this.input._hitTargets || [];
-            const target = targets.find(t => t.id === hoverId);
-            if (target) {
-                this.renderer.drawHoverGlow(target.x, target.y, target.width, target.height, glowColor, glowAlpha);
-            }
+            const src = scene.characters?.find(c => c.id === hoverId) || scene.objects?.find(o => o.id === hoverId);
+            return { img: glowInfo.img, x: glowInfo.x, y: glowInfo.y, scale: glowInfo.scale, anchorX: glowInfo.anchorX, anchorY: glowInfo.anchorY, flipX: glowInfo.flipX, zIndex: src?.zIndex || 1 };
         }
+
+        const targets = this.input._hitTargets || [];
+        const target = targets.find(t => t.id === hoverId);
+        if (target) {
+            const src = scene.characters?.find(c => c.id === hoverId) || scene.objects?.find(o => o.id === hoverId);
+            return { rect: target, y: target.y, zIndex: src?.zIndex || 1 };
+        }
+
+        return null;
     }
 
     _findGlowSource(hoverId, scene) {
@@ -931,12 +968,13 @@ class SceneManager {
 
             if (cycling) {
                 this._nightFade = 0;
+                this._nightWipeMode = true;
                 const holdDayPct = 0.15;
                 const dayToNightPct = 0.25;
                 const holdNightPct = 0.20;
                 const nightToDayPct = 0.25;
 
-                cycleRAF = requestAnimationFrame(function animateCycle(now) {
+                const animateCycle = (now) => {
                     if (!cycling) return;
                     const p = ((now - cycleStart) / cycleDuration) % 1;
 
@@ -953,7 +991,8 @@ class SceneManager {
                     }
 
                     cycleRAF = requestAnimationFrame(animateCycle);
-                }.bind(this));
+                };
+                cycleRAF = requestAnimationFrame(animateCycle);
             }
 
             setTimeout(() => {
@@ -964,6 +1003,7 @@ class SceneManager {
             const onClick = () => {
                 document.removeEventListener('click', onClick);
                 cycling = false;
+                this._nightWipeMode = false;
                 if (cycleRAF) cancelAnimationFrame(cycleRAF);
 
                 el.classList.remove('visible');

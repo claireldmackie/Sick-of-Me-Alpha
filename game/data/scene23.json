@@ -12,7 +12,7 @@
             "visible": true,
             "interactive": false,
             "zIndex": 2,
-            "filter": "brightness(0.78) sepia(0.12) hue-rotate(210deg) saturate(1.15)"
+            "filter": "brightness(0.82) sepia(0.06) hue-rotate(210deg) saturate(0.7)"
         }
     ],
     "objects": [

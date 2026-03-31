@@ -11,20 +11,22 @@
             "y": 1020,
             "visible": true,
             "interactive": false,
-            "zIndex": 2,
+            "zIndex": 5,
             "filter": "brightness(0.95)"
+        },
+        {
+            "id": "lady",
+            "image": "assets/characters/lady.png",
+            "x": 1230,
+            "y": 605,
+            "scale": 0.30,
+            "visible": true,
+            "interactive": true,
+            "zIndex": 3,
+            "hitbox": { "x": 830, "y": 250, "width": 260, "height": 520 }
         }
     ],
     "objects": [
-        {
-            "id": "lady",
-            "type": "hotspot",
-            "x": 900,
-            "y": 400,
-            "width": 250,
-            "height": 500,
-            "interactive": true
-        },
         {
             "id": "next-arrow",
             "type": "arrow",

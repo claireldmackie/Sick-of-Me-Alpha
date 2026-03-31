@@ -12,19 +12,21 @@
             "visible": true,
             "interactive": false,
             "zIndex": 2,
-            "filter": "brightness(0.72) sepia(0.15) hue-rotate(210deg) saturate(1.2)"
+            "filter": "brightness(0.48) sepia(0.12) hue-rotate(210deg) saturate(0.5)"
+        },
+        {
+            "id": "tree-creatures",
+            "image": "assets/characters/tree-people.png",
+            "x": 1060,
+            "y": 1080,
+            "scale": 1.0,
+            "visible": true,
+            "interactive": true,
+            "zIndex": 3,
+            "hitbox": { "x": 850, "y": 50, "width": 500, "height": 420 }
         }
     ],
     "objects": [
-        {
-            "id": "tree-creatures",
-            "type": "hotspot",
-            "x": 800,
-            "y": 200,
-            "width": 400,
-            "height": 300,
-            "interactive": true
-        },
         {
             "id": "next-arrow",
             "type": "arrow",

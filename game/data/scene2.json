@@ -24,6 +24,7 @@
             "visible": true,
             "interactive": true,
             "zIndex": 4,
+            "filter": "brightness(0.5) sepia(0.7) hue-rotate(185deg) saturate(2.0)",
             "hitbox": { "x": 1200, "y": 460, "width": 420, "height": 500 }
         }
     ],
@@ -31,10 +32,10 @@
         {
             "id": "chair",
             "image": "assets/objects/chair.png",
-            "x": 1160,
+            "x": 1170,
             "y": 480,
-            "scale": 1.0,
-            "brightness": 0.4,
+            "scale": 1.03,
+            "filter": "brightness(0.5) sepia(0.7) hue-rotate(185deg) saturate(2.0)",
             "interactive": false,
             "zIndex": 3
         },
