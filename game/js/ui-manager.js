@@ -57,6 +57,9 @@ class UIManager {
         this.btnCancelAction = document.getElementById('btn-cancel-action');
         this.btnSaveBack = document.getElementById('save-back-btn');
         this.btnSaveQuit = document.getElementById('btn-save-quit');
+        this.saveSelectedActions = document.getElementById('save-selected-actions');
+        this.btnSaveSelectedDelete = document.getElementById('btn-save-selected-delete');
+        this.btnSaveSelectedSave = document.getElementById('btn-save-selected-save');
 
         this.confirmMessage = document.getElementById('confirm-message');
         this.btnConfirmYes = document.getElementById('btn-confirm-yes');
@@ -141,6 +144,9 @@ class UIManager {
         this.btnStartGame.addEventListener('click', () => this._loadPanelStart());
         this.btnCancelAction.addEventListener('click', () => this.cancelSpecialMode());
         this.confirmDialog.querySelector('.close-btn').addEventListener('click', () => this.hideConfirm());
+
+        this.btnSaveSelectedSave.addEventListener('click', () => this._saveSelectedOverwrite());
+        this.btnSaveSelectedDelete.addEventListener('click', () => this._saveSelectedDelete());
     }
 
     _bindLetterEvents() {
@@ -228,6 +234,7 @@ class UIManager {
         this.saveActions.classList.toggle('hidden', mode !== 'save');
         this.loadActions.classList.toggle('hidden', mode !== 'load');
         this.saveActionsCancel.classList.add('hidden');
+        this.saveSelectedActions.classList.add('hidden');
         this.btnSaveQuit.classList.add('hidden');
         this._updateLoadActions();
 
@@ -239,6 +246,7 @@ class UIManager {
     hideSavePanel() {
         this.savePanel.classList.add('hidden');
         this.loadActions.classList.add('hidden');
+        this.saveSelectedActions.classList.add('hidden');
         this._syncInputBlock();
         this.panelMode = null;
         this.selectedSlot = null;
@@ -264,6 +272,7 @@ class UIManager {
             }
 
             slot.classList.toggle('selected', this.selectedSlot === i);
+            slot.classList.toggle('has-data', !!data);
         });
     }
 
@@ -288,7 +297,18 @@ class UIManager {
     _handleSlotSave(index) {
         const existing = this.saveManager.load(index);
         if (existing) {
-            this.showConfirm('Are you sure you want\nto overwrite this save?', () => {
+            if (this.selectedSlot === index) {
+                this.selectedSlot = null;
+                this.saveSelectedActions.classList.add('hidden');
+                this.saveActions.classList.remove('hidden');
+            } else {
+                this.selectedSlot = index;
+                this.saveActions.classList.add('hidden');
+                this.saveSelectedActions.classList.remove('hidden');
+            }
+            this.updateSaveSlotDisplay();
+        } else {
+            this.showConfirm('Would you like to save\nyour game here?', () => {
                 this.hideConfirm();
                 if (this.onSaveGame) this.onSaveGame(index);
                 this._savedSinceLoad = true;
@@ -297,12 +317,39 @@ class UIManager {
             }, () => {
                 this.hideConfirm();
             });
-        } else {
+        }
+    }
+
+    _saveSelectedOverwrite() {
+        if (this.selectedSlot === null) return;
+        const index = this.selectedSlot;
+        this.showConfirm('Are you sure you want\nto overwrite this save?', () => {
+            this.hideConfirm();
             if (this.onSaveGame) this.onSaveGame(index);
             this._savedSinceLoad = true;
+            this.selectedSlot = null;
+            this.saveSelectedActions.classList.add('hidden');
+            this.saveActions.classList.remove('hidden');
             this.updateSaveSlotDisplay();
             this.btnSaveQuit.classList.remove('hidden');
-        }
+        }, () => {
+            this.hideConfirm();
+        });
+    }
+
+    _saveSelectedDelete() {
+        if (this.selectedSlot === null) return;
+        const index = this.selectedSlot;
+        this.showConfirm('Are you sure you want\nto delete this save?', () => {
+            this.hideConfirm();
+            this.saveManager.delete(index);
+            this.selectedSlot = null;
+            this.saveSelectedActions.classList.add('hidden');
+            this.saveActions.classList.remove('hidden');
+            this.updateSaveSlotDisplay();
+        }, () => {
+            this.hideConfirm();
+        });
     }
 
     _handleSlotCopySource(index) {
@@ -369,6 +416,7 @@ class UIManager {
         this.saveTitleText.textContent = 'Select a file to delete';
         this.saveTitleText.classList.remove('hidden');
         this.saveActions.classList.add('hidden');
+        this.saveSelectedActions.classList.add('hidden');
         this.saveActionsCancel.classList.remove('hidden');
         this.updateSaveSlotDisplay();
     }
@@ -382,6 +430,7 @@ class UIManager {
         this.saveActions.classList.remove('hidden');
         this.loadActions.classList.add('hidden');
         this.saveActionsCancel.classList.add('hidden');
+        this.saveSelectedActions.classList.add('hidden');
         this.updateSaveSlotDisplay();
     }
 

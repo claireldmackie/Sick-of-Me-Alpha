@@ -40,6 +40,7 @@
     "sequence": [
         { "type": "waitForClick", "target": "clinic" },
         { "type": "dialogue", "speaker": "Hero", "text": "When did the clinic shut down?" },
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
         { "type": "showObject", "target": "next-arrow" },
         { "type": "waitForClick", "target": "next-arrow" },
         { "type": "transition" }

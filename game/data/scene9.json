@@ -48,8 +48,9 @@
         }
     ],
     "sequence": [
+        { "type": "dialogue", "speaker": "Hero", "text": "I've never seen him before, I thought I knew everyone in this town." },
         { "type": "waitForClick", "target": "backpack" },
-        { "type": "dialogue", "speaker": "Hero", "text": "I'm scared to know what's in there." },
+        { "type": "dialogue", "speaker": "Hero", "text": "Huh... looks familiar." },
         { "type": "waitForClick", "target": "jeff" },
         { "type": "dialogue", "speaker": "Jeff", "text": "I'm waiting for the bus..." },
         { "type": "dialogue", "speaker": "Hero", "text": "I can see that." },

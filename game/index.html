@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Reenie+Beanie&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=3">
+    <link rel="stylesheet" href="css/style.css?v=10">
 </head>
 <body>
     <div id="game-container">
@@ -28,29 +28,14 @@
         <!-- In-Game HUD -->
         <div id="hud" class="hidden">
             <button id="hud-hamburger" class="hud-icon" title="Menu">
-                <svg viewBox="0 0 30 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-                    <line x1="2" y1="4" x2="28" y2="4"/>
-                    <line x1="2" y1="12" x2="28" y2="12"/>
-                    <line x1="2" y1="20" x2="28" y2="20"/>
-                </svg>
+                <img src="assets/ui/menu-icon.png" alt="Menu">
             </button>
             <button id="hud-volume" class="hud-icon" title="Mute / Unmute">
-                <svg id="vol-icon-on" viewBox="-1 -1 36 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 12v8h6l8 8V4l-8 8H4z"/>
-                    <path d="M24 10a6 6 0 0 1 0 12"/>
-                    <path d="M27 6a11 11 0 0 1 0 20"/>
-                </svg>
-                <svg id="vol-icon-off" class="hidden" viewBox="-1 -1 36 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 12v8h6l8 8V4l-8 8H4z"/>
-                    <line x1="23" y1="12" x2="30" y2="20"/>
-                    <line x1="30" y1="12" x2="23" y2="20"/>
-                </svg>
+                <img id="vol-icon-on" src="assets/ui/vol-on.png" alt="Volume On">
+                <img id="vol-icon-off" class="hidden" src="assets/ui/vol-mute.png" alt="Volume Muted">
             </button>
             <button id="hud-envelope" class="hud-icon" title="Letters">
-                <svg viewBox="0 0 32 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="1" y="1" width="30" height="22" rx="2"/>
-                    <polyline points="1,1 16,14 31,1"/>
-                </svg>
+                <img src="assets/ui/letter-icon.png" alt="Letters">
                 <span id="letter-badge" class="hidden">0</span>
             </button>
         </div>
@@ -106,6 +91,10 @@
                     <div class="save-actions hidden" id="save-actions-cancel">
                         <button id="btn-cancel-action" class="text-btn">Cancel</button>
                     </div>
+                    <div class="save-actions hidden" id="save-selected-actions">
+                        <button id="btn-save-selected-delete" class="text-btn">Delete</button>
+                        <button id="btn-save-selected-save" class="text-btn">Save</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -148,8 +137,9 @@
 
         <!-- Tutorial Prompt (move right) -->
         <div id="tutorial-move" class="hidden">
-            <span>Use the arrow keys to move to the next room &rarr;</span>
+            <span>Move to the right of the screen to progress &rarr;</span>
         </div>
+        <div id="edge-glow-right" class="hidden"></div>
 
         <!-- Hidden video for phone screen playback -->
         <video id="phone-video" muted playsinline style="display:none;"></video>
@@ -179,10 +169,18 @@
             <span id="dialogue-speaker"></span>
             <p id="dialogue-text"></p>
             <button id="skip-btn" title="Skip dialogue (dev only)">Skip &gt;&gt;</button>
+            <div id="dialogue-nav" class="hidden">
+                <button id="dialogue-prev" class="dialogue-nav-btn"><img src="assets/ui/arrow-left.png" alt="Previous"></button>
+                <button id="dialogue-next" class="dialogue-nav-btn"><img src="assets/ui/arrow-right.png" alt="Next"></button>
+            </div>
         </div>
 
         <div id="narration-box" class="hidden">
             <p id="narration-text"></p>
+            <div id="narration-nav" class="dialogue-nav hidden">
+                <button id="narration-prev" class="dialogue-nav-btn"><img src="assets/ui/arrow-left.png" alt="Previous"></button>
+                <button id="narration-next" class="dialogue-nav-btn"><img src="assets/ui/arrow-right.png" alt="Next"></button>
+            </div>
         </div>
 
         <div id="closeup-overlay" class="hidden">
@@ -190,6 +188,10 @@
             <div id="closeup-dialogue-box" class="hidden">
                 <span id="closeup-speaker"></span>
                 <p id="closeup-text"></p>
+                <div id="closeup-dialogue-nav" class="dialogue-nav hidden">
+                    <button id="closeup-prev" class="dialogue-nav-btn"><img src="assets/ui/arrow-left.png" alt="Previous"></button>
+                    <button id="closeup-next" class="dialogue-nav-btn"><img src="assets/ui/arrow-right.png" alt="Next"></button>
+                </div>
             </div>
         </div>
 
@@ -216,8 +218,8 @@
     <script src="js/dialogue.js?v=2"></script>
     <script src="js/save-manager.js?v=2"></script>
     <script src="js/letter-manager.js?v=2"></script>
-    <script src="js/scene-manager.js?v=2"></script>
-    <script src="js/ui-manager.js?v=2"></script>
+    <script src="js/scene-manager.js?v=11"></script>
+    <script src="js/ui-manager.js?v=5"></script>
     <script src="js/main.js?v=2"></script>
 </body>
 </html>

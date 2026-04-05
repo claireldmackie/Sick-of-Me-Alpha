@@ -72,7 +72,7 @@
         { "type": "dialogue", "speaker": "Hero", "text": "..." },
         { "type": "dialogue", "speaker": "Hero", "text": "So many god damn letters." },
         { "type": "dialogue", "speaker": "Hero", "text": "..." },
-        { "type": "dialogue", "speaker": "Hero", "text": "I guess I should go to the store." },
+        { "type": "dialogue", "speaker": "Hero", "text": "I should go to the store and get something for Cara." },
         { "type": "hideObject", "target": "mailbox-letters" },
         { "type": "showObject", "target": "next-arrow" },
         { "type": "waitForClick", "target": "next-arrow" },

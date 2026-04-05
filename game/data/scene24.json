@@ -17,6 +17,16 @@
     ],
     "objects": [
         {
+            "id": "animal",
+            "type": "hotspot",
+            "x": 600,
+            "y": 200,
+            "width": 500,
+            "height": 400,
+            "visible": true,
+            "interactive": true
+        },
+        {
             "id": "next-arrow",
             "type": "arrow",
             "x": 1905,
@@ -24,12 +34,15 @@
             "direction": "right",
             "size": 15,
             "color": "rgba(0, 0, 0, 0)",
-            "visible": true,
-            "interactive": true,
+            "visible": false,
+            "interactive": false,
             "zIndex": 10
         }
     ],
     "sequence": [
+        { "type": "waitForClick", "target": "animal" },
+        { "type": "dialogue", "speaker": "Hero", "text": "Creepy... it feels like everything's watching me." },
+        { "type": "showObject", "target": "next-arrow" },
         { "type": "waitForClick", "target": "next-arrow" },
         { "type": "transition" }
     ]

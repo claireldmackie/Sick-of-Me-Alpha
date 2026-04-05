@@ -51,13 +51,14 @@
         { "type": "dialogue", "speaker": "Hero", "text": "These are for you... It's your favourite flavour." },
         { "type": "showObject", "target": "basket" },
         { "type": "waitForClick", "target": "basket" },
-        { "type": "dialogue", "speaker": "Hero", "text": "Everyone in town left stuff here for me while I was gone..." },
+        { "type": "dialogue", "speaker": "Hero", "text": "There's a note here..." },
+        { "type": "dialogue", "speaker": "", "text": "Hero, I figured you'd come visit eventually, I thought I'd leave you some stuff to keep you comfortable. Heavens, I can only imagine how hard this is for you. Your neighbour, Erma" },
+        { "type": "dialogue", "speaker": "Hero", "text": "..." },
         { "type": "showObject", "target": "grave-letter" },
         { "type": "waitForClick", "target": "grave-letter" },
         { "type": "dialogue", "speaker": "Hero", "text": "I wrote a letter for you..." },
         { "type": "collectLetter", "letterId": "letter-hero" },
-        { "type": "dialogue", "speaker": "Hero", "text": "I wrote you a letter explaining how I feel, but now it all feels wrong." },
-        { "type": "dialogue", "speaker": "Hero", "text": "It's different when I'm sitting here, I have to face the fact that you're really gone." },
+        { "type": "dialogue", "speaker": "Hero", "text": "I wrote you a letter explaining how I feel... It feels different reading it now that I'm sitting here." },
 
         {
             "type": "dialogueOptions",
@@ -66,7 +67,7 @@
             "options": [
                 { "id": "guilty", "label": "Guilty...", "followUp": "Sitting by your grave now that you're gone. I should have been there for you more while you were here.", "category": "connect" },
                 { "id": "helpless", "label": "Helpless...", "followUp": "You're gone and there is nothing I can do to change that. Everything feels so out of my control.", "category": "leave" },
-                { "id": "angry", "label": "Angry...", "followUp": "You knew you were sick and you acted like everything was fine. I wish you took it more seriously.", "category": "reflect" }
+                { "id": "angry", "label": "Angry...", "followUp": "You knew you were sick and you acted like everything was fine. I felt like you weren't taking it seriously.", "category": "reflect" }
             ]
         },
 
@@ -88,7 +89,7 @@
             "options": [
                 { "id": "blame-me", "label": "Would blame me...", "followUp": "I left for so long. I wasn't there to help you and I wasn't there to help them move on.", "category": "leave" },
                 { "id": "pity-me", "label": "Would pity me...", "followUp": "I don't need that. I don't want people to look at me differently.", "category": "reflect" },
-                { "id": "move-on", "label": "Would move on...", "followUp": "I felt so stuck. I couldn't face the change. It hurt to see the town without you.", "category": "connect" }
+                { "id": "move-on", "label": "Would move on...", "followUp": "I felt so stuck. I couldn't face the change. It hurts to see the town without you.", "category": "connect" }
             ]
         },
 
@@ -108,9 +109,9 @@
             "speaker": "Hero",
             "prompt": "I need to figure out how to live without you. I think the only way I can do that is by...",
             "options": [
-                { "id": "connect-community", "label": "Connecting more with the community...", "followUp": "I'm going to try and move on in your absence. I've learned that life keeps moving even when I can't, and I want to be there for people.", "category": "connect" },
-                { "id": "move-away", "label": "Moving somewhere and keep living...", "followUp": "I need to get out of here. I don't think I can move past anything, living in that house and living without you feels so lonely.", "category": "leave" },
-                { "id": "take-time", "label": "Taking more time to reflect...", "followUp": "Everything feels like too much, I just want to sleep. I feel like everyone's relying on me and I don't know what to do.", "category": "reflect" }
+                { "id": "connect-community", "label": "Connecting more with the Town...", "followUp": "I've learned that life keeps moving even when I can't. I think it's time for me to be a part of the town again, we have to move forward together.", "category": "connect" },
+                { "id": "move-away", "label": "Learning to move on...", "followUp": "It's hard to move past anything while I'm still in this town. Living in that house and living without you feels so lonely.", "category": "leave" },
+                { "id": "take-time", "label": "Taking more time to myself...", "followUp": "Everything feels like too much. I feel like everyone's relying on me and I don't know what to do. I think I need more time alone.", "category": "reflect" }
             ]
         },
 

@@ -39,7 +39,7 @@
     ],
     "sequence": [
         { "type": "waitForClick", "target": "erma" },
-        { "type": "dialogue", "speaker": "Erma", "text": "Today's Tuesday... Tuesdays used to be my favourite day." },
+        { "type": "dialogue", "speaker": "Erma", "text": "Tuesdays used to be my favourite day..." },
         { "type": "dialogue", "speaker": "Hero", "text": "..." },
         { "type": "dialogue", "speaker": "Erma", "text": "The tea might get cold." },
         { "type": "showObject", "target": "next-arrow" },
