@@ -411,7 +411,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(240, 238, 235, 0.95);
+    background: rgba(20, 18, 15, 0.9);
 }
 
 .letter-container {
@@ -830,6 +830,7 @@ html, body {
     color: rgba(255, 255, 255, 0.7);
     background: none;
     border: 1px solid rgba(255, 255, 255, 0.3);
+    margin-top: 6px;
     border-radius: 8px;
     padding: 6px 40px;
     cursor: pointer;
