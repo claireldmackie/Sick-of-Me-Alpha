@@ -50,6 +50,8 @@
     "sequence": [
         { "type": "startMusic", "fadeDuration": 2000 },
         { "type": "panDown", "duration": 6000 },
+        { "type": "nameHero" },
+        { "type": "pause", "duration": 900 },
         { "type": "clickToStart" },
         { "type": "stopMusic", "fadeDuration": 2000 },
         { "type": "dialogue", "speaker": "Hero", "text": "Hhmm..." },

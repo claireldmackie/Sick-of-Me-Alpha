@@ -12,6 +12,7 @@ class InputManager {
         this.container.addEventListener('click', (e) => this.handleClick(e));
         this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
         document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             const key = e.key.toLowerCase();
             e.preventDefault();
             this.keysDown.add(key);
@@ -19,6 +20,7 @@ class InputManager {
             else if (key === 'd' || key === 'arrowright') this.lastHorizontal = 'right';
         });
         document.addEventListener('keyup', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             e.preventDefault();
             this.keysDown.delete(e.key.toLowerCase());
         });

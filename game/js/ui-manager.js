@@ -17,6 +17,7 @@ class UIManager {
         this.onResume = null;
         this.onQuitToMenu = null;
         this._savedSinceLoad = false;
+        this.heroName = 'Hero';
 
         this._bindElements();
         this._bindHomepageEvents();
@@ -40,7 +41,6 @@ class UIManager {
 
         this.btnContinue = document.getElementById('btn-continue');
         this.btnNewGame = document.getElementById('btn-new-game');
-        this.btnQuitHome = document.getElementById('btn-quit-home');
 
         this.btnSave = document.getElementById('btn-save');
         this.btnQuitPause = document.getElementById('btn-quit-pause');
@@ -90,7 +90,6 @@ class UIManager {
             this._savedSinceLoad = false;
             if (this.onNewGame) this.onNewGame();
         });
-        this.btnQuitHome.addEventListener('click', () => this.hideAll());
     }
 
     _bindHudEvents() {
@@ -590,12 +589,17 @@ class UIManager {
         this.updateLetterDisplay();
     }
 
+    _substituteHeroName(str) {
+        if (!str || this.heroName === 'Hero') return str;
+        return str.replace(/\bHero\b/g, this.heroName);
+    }
+
     updateLetterDisplay() {
         const collected = this.letterManager.getCollected();
         const letter = collected[this.currentLetterIndex];
         if (!letter) return;
 
-        this.letterTitle.textContent = letter.title;
+        this.letterTitle.textContent = this._substituteHeroName(letter.title);
         this._applyLetterContent(letter);
         this.btnLetterPrev.classList.toggle('hidden', this.currentLetterIndex <= 0);
         this.btnLetterNext.classList.toggle('hidden', this.currentLetterIndex >= collected.length - 1);
@@ -608,7 +612,7 @@ class UIManager {
             this.letterContent.innerHTML = '';
         } else {
             this.letterContainer.style.backgroundImage = "url('assets/ui/letter-bg.png')";
-            this.letterContent.textContent = letter.content;
+            this.letterContent.textContent = this._substituteHeroName(letter.content);
         }
     }
 

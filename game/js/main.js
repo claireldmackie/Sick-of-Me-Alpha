@@ -82,6 +82,8 @@ class Game {
             this.sceneProgress = {};
             this.browsingCompleted = false;
             this.letterManager.setCollected([]);
+            this.sceneManager.heroName = 'Hero';
+            this.ui.heroName = 'Hero';
             this.loadSceneByIndex(0);
         };
 
@@ -90,6 +92,9 @@ class Game {
             this.letterManager.setCollected(saveData.letters || []);
             this.sceneProgress = saveData.sceneProgress || {};
             this.browsingCompleted = false;
+            const heroName = saveData.heroName || 'Hero';
+            this.sceneManager.heroName = heroName;
+            this.ui.heroName = heroName;
             this._syncMusic(saveData.sceneIndex);
             this.loadSceneByIndex(saveData.sceneIndex, saveData.sequenceIndex);
         };
@@ -102,7 +107,8 @@ class Game {
                 sequenceIndex: state.sequenceIndex,
                 sceneName: this.sceneNames[this.currentSceneIndex] || '',
                 letters: this.letterManager.getCollectedIds(),
-                sceneProgress: this.sceneProgress
+                sceneProgress: this.sceneProgress,
+                heroName: this.sceneManager.heroName || 'Hero'
             });
             this.activeSlot = slotIndex;
         };

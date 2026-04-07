@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Reenie+Beanie&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/style.css?v=20">
 </head>
 <body>
     <div id="game-container">
@@ -21,7 +21,6 @@
             <div class="homepage-menu">
                 <button id="btn-continue" class="ui-btn hidden"><span>Load Game</span></button>
                 <button id="btn-new-game" class="ui-btn-text">New Game</button>
-                <button id="btn-quit-home" class="ui-btn-text">Quit</button>
             </div>
         </div>
 
@@ -144,6 +143,13 @@
         <!-- Hidden video for phone screen playback -->
         <video id="phone-video" muted playsinline style="display:none;"></video>
 
+        <!-- Name Your Hero Prompt -->
+        <div id="name-hero-prompt" class="hidden">
+            <p>Name your hero</p>
+            <input type="text" id="hero-name-input" maxlength="20" placeholder="Hero">
+            <button id="hero-name-confirm">Confirm</button>
+        </div>
+
         <!-- Click to Start Prompt -->
         <div id="click-to-start" class="hidden">
             <span>Click to Start</span>
@@ -214,12 +220,12 @@
     <script src="js/constants.js?v=1"></script>
     <script src="js/audio-manager.js?v=1"></script>
     <script src="js/engine.js?v=1"></script>
-    <script src="js/input.js?v=2"></script>
+    <script src="js/input.js?v=3"></script>
     <script src="js/dialogue.js?v=2"></script>
-    <script src="js/save-manager.js?v=2"></script>
+    <script src="js/save-manager.js?v=3"></script>
     <script src="js/letter-manager.js?v=2"></script>
-    <script src="js/scene-manager.js?v=11"></script>
-    <script src="js/ui-manager.js?v=5"></script>
-    <script src="js/main.js?v=2"></script>
+    <script src="js/scene-manager.js?v=12"></script>
+    <script src="js/ui-manager.js?v=7"></script>
+    <script src="js/main.js?v=3"></script>
 </body>
 </html>

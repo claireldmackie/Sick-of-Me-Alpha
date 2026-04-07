@@ -10,7 +10,8 @@ class SaveManager {
             sceneName: data.sceneName || '',
             timestamp: Date.now(),
             letters: data.letters || [],
-            sceneProgress: data.sceneProgress || {}
+            sceneProgress: data.sceneProgress || {},
+            heroName: data.heroName || 'Hero'
         };
         localStorage.setItem(this.prefix + slotIndex, JSON.stringify(saveData));
     }

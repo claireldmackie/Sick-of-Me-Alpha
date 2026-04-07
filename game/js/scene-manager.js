@@ -32,6 +32,7 @@ class SceneManager {
         this._dialogueHistory = [];
         this._originalCharacters = [];
         this._originalObjects = [];
+        this.heroName = 'Hero';
 
         this._initStepHandlers();
 
@@ -54,7 +55,7 @@ class SceneManager {
     _initStepHandlers() {
         this._stepHandlers = {
             dialogue: (step) => this._handleDialogue(step),
-            showDialogueBox: (step) => { this._hideDialogueNav(); this.dialogue.show(step.speaker, step.text); },
+            showDialogueBox: (step) => { this._hideDialogueNav(); this.dialogue.show(this._substituteHeroName(step.speaker), this._substituteHeroName(step.text)); },
             hideDialogueBox: () => this.dialogue.hide(),
             narration: (step) => this._handleNarration(step),
             waitForClick: (step) => this._handleWaitForClick(step),
@@ -82,6 +83,7 @@ class SceneManager {
             showBgOverlay: (step) => this._handleShowBgOverlay(step),
             hideBgOverlay: () => this._handleHideBgOverlay(),
             panDown: (step) => this._handlePanDown(step),
+            nameHero: () => this._handleNameHero(),
             clickToStart: () => this._handleClickToStart(),
             playPhoneVideo: (step) => this._handlePlayPhoneVideo(step),
             hidePhoneVideo: () => this._handleHidePhoneVideo(),
@@ -134,7 +136,7 @@ class SceneManager {
         this.dialogue.hide();
         this.dialogue.hideCloseup?.();
 
-        const ids = ['click-to-start', 'tutorial-interact', 'tutorial-move', 'tutorial-prompt', 'edge-glow-right'];
+        const ids = ['click-to-start', 'tutorial-interact', 'tutorial-move', 'tutorial-prompt', 'edge-glow-right', 'name-hero-prompt'];
         for (const id of ids) {
             const el = document.getElementById(id);
             if (el) {
@@ -714,7 +716,7 @@ class SceneManager {
         this._dialogueHistory.push({ index: this.sequenceIndex, step });
         const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
         this.showSkipButton(remaining >= 3);
-        this.dialogue.show(step.speaker, step.text);
+        this.dialogue.show(this._substituteHeroName(step.speaker), this._substituteHeroName(step.text));
         this._showDialogueNav();
         const action = await this.waitForDialogueNav();
         this.dialogue.hide();
@@ -730,7 +732,7 @@ class SceneManager {
         this._dialogueHistory.push({ index: this.sequenceIndex, step });
         const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
         this.showSkipButton(remaining >= 3);
-        this.dialogue.showNarrationText(step.text);
+        this.dialogue.showNarrationText(this._substituteHeroName(step.text));
         this._showDialogueNav();
         const action = await this.waitForDialogueNav();
         this.dialogue.hide();
@@ -813,7 +815,7 @@ class SceneManager {
         this._dialogueHistory.push({ index: this.sequenceIndex, step });
         const remaining = this.countConsecutiveDialogueSteps(this.sequenceIndex);
         this.showSkipButton(remaining >= 3);
-        this.dialogue.showCloseupText(step.speaker, step.text, step.html);
+        this.dialogue.showCloseupText(this._substituteHeroName(step.speaker), this._substituteHeroName(step.text), step.html);
         this._showDialogueNav();
         const action = await this.waitForDialogueNav();
         this.dialogue.hide();
@@ -966,6 +968,49 @@ class SceneManager {
             this._bgOverlayOpacity = 0;
             this.render();
         }
+    }
+
+    _substituteHeroName(str) {
+        if (!str || this.heroName === 'Hero') return str;
+        return str.replace(/\bHero\b/g, this.heroName);
+    }
+
+    _handleNameHero() {
+        return new Promise(resolve => {
+            const el = document.getElementById('name-hero-prompt');
+            const input = document.getElementById('hero-name-input');
+            const btn = document.getElementById('hero-name-confirm');
+            if (!el || !input || !btn) { resolve(); return; }
+
+            el.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                el.classList.add('visible');
+                input.focus();
+            });
+
+            const confirm = () => {
+                btn.removeEventListener('click', confirm);
+                input.removeEventListener('keydown', onKey);
+                const name = input.value.trim() || 'Hero';
+                this.heroName = name;
+                if (this.uiManager) this.uiManager.heroName = name;
+
+                el.classList.remove('visible');
+                el.classList.add('fading-out');
+                setTimeout(() => {
+                    el.classList.add('hidden');
+                    el.classList.remove('fading-out');
+                    resolve();
+                }, 800);
+            };
+
+            const onKey = (e) => {
+                if (e.key === 'Enter') confirm();
+            };
+
+            btn.addEventListener('click', confirm);
+            input.addEventListener('keydown', onKey);
+        });
     }
 
     _handlePanDown(step) {
