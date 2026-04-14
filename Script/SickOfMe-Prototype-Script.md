@@ -1,6 +1,6 @@
 # SICK OF ME -- Prototype Script
 
-> **Last Updated:** March 11, 2026
+> **Last Updated:** April 13, 2026
 > This document reflects the current state of the game prototype as built in code.
 > It is the source of truth for scene flow, dialogue, interactions, and branching.
 
@@ -615,9 +615,8 @@ Scene 1 (Bedroom)
 5. **Hero:** "Thank you."
 6. **Calvin:** "Found suh-some old photos \*urppp\* in my house..."
 7. **Calvin:** "Take a look."
-8. *[Close-up appears (no image)]*
-9. *[Close-up text: "Faded photos of two young men laughing."]*
-10. *[Close-up hides]*
+8. *[Close-up appears showing Calvin photos image (calvin-photos.png), X button to close]*
+9. *[Close-up hides after player clicks X]*
 11. **Calvin:** "It's me and an old friend of m-mine..."
 12. **Calvin:** "That's what I looked like back in the day"
 13. **Hero:** "..."

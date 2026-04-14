@@ -187,7 +187,7 @@ class SceneManager {
         if (sceneData.closeupImage) sources.push(sceneData.closeupImage);
         if (sceneData.sequence) {
             for (const step of sceneData.sequence) {
-                if ((step.type === 'setCharacterImage' || step.type === 'showBgOverlay') && step.image) {
+                if ((step.type === 'setCharacterImage' || step.type === 'showBgOverlay' || step.type === 'closeup') && step.image) {
                     sources.push(step.image);
                 }
             }
@@ -807,8 +807,11 @@ class SceneManager {
         this.render();
     }
 
-    _handleCloseup(step) {
-        this.dialogue.showCloseup(step.image || null);
+    async _handleCloseup(step) {
+        this.dialogue.showCloseup(step.image || null, !!step.waitForClose);
+        if (step.waitForClose) {
+            await this.dialogue.waitForCloseupClose();
+        }
     }
 
     async _handleCloseupDialogue(step) {

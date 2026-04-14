@@ -192,9 +192,9 @@ class Game {
             lastTime = now;
 
             if (!this.sceneManager.currentScene) return;
-            this.sceneManager.render();
             if (this._transitioning) return;
             if (this.sceneManager.fading) return;
+            this.sceneManager.render();
             if (this.input.blocked) return;
             const hero = this.sceneManager.currentScene.characters?.find(c => c.id === 'hero');
             if (!hero || hero.visible === false) return;

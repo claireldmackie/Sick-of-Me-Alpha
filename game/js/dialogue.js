@@ -10,6 +10,7 @@ class DialogueManager {
         this.closeupDialogueBox = document.getElementById('closeup-dialogue-box');
         this.closeupSpeaker = document.getElementById('closeup-speaker');
         this.closeupText = document.getElementById('closeup-text');
+        this.closeupCloseBtn = document.getElementById('closeup-close-btn');
 
         this.isShowing = false;
         this.isCloseup = false;
@@ -28,15 +29,31 @@ class DialogueManager {
         this.isShowing = true;
     }
 
-    showCloseup(imageUrl) {
-        this.closeupContent.innerHTML = '';
+    showCloseup(imageUrl, showCloseBtn) {
+        const existing = this.closeupContent.querySelector('img:not(.close-btn img)');
+        if (existing) existing.remove();
         if (imageUrl) {
             const img = document.createElement('img');
             img.src = imageUrl;
             this.closeupContent.appendChild(img);
         }
+        if (showCloseBtn) {
+            this.closeupCloseBtn.classList.remove('hidden');
+        } else {
+            this.closeupCloseBtn.classList.add('hidden');
+        }
         this.closeupOverlay.classList.remove('hidden');
         this.isCloseup = true;
+    }
+
+    waitForCloseupClose() {
+        return new Promise((resolve) => {
+            const handler = () => {
+                this.closeupCloseBtn.removeEventListener('click', handler);
+                resolve();
+            };
+            this.closeupCloseBtn.addEventListener('click', handler);
+        });
     }
 
     showCloseupText(speaker, text, useHtml) {
@@ -53,6 +70,7 @@ class DialogueManager {
     hideCloseup() {
         this.closeupOverlay.classList.add('hidden');
         this.closeupDialogueBox.classList.add('hidden');
+        this.closeupCloseBtn.classList.add('hidden');
         this.isCloseup = false;
     }
 
